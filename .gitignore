@@ -1,0 +1,36 @@
+# Node.js
+node_modules/
+npm-debug.log
+package-lock.json
+.npm
+
+# CleanMac output files
+cleanmac_*.log
+cleanmac_*.html
+dryrun_report_*.txt
+disk_analysis_*.txt
+large_files_*.txt
+unused_apps_*.txt
+duplicates_*.txt
+config_backup_*/
+.cleanmac_temp.sh
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Thumbnails
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local

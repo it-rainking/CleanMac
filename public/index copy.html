@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CleanMac Web Interface v1.0</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🧹 CleanMac Web Interface</h1>
+                <p>Gestione pulizia e manutenzione macOS</p>
+                <div class="status-indicator" id="statusIndicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Server Ready</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Control Panel -->
+            <section class="control-panel">
+                <h2>🎮 Pannello di Controllo</h2>
+
+                <div class="mode-selector">
+                    <label class="mode-option">
+                        <input type="radio" name="mode" value="dryrun" checked>
+                        <div class="mode-card">
+                            <div class="mode-icon">🔍</div>
+                            <div class="mode-title">Dry Run</div>
+                            <div class="mode-description">Analizza spazio senza eliminare</div>
+                        </div>
+                    </label>
+
+                    <label class="mode-option">
+                        <input type="radio" name="mode" value="cleanup">
+                        <div class="mode-card warning">
+                            <div class="mode-icon">⚠️</div>
+                            <div class="mode-title">Pulizia Diretta</div>
+                            <div class="mode-description">Elimina file trovati</div>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="actions">
+                    <button id="startBtn" class="btn btn-primary">
+                        <span class="btn-icon">▶️</span>
+                        Avvia Scansione
+                    </button>
+                    <button id="stopBtn" class="btn btn-danger" disabled>
+                        <span class="btn-icon">⏹️</span>
+                        Interrompi
+                    </button>
+                </div>
+
+                <div class="info-box">
+                    <h3>ℹ️ Informazioni</h3>
+                    <p>
+                        <strong>Dry Run:</strong> Analizza il sistema e mostra quanto spazio può essere liberato senza eliminare nulla.<br>
+                        <strong>Pulizia Diretta:</strong> Esegue effettivamente l'eliminazione dei file. <em>Usa con attenzione!</em>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Live Output -->
+            <section class="output-section">
+                <div class="output-header">
+                    <h2>📝 Output Live</h2>
+                    <button id="clearLogBtn" class="btn btn-small">Pulisci</button>
+                </div>
+
+                <div class="output-container">
+                    <div id="outputLog" class="output-log">
+                        <div class="log-entry log-info">
+                            <span class="log-time">[--:--:--]</span>
+                            <span class="log-message">In attesa di avviare la scansione...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Elaborazione in corso...</div>
+                </div>
+            </section>
+
+            <!-- Statistics -->
+            <section class="stats-section">
+                <h2>📊 Statistiche</h2>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">💾</div>
+                        <div class="stat-value" id="spaceSaved">0 MB</div>
+                        <div class="stat-label">Spazio Liberato/Analizzato</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-value" id="executionTime">--:--</div>
+                        <div class="stat-label">Tempo di Esecuzione</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-value" id="operationsCount">0</div>
+                        <div class="stat-label">Operazioni Completate</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">🗂️</div>
+                        <div class="stat-value" id="filesProcessed">0</div>
+                        <div class="stat-label">File Processati</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports History -->
+            <section class="reports-section">
+                <div class="section-header">
+                    <h2>📄 Cronologia Report</h2>
+                    <button id="refreshReportsBtn" class="btn btn-small">🔄 Aggiorna</button>
+                </div>
+
+                <div id="reportsList" class="reports-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <p>Nessun report disponibile</p>
+                        <small>Esegui una scansione per generare il primo report</small>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>CleanMac Web Interface v1.0 • Powered by Node.js & Socket.IO</p>
+            <p><small>Connected to: <span id="serverUrl">localhost:3000</span></small></p>
+        </footer>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Password Modal -->
+    <div id="passwordModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔐 Autenticazione Richiesta</h3>
+            </div>
+            <div class="modal-body">
+                <p>Alcune operazioni richiedono i permessi di amministratore.</p>
+                <p class="modal-note">Inserisci la password del tuo utente macOS:</p>
+                <div class="input-group">
+                    <input type="password" id="passwordInput" class="password-input" placeholder="Password" autofocus>
+                </div>
+                <div class="modal-error" id="passwordError" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelPasswordBtn" class="btn btn-secondary">Annulla</button>
+                <button id="submitPasswordBtn" class="btn btn-primary">Conferma</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

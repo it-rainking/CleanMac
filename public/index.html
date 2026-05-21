@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CleanMac Web Interface</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="topbar">
+    <div>
+      <h1>CleanMac</h1>
+      <p class="subtitle">Pulizia e manutenzione macOS</p>
+    </div>
+    <div id="statusIndicator" class="status-indicator">
+      <span class="status-dot"></span>
+      <span class="status-text">Sistema pronto</span>
+    </div>
+    <button id="shutdownBtn" class="btn danger" title="Ferma CleanMac e spegni il server">⏻ Spegni tutto</button>
+  </header>
+
+  <!-- MAIN -->
+  <main class="layout">
+
+    <!-- CONTROL FLOW -->
+    <section class="panel">
+      <h2>1. Modalità</h2>
+
+      <div class="mode-selector">
+        <label class="mode-option">
+          <input type="radio" name="mode" value="dryrun" checked>
+          <div class="mode-card">
+            <strong>Dry Run</strong>
+            <span>Analisi senza eliminare file</span>
+          </div>
+        </label>
+
+        <label class="mode-option danger">
+          <input type="radio" name="mode" value="cleanup">
+          <div class="mode-card">
+            <strong>Pulizia Diretta</strong>
+            <span>Eliminazione reale dei file</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="warning-inline">
+        ⚠️ La pulizia diretta è irreversibile.
+      </div>
+
+      <h2>2. Categorie (v4.2)</h2>
+      <div id="categorySelection" class="category-panel">
+        <p class="category-intro">
+          💡 Seleziona quali operazioni eseguire
+        </p>
+
+        <div class="category-checkboxes">
+          <label class="category-checkbox">
+            <input type="checkbox" name="category" value="CLEANUP" checked>
+            <span class="category-content">
+              <span class="category-header">
+                <span class="category-icon">🗑️</span>
+                <span class="category-name">PULIZIA</span>
+                <span class="category-mb" id="cleanup-mb">-- MB</span>
+              </span>
+              <span class="category-desc">Cache, log, file temporanei, trash, mail attachments</span>
+            </span>
+          </label>
+
+          <label class="category-checkbox performance-default">
+            <input type="checkbox" name="category" value="PERFORMANCE" checked>
+            <span class="category-content">
+              <span class="category-header">
+                <span class="category-icon">⚡</span>
+                <span class="category-name">PERFORMANCE</span>
+                <span class="category-badge">Consigliato</span>
+                <span class="category-mb">0 MB</span>
+              </span>
+              <span class="category-desc">RAM, Spotlight, DNS, LaunchServices (non elimina file)</span>
+            </span>
+          </label>
+
+          <label class="category-checkbox">
+            <input type="checkbox" name="category" value="ANALYSIS" checked>
+            <span class="category-content">
+              <span class="category-header">
+                <span class="category-icon">📊</span>
+                <span class="category-name">ANALISI</span>
+                <span class="category-mb">0 MB</span>
+              </span>
+              <span class="category-desc">Report file grandi, duplicati, app non usate, APFS purgeable</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="category-info">
+          <small>
+            <strong>Nota:</strong> UTILITY (backup config) è sempre abilitata.
+            Performance pre-selezionata di default per migliorare velocità.
+          </small>
+        </div>
+      </div>
+
+      <h2>3. Azione</h2>
+      <div class="actions">
+        <button id="startBtn" class="btn primary">Avvia</button>
+        <button id="stopBtn" class="btn danger" disabled>Stop</button>
+      </div>
+
+      <small class="hint">Durata stimata: 2–5 minuti</small>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="panel">
+      <h2>Statistiche</h2>
+
+      <div class="stats-grid">
+        <div class="stat">
+          <span id="spaceSaved">0 MB</span>
+          <label>Spazio liberato</label>
+        </div>
+        <div class="stat">
+          <span id="executionTime">--:--</span>
+          <label>Tempo</label>
+        </div>
+        <div class="stat">
+          <span id="operationsCount">0</span>
+          <label>Operazioni</label>
+        </div>
+        <div class="stat">
+          <span id="filesProcessed">0</span>
+          <label>File</label>
+        </div>
+        <div class="stat">
+          <span id="cacheCleared">0 MB</span>
+          <label>Cache</label>
+        </div>
+      </div>
+
+      <div class="output-header">
+        <h3>Report</h3>
+        <div style="display: flex; gap: 8px;">
+          <button id="refreshReportsBtn" class="btn ghost">Aggiorna</button>
+          <button id="deleteAllReportsBtn" class="btn ghost" style="color: var(--danger);">Elimina Tutti</button>
+        </div>
+      </div>
+      <div id="reportsList" class="reports empty">
+        Nessun report disponibile
+      </div>
+    </section>
+
+  </main>
+
+  <!-- DRY RUN SELECTION PANEL -->
+  <section id="dryrunPanel" class="panel dry-run-panel" style="display:none;">
+    <div class="output-header">
+      <h2>🔍 Risultati Dry Run — Seleziona cosa eliminare</h2>
+      <div style="display:flex;gap:8px;">
+        <button id="selectAllOpsBtn" class="btn ghost small">Seleziona tutti</button>
+        <button id="deselectAllOpsBtn" class="btn ghost small">Deseleziona tutti</button>
+      </div>
+    </div>
+    <p class="dry-run-intro">Seleziona le operazioni da eseguire. Solo gli elementi con spazio &gt; 0 MB sono selezionabili per la pulizia.</p>
+    <div id="opsSelectionList" class="ops-selection-list"></div>
+    <div class="dry-run-footer">
+      <span id="selectedSpaceTotal" class="selected-space">0 MB selezionati</span>
+      <button id="cleanSelectedBtn" class="btn primary" disabled>🧹 Pulisci selezionati</button>
+    </div>
+  </section>
+
+  <!-- INSIGHTS -->
+  <section class="panel insights-panel">
+    <div class="output-header">
+      <h2>📊 Analisi e Insight</h2>
+      <button id="analyzeBtn" class="btn ghost">Analizza Report</button>
+    </div>
+
+    <div id="insightsContent" class="insights-content">
+      <div class="empty-state">
+        <div class="empty-icon">📈</div>
+        <p>Nessuna analisi disponibile</p>
+        <small>Esegui una scansione o clicca "Analizza Report" per vedere statistiche e raccomandazioni</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUTPUT FULL WIDTH -->
+  <section class="panel output-full">
+    <details open>
+      <summary class="output-summary">
+        <span>📟 Output Live</span>
+        <button id="clearLogBtn" class="btn ghost" onclick="event.stopPropagation()">Pulisci</button>
+      </summary>
+
+      <div id="outputLog" class="terminal">
+        <div class="log info">Pronto. Seleziona una modalità.</div>
+      </div>
+
+      <div id="progressContainer" class="progress hidden">
+        <div class="progress-bar">
+          <div id="progressFill"></div>
+        </div>
+        <div id="progressText">Inizializzazione…</div>
+      </div>
+    </details>
+  </section>
+
+</div>
+
+<!-- Toast Notifications -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- Password Modal -->
+<div id="passwordModal" class="modal" style="display: none;">
+  <div class="modal-overlay"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>🔐 Autenticazione Richiesta</h3>
+    </div>
+    <div class="modal-body">
+      <p>Alcune operazioni richiedono i permessi di amministratore.</p>
+      <p class="modal-note">Inserisci la password del tuo utente macOS:</p>
+      <div class="input-group">
+        <input type="password" id="passwordInput" class="password-input" placeholder="Password" autofocus>
+      </div>
+      <div class="modal-error" id="passwordError" style="display: none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button id="cancelPasswordBtn" class="btn ghost">Annulla</button>
+      <button id="submitPasswordBtn" class="btn primary">Conferma</button>
+    </div>
+  </div>
+</div>
+
+<!-- Large Files Modal -->
+<div id="largeFilesModal" class="modal" style="display: none;">
+  <div class="modal-overlay"></div>
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h3>📦 File Grandi</h3>
+      <button class="modal-close" onclick="closeLargeFilesModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-controls">
+        <button id="selectAllFilesBtn" class="btn ghost small">Seleziona Tutti</button>
+        <button id="deselectAllFilesBtn" class="btn ghost small">Deseleziona Tutti</button>
+        <span id="fileSelectionCount" class="selection-count">0 selezionati</span>
+      </div>
+      <div id="largeFilesList" class="file-list">
+        <!-- File list will be populated here -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="closeLargeFilesBtn" class="btn ghost">Chiudi</button>
+      <button id="deleteSelectedFilesBtn" class="btn danger" disabled>Elimina Selezionati</button>
+    </div>
+  </div>
+</div>
+
+<!-- Unused Apps Modal -->
+<div id="unusedAppsModal" class="modal" style="display: none;">
+  <div class="modal-overlay"></div>
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h3>⚠️ App Non Utilizzate</h3>
+      <button class="modal-close" onclick="closeUnusedAppsModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-controls">
+        <button id="selectAllAppsBtn" class="btn ghost small">Seleziona Tutti</button>
+        <button id="deselectAllAppsBtn" class="btn ghost small">Deseleziona Tutti</button>
+        <span id="appSelectionCount" class="selection-count">0 selezionati</span>
+      </div>
+      <div id="unusedAppsList" class="file-list">
+        <!-- App list will be populated here -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="closeUnusedAppsBtn" class="btn ghost">Chiudi</button>
+      <button id="uninstallSelectedAppsBtn" class="btn danger" disabled>Disinstalla Selezionati</button>
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

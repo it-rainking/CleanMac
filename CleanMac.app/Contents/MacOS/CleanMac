@@ -1,0 +1,78 @@
+#!/bin/bash
+# Launcher CleanMac.app -- avvia il server web e apre il browser
+SCRIPT_DIR="/Volumes/Dati/Dropbox/GitHub/CleanMac"
+LOG_FILE="$SCRIPT_DIR/server.log"
+PID_FILE="$SCRIPT_DIR/server.pid"
+
+show_dialog() {
+    osascript -e "display dialog \"$1\" buttons {\"OK\"} default button \"OK\" with icon note"
+}
+
+# Trova node: prima path assoluto nvm, poi PATH standard
+find_node() {
+    # nvm: versione default
+    local NVM_DIR="$HOME/.nvm"
+    local NVM_DEFAULT
+    NVM_DEFAULT=$(cat "$NVM_DIR/alias/default" 2>/dev/null | tr -d '\n')
+    if [ -n "$NVM_DEFAULT" ]; then
+        local candidate="$NVM_DIR/versions/node/$NVM_DEFAULT/bin/node"
+        [ -x "$candidate" ] && { echo "$candidate"; return; }
+        # default potrebbe essere un alias (es. "22" → "v22.17.0")
+        local resolved
+        resolved=$(ls -1 "$NVM_DIR/versions/node/" 2>/dev/null | grep "^v${NVM_DEFAULT}" | sort -V | tail -1)
+        [ -n "$resolved" ] && candidate="$NVM_DIR/versions/node/$resolved/bin/node"
+        [ -x "$candidate" ] && { echo "$candidate"; return; }
+    fi
+    # nvm: versione più recente installata
+    local latest
+    latest=$(ls -1 "$NVM_DIR/versions/node/" 2>/dev/null | sort -V | tail -1)
+    [ -n "$latest" ] && { echo "$NVM_DIR/versions/node/$latest/bin/node"; return; }
+    # volta
+    [ -x "$HOME/.volta/bin/node" ] && { echo "$HOME/.volta/bin/node"; return; }
+    # PATH standard
+    command -v node 2>/dev/null
+}
+
+NODE_BIN=$(find_node)
+if [ -z "$NODE_BIN" ] || [ ! -x "$NODE_BIN" ]; then
+    show_dialog "Node.js non trovato. Installa da https://nodejs.org/"
+    exit 1
+fi
+
+# Server gia in esecuzione: apre solo il browser
+if [ -f "$PID_FILE" ]; then
+    OLD_PID=$(cat "$PID_FILE")
+    if ps -p "$OLD_PID" > /dev/null 2>&1; then
+        open http://localhost:3000
+        exit 0
+    else
+        rm -f "$PID_FILE"
+    fi
+fi
+
+cd "$SCRIPT_DIR"
+if [ ! -d "node_modules" ]; then
+    NPM_BIN=$(command -v npm 2>/dev/null)
+    "$NPM_BIN" install >> "$LOG_FILE" 2>&1
+fi
+
+nohup "$NODE_BIN" "$SCRIPT_DIR/server.js" >> "$LOG_FILE" 2>&1 &
+SERVER_PID=$!
+echo $SERVER_PID > "$PID_FILE"
+
+READY=false
+for i in $(seq 1 10); do
+    sleep 1
+    if ! ps -p "$SERVER_PID" > /dev/null 2>&1; then
+        show_dialog "Il server si e fermato. Controlla server.log."
+        rm -f "$PID_FILE"
+        exit 1
+    fi
+    if lsof -i :3000 -sTCP:LISTEN > /dev/null 2>&1; then
+        READY=true
+        break
+    fi
+done
+
+open http://localhost:3000
+exit 0

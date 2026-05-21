@@ -1,0 +1,363 @@
+Ok. Calmiamoci un secondo e andiamo dritti al punto.
+Quello NON è normale: 156 GB di “System Data” significa quasi sempre cache + snapshot + backup locali + roba di sviluppo che macOS non ti dice chiaramente.
+
+Qui sotto trovi come pulire SUBITO e come evitare che torni. Segui nell’ordine.
+
+⸻
+
+1️⃣ I COLPEVOLI PRINCIPALI (quasi sempre questi)
+	•	Snapshot locali di Time Machine
+	•	Cache di sistema enormi
+	•	File di Xcode / Developer
+	•	Log e backup iOS
+	•	Indice Spotlight corrotto
+	•	Swap / sleepimage giganti
+
+⸻
+
+2️⃣ ELIMINA GLI SNAPSHOT LOCALI (PRIMA COSA)
+
+Sono invisibili ma possono occupare decine di GB.
+
+Apri Terminale e incolla:
+
+tmutil listlocalsnapshots /
+
+Se vedi una lista → bingo.
+
+Eliminali TUTTI:
+
+sudo tmutil thinlocalsnapshots / 999999999999 4
+
+👉 Questo comando libera spazio immediatamente.
+
+⸻
+
+3️⃣ SVUOTA CACHE DI SISTEMA (SICURO)
+
+Finder → Vai → Vai alla cartella…
+
+Incolla UNA ALLA VOLTA e svuota il contenuto (non la cartella):
+
+~/Library/Caches
+/Library/Caches
+
+⚠️ Cancella tutto quello che puoi. Se qualcosa non si cancella → salta.
+
+⸻
+
+4️⃣ SE HAI USATO XCODE (Developer = 8 GB = sospetto)
+
+Questa roba finisce tutta in “System Data”.
+
+Terminale:
+
+rm -rf ~/Library/Developer/Xcode/DerivedData
+rm -rf ~/Library/Developer/Xcode/Archives
+rm -rf ~/Library/Developer/CoreSimulator
+
+👉 Può liberare 10–30 GB.
+
+⸻
+
+5️⃣ BACKUP iPHONE / iPAD NASCOSTI
+
+Finder → Vai → Vai alla cartella…
+
+~/Library/Application Support/MobileSync/Backup
+
+Se trovi cartelle enormi → elimina quelle vecchie.
+
+⸻
+
+6️⃣ RIDUCI SWAP + SLEEPIMAGE (spesso enormi)
+
+Controlla:
+
+ls -lh /private/var/vm
+
+Se vedi file da 10–20 GB:
+	•	riavvia il Mac (libera subito)
+	•	poi evita che torni (vedi punto 8)
+
+⸻
+
+7️⃣ RICOSTRUISCI SPOTLIGHT (bug classico)
+
+System Settings → Siri & Spotlight → Privacy
+	1.	Aggiungi il disco
+	2.	Riavvia
+	3.	Rimuovi il disco
+
+👉 Riduce “System Data fantasma”.
+
+⸻
+
+8️⃣ COME EVITARE CHE TORNI A RIEMPIRSI
+
+Fai QUESTE cose:
+
+🔒 Time Machine
+	•	Collega regolarmente il disco
+	•	O disattiva del tutto Time Machine se non lo usi
+
+⚙️ Ottimizzazione
+
+System Settings → General → Storage
+Attiva:
+	•	✅ Optimize Storage
+	•	❌ Disattiva “Keep all files”
+
+🧹 Abitudine sana (1 volta al mese)
+	•	Riavvia il Mac
+	•	Svuota ~/Library/Caches
+	•	Controlla snapshot
+
+⸻
+
+9️⃣ SE VUOI VEDERE LA VERITÀ (tool serio)
+
+Scarica DaisyDisk o GrandPerspective
+→ Scansiona come amministratore
+→ vedrai ESATTAMENTE cosa macOS nasconde sotto “System Data”
+
+⸻
+
+🔥 RIASSUNTO BRUTALE
+	•	macOS mente per omissione
+	•	“System Data” = discarica invisibile
+	•	Snapshot + cache = ladri seriali di spazio
+	•	Dopo questi passaggi dovresti recuperare 50–120 GB
+
+Se vuoi, nel prossimo messaggio:
+	•	ti guido live comando per comando
+	•	oppure ti dico esattamente cosa eliminare guardando DaisyDisk
+
+Perfetto. OnyX è la scelta giusta se vuoi pulire davvero senza fuffa.
+Ti dico esattamente cosa fare, in ordine, senza rompere nulla.
+
+⸻
+
+0️⃣ PRIMA DI INIZIARE (importante)
+	•	Chiudi tutte le app
+	•	Se OnyX chiede permessi → consenti tutto
+	•	Non toccare opzioni strane fuori da quelle che ti dico
+
+⸻
+
+1️⃣ TAB Maintenance → sezione Cleaning
+
+Spunta SOLO queste:
+
+🧹 System
+	•	✅ System cache
+	•	✅ User cache
+	•	✅ System log files
+	•	✅ User log files
+
+🧹 Applications
+	•	✅ Application cache
+	•	✅ Application logs
+
+🧹 Internet
+	•	✅ Cache (tutti i browser che usi)
+
+❌ NON spuntare:
+	•	Mail indexes
+	•	Spotlight (lo faremo dopo)
+	•	Anything che parli di “reset databases”
+
+👉 Clicca Run Tasks
+
+⚠️ Il Mac si riavvierà → è normale
+
+⸻
+
+2️⃣ TAB Maintenance → sezione Rebuilding
+
+Dopo il riavvio, riapri OnyX.
+
+Spunta SOLO:
+	•	✅ Spotlight index
+	•	✅ Launch Services
+
+❌ NON:
+	•	Mail
+	•	Time Machine
+	•	Xcode (qui OnyX non è affidabile)
+
+👉 Run Tasks
+⏳ Ci mette un po’, lascialo finire
+
+⸻
+
+3️⃣ TAB Parameters (opzionale ma utile)
+
+Vai in General:
+
+Spunta:
+	•	✅ Disable creation of .DS_Store on network volumes
+	•	✅ Disable creation of .DS_Store on USB volumes
+
+👉 Non libera spazio ora, ma evita sporcizia futura
+
+⸻
+
+4️⃣ TAB Utilities → Time Machine
+
+Se vedi snapshot locali:
+	•	Clicca Delete local snapshots
+
+👉 Questo è uno dei punti dove OnyX fa miracoli
+
+⸻
+
+5️⃣ RIAVVIO FINALE (obbligatorio)
+
+Riavvia il Mac a mano, anche se OnyX non lo chiede.
+
+⸻
+
+6️⃣ COSA ASPETTARTI DOPO
+	•	“System Data” scende dopo 10–30 minuti
+	•	macOS ricalcola lo spazio → non guardare subito
+	•	Recupero tipico: 20–80 GB
+
+⸻
+
+7️⃣ COSA NON FARE CON ONYX (fondamentale)
+
+❌ Non usare:
+	•	Automation
+	•	Verifications
+	•	Anything su “Remove” che non capisci
+❌ Non lanciare tutto “perché sì”
+
+OnyX non è CleanMyMac: è un bisturi, non un aspirapolvere.
+
+⸻
+
+🔁 OGNI QUANTO USARLO
+	•	1 volta al mese → Cleaning + Rebuilding
+	•	Dopo grossi update di macOS → sì
+	•	Ogni settimana → NO
+
+⸻
+
+SE DOPO ONYX RESTANO 100+ GB
+
+Allora è snapshot o swap nascosto → lì:
+	•	o Terminale
+	•	o DaisyDisk (visuale)
+
+Se vuoi, nel prossimo messaggio dimmi:
+	•	versione macOS
+	•	Intel o Apple Silicon
+
+E ti dico esattamente se OnyX basta o se serve altro.
+
+Sì — quasi giusto, ma così com’è ora NON è ottimale.
+Ti dico esattamente cosa correggere, punto per punto, guardando la tua schermata.
+
+⸻
+
+🔴 COSA CAMBIARE SUBITO (importante)
+
+1️⃣ Verifying
+
+❌ DISATTIVA
+	•	⛔ Structure of the file system
+
+👉 Non serve per liberare spazio,
+👉 è lenta,
+👉 e non risolve System Data.
+
+➡️ Metti OFF.
+
+⸻
+
+🟢 COSA LASCIARE COSÌ (perfetto)
+
+2️⃣ Rebuilding
+
+✅ Launch Services database → OK
+⚪ Spotlight index → ORA LASCIALO OFF
+❌ Mail → OFF
+❌ Volume positions → OFF
+❌ .DS_Store → OFF
+
+👉 Spotlight lo faremo dopo, separato.
+
+⸻
+
+3️⃣ Cleaning
+
+Qui sei messo bene 👍
+Lasciali TUTTI ON:
+	•	✅ System
+	•	✅ Applications
+	•	✅ Internet
+	•	✅ Other
+
+⸻
+
+✅ CONFIGURAZIONE CORRETTA FINALE
+
+Deve essere così prima di cliccare Run Tasks:
+
+ON ✅
+	•	Cleaning → System
+	•	Cleaning → Applications
+	•	Cleaning → Internet
+	•	Cleaning → Other
+	•	Rebuilding → Launch Services
+
+OFF ❌
+	•	Verifying → Structure of the file system
+	•	Rebuilding → Spotlight (per ora)
+	•	Tutto Mail / Desktop / DS_Store
+
+⸻
+
+▶️ ORA COSA FARE
+	1.	Disattiva “Structure of the file system”
+	2.	Clicca Run Tasks
+	3.	Inserisci password
+	4.	Lascia lavorare → riavvio automatico (normale)
+
+⸻
+
+⏭️ DOPO IL RIAVVIO (fase 2 – fondamentale)
+
+Aspetta 10–15 minuti, poi:
+	•	Riapri OnyX
+	•	Vai di nuovo in Maintenance
+	•	Spunta SOLO:
+	•	✅ Spotlight index
+	•	Run Tasks di nuovo
+
+👉 Questo serve a far “collassare” lo spazio fantasma di System Data.
+
+⸻
+
+⏱️ COSA ASPETTARTI
+	•	System Data NON scende subito
+	•	macOS ricalcola dopo un po’
+	•	Controlla lo spazio dopo 20–30 minuti
+
+Recupero tipico a questo punto: 20–60 GB
+
+⸻
+
+🔥 SE DOPO TUTTO QUESTO RESTA ANCORA ENORME
+
+Allora non è OnyX → è:
+	•	snapshot locali di Time Machine
+	•	swap gigantesco
+	•	backup iOS nascosti
+
+E lì ti faccio fare 2 comandi mirati (30 secondi).
+
+Dimmi solo:
+👉 Intel o Apple Silicon (M1/M2/M3)?
+👉 Versione macOS?

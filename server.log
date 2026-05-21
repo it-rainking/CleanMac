@@ -1,0 +1,3824 @@
+
+> cleanmac-web@1.0.0 start
+> node server.js
+
+
+╔════════════════════════════════════════╗
+║                                        ║
+║   🧹 CleanMac Web Interface v1.0      ║
+║                                        ║
+║   Server running on:                   ║
+║   http://localhost:3000                ║
+║                                        ║
+╚════════════════════════════════════════╝
+  
+Client connected
+[11:06:57] ═══════════════════════════════════════════════════════════
+
+[11:06:57] CleanMac v4.0 — Avvio
+
+[11:06:57] ═══════════════════════════════════════════════════════════
+
+[11:06:57] Modalità: DRY RUN (analisi senza eliminazione)
+
+[11:06:57] Analisi spazio disco...
+
+[11:06:57] 📁 /Users/nf/Desktop:  21M
+
+[11:06:57] 📁 /Users/nf/Downloads:  30M
+
+[11:06:57] 📁 /Users/nf/Documents:  45M
+
+[11:06:57] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_11-06-57.txt
+
+[11:06:57] Analisi cache utente...
+
+[11:06:57] Cache utente analizzata: 1057 MB
+
+[11:06:57] Analisi cache sistema...
+
+[11:06:57] Cache sistema analizzata: 1 MB
+
+[11:06:57] Analisi file di log...
+
+[11:06:57] File di log analizzati: 27 file — 2 MB
+
+[11:06:57] Analisi Safari...
+
+[11:06:57] Safari analizzato: 1 MB
+
+[11:06:57] Analisi DerivedData...
+
+[11:06:57] DerivedData analizzato: 0 MB
+
+[11:06:57] Analisi .DS_Store...
+
+[11:07:09] .DS_Store analizzati: 37 file
+
+[11:07:09] Analisi cartelle temporanee...
+
+[11:07:09] Cartelle temporanee analizzate: 0 MB
+
+[11:07:09] Analisi Trash...
+
+[11:07:09] Cestino analizzato: 0 MB
+
+[11:07:09] Scansione file grandi...
+
+[11:07:16] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_11-06-57.txt
+
+[11:07:16] Analisi file .localized e system junk...
+
+[11:07:43] System junk analizzato
+
+[11:07:43] Analisi cache app...
+
+[11:07:43] Cache app analizzate: 262 MB
+
+[11:07:43] Analisi log da comprimere...
+
+[11:07:43] Log vecchi analizzati: 5 file
+
+[11:07:43] Analisi Download vecchi...
+
+[11:07:43] Download vecchi analizzati: 1 file, 1 MB
+
+[11:07:43] Analisi app non utilizzate...
+
+[11:07:43] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_11-06-57.txt
+
+[11:07:43] Backup configurazioni...
+
+[11:07:43] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_11-06-57
+
+[11:07:43] Scansione file duplicati...
+
+[11:07:49] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_11-06-57.txt
+
+[11:07:49] Ottimizzazione memoria...
+
+[11:07:50] RAM ottimizzata.
+
+[11:07:50] Ricostruzione LaunchServices...
+
+[11:08:33] LaunchServices ricostruito.
+
+[11:08:33] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[11:10:34] Permessi riparati.
+
+[11:10:34] Flush DNS...
+
+sudo: unable to read password: Input/output error
+
+sudo: a password is required
+
+sudo: unable to read password: Input/output error
+
+sudo: a password is required
+
+[11:10:34] DNS cache resettato.
+
+[11:10:34] Reset Spotlight index...
+
+[11:10:36] Spotlight reset completato (reindicizzazione in background).
+
+[11:10:37] Ottimizzazione font cache...
+
+[11:10:38] Font cache ottimizzato.
+
+[11:10:38] Analisi cache package manager...
+
+[11:10:38] Cache package manager analizzate: 407 MB
+
+[11:10:38] Analisi Docker...
+
+[11:10:38] Docker non installato o non in esecuzione, skip
+
+[11:10:38] Analisi Homebrew...
+
+[11:10:38] Homebrew analizzato: 0 MB
+
+[11:10:38] ═══════════════════════════════════════════════════════════
+
+[11:10:38] ✅ DRY RUN COMPLETATO
+
+[11:10:38] ═══════════════════════════════════════════════════════════
+
+[11:10:38] 📊 Spazio liberabile: 1731 MB
+
+[11:10:38] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_11-06-57.txt
+
+[11:10:38] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+[11:49:31] ═══════════════════════════════════════════════════════════
+
+[11:49:31] CleanMac v4.0 — Avvio
+
+[11:49:31] ═══════════════════════════════════════════════════════════
+
+[11:49:31] Modalità: DRY RUN (analisi senza eliminazione)
+
+[11:49:32] Analisi spazio disco...
+
+[11:49:32] 📁 /Users/nf/Desktop:  21M
+
+[11:49:32] 📁 /Users/nf/Downloads:  30M
+
+[11:49:32] 📁 /Users/nf/Documents:  45M
+
+[11:49:32] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_11-49-31.txt
+
+[11:49:32] Analisi cache utente...
+
+[11:49:32] Cache utente analizzata: 1055 MB
+
+[11:49:32] Analisi cache sistema...
+
+[11:49:32] Cache sistema analizzata: 1 MB
+
+[11:49:32] Analisi file di log...
+
+[11:49:32] File di log analizzati: 27 file — 2 MB
+
+[11:49:32] Analisi Safari...
+
+[11:49:32] Safari analizzato: 1 MB
+
+[11:49:32] Analisi DerivedData...
+
+[11:49:32] DerivedData analizzato: 0 MB
+
+[11:49:32] Analisi .DS_Store...
+
+[11:49:42] .DS_Store analizzati: 37 file
+
+[11:49:42] Analisi cartelle temporanee...
+
+[11:49:42] Cartelle temporanee analizzate: 0 MB
+
+[11:49:42] Analisi Trash...
+
+[11:49:42] Cestino analizzato: 0 MB
+
+[11:49:42] Scansione file grandi...
+
+[11:49:47] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_11-49-31.txt
+
+[11:49:47] Analisi file .localized e system junk...
+
+[11:50:15] System junk analizzato
+
+[11:50:15] Analisi cache app...
+
+[11:50:15] Cache app analizzate: 264 MB
+
+[11:50:15] Analisi log da comprimere...
+
+[11:50:15] Log vecchi analizzati: 5 file
+
+[11:50:15] Analisi Download vecchi...
+
+[11:50:15] Download vecchi analizzati: 1 file, 1 MB
+
+[11:50:15] Analisi app non utilizzate...
+
+[11:50:16] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_11-49-31.txt
+
+[11:50:16] Backup configurazioni...
+
+[11:50:16] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_11-49-31
+
+[11:50:16] Scansione file duplicati...
+
+[11:50:22] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_11-49-31.txt
+
+[11:50:22] Ottimizzazione memoria...
+
+[11:50:22] RAM ottimizzata.
+
+[11:50:22] Ricostruzione LaunchServices...
+
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+[11:51:09] LaunchServices ricostruito.
+
+[11:51:09] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[11:54:41] Permessi riparati.
+
+[11:54:41] Flush DNS...
+
+sudo: unable to read password: Input/output error
+
+sudo: a password is required
+
+sudo: unable to read password: Input/output error
+
+sudo: a password is required
+
+[11:54:41] DNS cache resettato.
+
+[11:54:41] Reset Spotlight index...
+
+[11:54:43] Spotlight reset completato (reindicizzazione in background).
+
+[11:54:43] Ottimizzazione font cache...
+
+[11:54:44] Font cache ottimizzato.
+
+[11:54:44] Analisi cache package manager...
+
+[11:54:45] Cache package manager analizzate: 407 MB
+
+[11:54:45] Analisi Docker...
+
+[11:54:45] Docker non installato o non in esecuzione, skip
+
+[11:54:45] Analisi Homebrew...
+
+[11:54:45] Homebrew analizzato: 0 MB
+
+[11:54:45] ═══════════════════════════════════════════════════════════
+
+[11:54:45] ✅ DRY RUN COMPLETATO
+
+[11:54:45] ═══════════════════════════════════════════════════════════
+
+[11:54:45] 📊 Spazio liberabile: 1731 MB
+
+[11:54:45] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_11-49-31.txt
+
+[11:54:45] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+[11:58:41] ═══════════════════════════════════════════════════════════
+
+[11:58:41] CleanMac v4.0 — Avvio
+
+[11:58:41] ═══════════════════════════════════════════════════════════
+
+[11:58:41] Modalità: DRY RUN (analisi senza eliminazione)
+
+[11:58:41] Analisi spazio disco...
+
+[11:58:41] 📁 /Users/nf/Desktop:  21M
+
+[11:58:41] 📁 /Users/nf/Downloads:  30M
+
+[11:58:41] 📁 /Users/nf/Documents:  45M
+
+[11:58:41] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_11-58-41.txt
+
+[11:58:41] Analisi cache utente...
+
+[11:58:41] Cache utente analizzata: 1064 MB
+
+[11:58:41] Analisi cache sistema...
+
+[11:58:41] Cache sistema analizzata: 1 MB
+
+[11:58:41] Analisi file di log...
+
+[11:58:41] File di log analizzati: 27 file — 2 MB
+
+[11:58:41] Analisi Safari...
+
+[11:58:42] Safari analizzato: 1 MB
+
+[11:58:42] Analisi DerivedData...
+
+[11:58:42] DerivedData analizzato: 0 MB
+
+[11:58:42] Analisi .DS_Store...
+
+[11:58:55] .DS_Store analizzati: 37 file
+
+[11:58:55] Analisi cartelle temporanee...
+
+[11:58:55] Cartelle temporanee analizzate: 0 MB
+
+[11:58:55] Analisi Trash...
+
+[11:58:55] Cestino analizzato: 0 MB
+
+[11:58:55] Scansione file grandi...
+
+[11:59:04] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_11-58-41.txt
+
+[11:59:04] Analisi file .localized e system junk...
+
+[11:59:24] System junk analizzato
+
+[11:59:24] Analisi cache app...
+
+[11:59:25] Cache app analizzate: 274 MB
+
+[11:59:25] Analisi log da comprimere...
+
+[11:59:25] Log vecchi analizzati: 5 file
+
+[11:59:25] Analisi Download vecchi...
+
+[11:59:25] Download vecchi analizzati: 1 file, 1 MB
+
+[11:59:25] Analisi app non utilizzate...
+
+[11:59:25] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_11-58-41.txt
+
+[11:59:25] Backup configurazioni...
+
+[11:59:25] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_11-58-41
+
+[11:59:25] Scansione file duplicati...
+
+[11:59:30] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_11-58-41.txt
+
+[11:59:30] Ottimizzazione memoria...
+
+[11:59:30] RAM ottimizzata.
+
+[11:59:30] Ricostruzione LaunchServices...
+
+[12:00:12] LaunchServices ricostruito.
+
+[12:00:12] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[12:06:32] Permessi riparati.
+
+[12:06:32] Flush DNS...
+
+sudo: unable to read password: Input/output error
+
+sudo: a password is required
+
+sudo: unable to read password: Input/output error
+
+sudo: a password is required
+
+[12:06:32] DNS cache resettato.
+
+[12:06:32] Reset Spotlight index...
+
+[12:06:34] Spotlight reset completato (reindicizzazione in background).
+
+[12:06:34] Ottimizzazione font cache...
+
+[12:06:35] Font cache ottimizzato.
+
+[12:06:35] Analisi cache package manager...
+
+[12:06:35] Cache package manager analizzate: 407 MB
+
+[12:06:35] Analisi Docker...
+
+[12:06:35] Docker non installato o non in esecuzione, skip
+
+[12:06:35] Analisi Homebrew...
+
+[12:06:35] Homebrew analizzato: 0 MB
+
+[12:06:35] ═══════════════════════════════════════════════════════════
+
+[12:06:35] ✅ DRY RUN COMPLETATO
+
+[12:06:35] ═══════════════════════════════════════════════════════════
+
+[12:06:35] 📊 Spazio liberabile: 1750 MB
+
+[12:06:35] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_11-58-41.txt
+
+[12:06:35] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+[12:23:26] ═══════════════════════════════════════════════════════════
+
+[12:23:26] CleanMac v4.0 — Avvio
+
+[12:23:26] ═══════════════════════════════════════════════════════════
+
+[12:23:26] Modalità: DRY RUN (analisi senza eliminazione)
+
+[12:23:26] Analisi spazio disco...
+
+[12:23:26] 📁 /Users/nf/Desktop:  21M
+
+[12:23:26] 📁 /Users/nf/Downloads:  69M
+
+[12:23:26] 📁 /Users/nf/Documents:  45M
+
+[12:23:26] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_12-23-26.txt
+
+[12:23:26] Analisi cache utente...
+
+[12:23:26] Cache utente analizzata: 1097 MB
+
+[12:23:26] Analisi cache sistema...
+
+[12:23:26] Cache sistema analizzata: 1 MB
+
+[12:23:26] Analisi file di log...
+
+[12:23:26] File di log analizzati: 27 file — 2 MB
+
+[12:23:26] Analisi Safari...
+
+[12:23:26] Safari analizzato: 1 MB
+
+[12:23:26] Analisi DerivedData...
+
+[12:23:26] DerivedData analizzato: 0 MB
+
+[12:23:26] Analisi .DS_Store...
+
+[12:23:35] .DS_Store analizzati: 38 file
+
+[12:23:35] Analisi cartelle temporanee...
+
+[12:23:35] Cartelle temporanee analizzate: 0 MB
+
+[12:23:35] Analisi Trash...
+
+[12:23:35] Cestino analizzato: 90 MB
+
+[12:23:35] Scansione file grandi...
+
+[12:23:40] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_12-23-26.txt
+
+[12:23:40] Analisi file .localized e system junk...
+
+Client disconnected
+Client connected
+[12:24:03] System junk analizzato
+
+[12:24:03] Analisi cache app...
+
+[12:24:03] Cache app analizzate: 306 MB
+
+[12:24:03] Analisi log da comprimere...
+
+[12:24:03] Log vecchi analizzati: 5 file
+
+[12:24:03] Analisi Download vecchi...
+
+[12:24:03] Download vecchi analizzati: 1 file, 1 MB
+
+[12:24:03] Analisi app non utilizzate...
+
+[12:24:03] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_12-23-26.txt
+
+[12:24:03] Backup configurazioni...
+
+[12:24:03] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_12-23-26
+
+[12:24:03] Scansione file duplicati...
+
+[12:24:09] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_12-23-26.txt
+
+[12:24:09] Ottimizzazione memoria...
+
+[12:24:09] RAM ottimizzata.
+
+[12:24:09] Ricostruzione LaunchServices...
+
+Client disconnected
+[12:24:54] LaunchServices ricostruito.
+
+[12:24:54] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[12:25:27] Permessi riparati.
+
+[12:25:27] Flush DNS...
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+[12:25:27] DNS cache resettato.
+
+[12:25:27] Reset Spotlight index...
+
+[12:25:29] Spotlight reset completato (reindicizzazione in background).
+
+[12:25:29] Ottimizzazione font cache...
+
+[12:25:30] Font cache ottimizzato.
+
+[12:25:30] Analisi cache package manager...
+
+[12:25:30] Cache package manager analizzate: 407 MB
+
+[12:25:30] Analisi Docker...
+
+[12:25:30] Docker non installato o non in esecuzione, skip
+
+[12:25:30] Analisi Homebrew...
+
+[12:25:30] Homebrew analizzato: 0 MB
+
+[12:25:30] ═══════════════════════════════════════════════════════════
+
+[12:25:30] ✅ DRY RUN COMPLETATO
+
+[12:25:30] ═══════════════════════════════════════════════════════════
+
+[12:25:30] 📊 Spazio liberabile: 1905 MB
+
+[12:25:30] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_12-23-26.txt
+
+[12:25:30] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client connected
+[12:33:13] ═══════════════════════════════════════════════════════════
+
+[12:33:14] CleanMac v4.0 — Avvio
+
+[12:33:14] ═══════════════════════════════════════════════════════════
+
+[12:33:14] Modalità: DRY RUN (analisi senza eliminazione)
+
+[12:33:14] Analisi spazio disco...
+
+[12:33:14] 📁 /Users/nf/Desktop:  21M
+
+[12:33:14] 📁 /Users/nf/Downloads:  83M
+
+[12:33:14] 📁 /Users/nf/Documents:  45M
+
+[12:33:14] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_12-33-13.txt
+
+[12:33:14] Analisi cache utente...
+
+[12:33:14] Cache utente analizzata: 1097 MB
+
+[12:33:14] Analisi cache sistema...
+
+[12:33:14] Cache sistema analizzata: 1 MB
+
+[12:33:14] Analisi file di log...
+
+[12:33:14] File di log analizzati: 27 file — 2 MB
+
+[12:33:14] Analisi Safari...
+
+[12:33:14] Safari analizzato: 1 MB
+
+[12:33:14] Analisi DerivedData...
+
+[12:33:14] DerivedData analizzato: 0 MB
+
+[12:33:14] Analisi .DS_Store...
+
+Client disconnected
+[12:33:23] .DS_Store analizzati: 37 file
+
+[12:33:23] Analisi cartelle temporanee...
+
+[12:33:23] Cartelle temporanee analizzate: 0 MB
+
+[12:33:23] Analisi Trash...
+
+[12:33:23] Cestino analizzato: 32 MB
+
+[12:33:23] Scansione file grandi...
+
+[12:33:28] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_12-33-13.txt
+
+[12:33:28] Analisi file .localized e system junk...
+
+[12:34:06] System junk analizzato
+
+[12:34:06] Analisi cache app...
+
+[12:34:06] Cache app analizzate: 306 MB
+
+[12:34:06] Analisi log da comprimere...
+
+[12:34:06] Log vecchi analizzati: 5 file
+
+[12:34:06] Analisi Download vecchi...
+
+[12:34:07] Download vecchi analizzati: 1 file, 1 MB
+
+[12:34:07] Analisi app non utilizzate...
+
+[12:34:07] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_12-33-13.txt
+
+[12:34:07] Backup configurazioni...
+
+[12:34:07] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_12-33-13
+
+[12:34:07] Scansione file duplicati...
+
+[12:34:12] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_12-33-13.txt
+
+[12:34:12] Ottimizzazione memoria...
+
+[12:34:12] RAM ottimizzata.
+
+[12:34:12] Ricostruzione LaunchServices...
+
+[12:35:00] LaunchServices ricostruito.
+
+[12:35:00] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[12:35:37] Permessi riparati.
+
+[12:35:37] Flush DNS...
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+sudo: a password is required
+
+[12:35:38] DNS cache resettato.
+
+[12:35:38] Reset Spotlight index...
+
+[12:35:40] Spotlight reset completato (reindicizzazione in background).
+
+[12:35:40] Ottimizzazione font cache...
+
+[12:35:41] Font cache ottimizzato.
+
+[12:35:41] Analisi cache package manager...
+
+[12:35:41] Cache package manager analizzate: 407 MB
+
+[12:35:41] Analisi Docker...
+
+[12:35:41] Docker non installato o non in esecuzione, skip
+
+[12:35:41] Analisi Homebrew...
+
+[12:35:41] Homebrew analizzato: 0 MB
+
+[12:35:41] ═══════════════════════════════════════════════════════════
+
+[12:35:41] ✅ DRY RUN COMPLETATO
+
+[12:35:41] ═══════════════════════════════════════════════════════════
+
+[12:35:41] 📊 Spazio liberabile: 1847 MB
+
+[12:35:41] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_12-33-13.txt
+
+[12:35:41] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client connected
+[12:41:04] ═══════════════════════════════════════════════════════════
+
+[12:41:04] CleanMac v4.0 — Avvio
+
+[12:41:04] ═══════════════════════════════════════════════════════════
+
+[12:41:04] Modalità: DRY RUN (analisi senza eliminazione)
+
+[12:41:04] Analisi spazio disco...
+
+[12:41:04] 📁 /Users/nf/Desktop:  21M
+
+[12:41:04] 📁 /Users/nf/Downloads:  30M
+
+[12:41:04] 📁 /Users/nf/Documents:  45M
+
+[12:41:04] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_12-41-04.txt
+
+[12:41:04] Analisi cache utente...
+
+[12:41:05] Cache utente analizzata: 1107 MB
+
+[12:41:05] Analisi cache sistema...
+
+[12:41:05] Cache sistema analizzata: 1 MB
+
+[12:41:05] Analisi file di log...
+
+[12:41:05] File di log analizzati: 27 file — 2 MB
+
+[12:41:05] Analisi Safari...
+
+[12:41:05] Safari analizzato: 1 MB
+
+[12:41:05] Analisi DerivedData...
+
+[12:41:05] DerivedData analizzato: 0 MB
+
+[12:41:05] Analisi .DS_Store...
+
+[12:41:13] .DS_Store analizzati: 37 file
+
+[12:41:13] Analisi cartelle temporanee...
+
+[12:41:13] Cartelle temporanee analizzate: 0 MB
+
+[12:41:13] Analisi Trash...
+
+[12:41:14] Cestino analizzato: 0 MB
+
+[12:41:14] Scansione file grandi...
+
+[12:41:24] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_12-41-04.txt
+
+[12:41:24] Analisi file .localized e system junk...
+
+[12:41:45] System junk analizzato
+
+[12:41:45] Analisi cache app...
+
+[12:41:46] Cache app analizzate: 316 MB
+
+[12:41:46] Analisi log da comprimere...
+
+[12:41:46] Log vecchi analizzati: 5 file
+
+[12:41:46] Analisi Download vecchi...
+
+[12:41:46] Download vecchi analizzati: 1 file, 1 MB
+
+[12:41:46] Analisi app non utilizzate...
+
+[12:41:46] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_12-41-04.txt
+
+[12:41:46] Backup configurazioni...
+
+[12:41:46] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_12-41-04
+
+[12:41:46] Scansione file duplicati...
+
+[12:41:51] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_12-41-04.txt
+
+[12:41:51] Ottimizzazione memoria...
+
+[12:41:51] RAM ottimizzata.
+
+[12:41:51] Ricostruzione LaunchServices...
+
+[12:42:35] LaunchServices ricostruito.
+
+[12:42:35] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[12:43:11] Permessi riparati.
+
+[12:43:11] Flush DNS...
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+sudo: a password is required
+
+[12:43:11] DNS cache resettato.
+
+[12:43:11] Reset Spotlight index...
+
+[12:43:13] Spotlight reset completato (reindicizzazione in background).
+
+[12:43:13] Ottimizzazione font cache...
+
+[12:43:14] Font cache ottimizzato.
+
+[12:43:14] Analisi cache package manager...
+
+[12:43:15] Cache package manager analizzate: 407 MB
+
+[12:43:15] Analisi Docker...
+
+[12:43:15] Docker non installato o non in esecuzione, skip
+
+[12:43:15] Analisi Homebrew...
+
+[12:43:15] Homebrew analizzato: 0 MB
+
+[12:43:15] ═══════════════════════════════════════════════════════════
+
+[12:43:15] ✅ DRY RUN COMPLETATO
+
+[12:43:15] ═══════════════════════════════════════════════════════════
+
+[12:43:15] 📊 Spazio liberabile: 1835 MB
+
+[12:43:15] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_12-41-04.txt
+
+[12:43:15] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client connected
+Client disconnected
+Client disconnected
+Client connected
+[12:53:08] ═══════════════════════════════════════════════════════════
+
+[12:53:08] CleanMac v4.0 — Avvio
+
+[12:53:08] ═══════════════════════════════════════════════════════════
+
+[12:53:08] Modalità: DRY RUN (analisi senza eliminazione)
+
+[12:53:08] Analisi spazio disco...
+
+[12:53:08] 📁 /Users/nf/Desktop:  21M
+
+[12:53:08] 📁 /Users/nf/Downloads:  30M
+
+[12:53:08] 📁 /Users/nf/Documents:  45M
+
+[12:53:08] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_12-53-08.txt
+
+[12:53:08] Analisi cache utente...
+
+[12:53:08] Cache utente analizzata: 1108 MB
+
+[12:53:08] Analisi cache sistema...
+
+[12:53:08] Cache sistema analizzata: 1 MB
+
+[12:53:08] Analisi file di log...
+
+[12:53:08] File di log analizzati: 27 file — 2 MB
+
+[12:53:08] Analisi Safari...
+
+[12:53:08] Safari analizzato: 1 MB
+
+[12:53:08] Analisi DerivedData...
+
+[12:53:08] DerivedData analizzato: 0 MB
+
+[12:53:08] Analisi .DS_Store...
+
+[12:53:19] .DS_Store analizzati: 37 file
+
+[12:53:19] Analisi cartelle temporanee...
+
+[12:53:19] Cartelle temporanee analizzate: 0 MB
+
+[12:53:19] Analisi Trash...
+
+[12:53:19] Cestino analizzato: 0 MB
+
+[12:53:19] Scansione file grandi...
+
+[12:53:24] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_12-53-08.txt
+
+[12:53:24] Analisi file .localized e system junk...
+
+[12:53:47] System junk analizzato
+
+[12:53:47] Analisi cache app...
+
+[12:53:47] Cache app analizzate: 317 MB
+
+[12:53:47] Analisi log da comprimere...
+
+[12:53:47] Log vecchi analizzati: 5 file
+
+[12:53:47] Analisi Download vecchi...
+
+[12:53:47] Download vecchi analizzati: 1 file, 1 MB
+
+[12:53:47] Analisi app non utilizzate...
+
+[12:53:47] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_12-53-08.txt
+
+[12:53:47] Backup configurazioni...
+
+[12:53:47] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_12-53-08
+
+[12:53:47] Scansione file duplicati...
+
+[12:53:53] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_12-53-08.txt
+
+[12:53:53] Ottimizzazione memoria...
+
+[12:53:53] RAM ottimizzata.
+
+[12:53:53] Ricostruzione LaunchServices...
+
+[12:54:40] LaunchServices ricostruito.
+
+[12:54:40] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[14:19:51] Permessi riparati.
+
+[14:19:51] Flush DNS...
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+[14:19:51] DNS cache resettato.
+
+[14:19:51] Reset Spotlight index...
+
+[14:19:53] Spotlight reset completato (reindicizzazione in background).
+
+[14:19:53] Ottimizzazione font cache...
+
+[14:19:54] Font cache ottimizzato.
+
+[14:19:54] Analisi cache package manager...
+
+[14:19:55] Cache package manager analizzate: 407 MB
+
+[14:19:55] Analisi Docker...
+
+[14:19:55] Docker non installato o non in esecuzione, skip
+
+[14:19:55] Analisi Homebrew...
+
+[14:19:55] Homebrew analizzato: 0 MB
+
+[14:19:55] ═══════════════════════════════════════════════════════════
+
+[14:19:55] ✅ DRY RUN COMPLETATO
+
+[14:19:55] ═══════════════════════════════════════════════════════════
+
+[14:19:55] 📊 Spazio liberabile: 1837 MB
+
+[14:19:55] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_12-53-08.txt
+
+[14:19:55] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+[14:27:28] ═══════════════════════════════════════════════════════════
+
+[14:27:28] CleanMac v4.0 — Avvio
+
+[14:27:28] ═══════════════════════════════════════════════════════════
+
+[14:27:28] Modalità: DRY RUN (analisi senza eliminazione)
+
+[14:27:28] Analisi spazio disco...
+
+[14:27:28] 📁 /Users/nf/Desktop:  21M
+
+[14:27:28] 📁 /Users/nf/Downloads:  30M
+
+[14:27:29] 📁 /Users/nf/Documents:  45M
+
+[14:27:29] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_14-27-28.txt
+
+[14:27:29] Analisi cache utente...
+
+[14:27:29] Cache utente analizzata: 1109 MB
+
+[14:27:29] Analisi cache sistema...
+
+[14:27:29] Cache sistema analizzata: 1 MB
+
+[14:27:29] Analisi file di log...
+
+[14:27:29] File di log analizzati: 27 file — 2 MB
+
+[14:27:29] Analisi Safari...
+
+[14:27:29] Safari analizzato: 1 MB
+
+[14:27:29] Analisi DerivedData...
+
+[14:27:29] DerivedData analizzato: 0 MB
+
+[14:27:29] Analisi .DS_Store...
+
+[14:27:38] .DS_Store analizzati: 37 file
+
+[14:27:38] Analisi cartelle temporanee...
+
+[14:27:38] Cartelle temporanee analizzate: 0 MB
+
+[14:27:38] Analisi Trash...
+
+[14:27:38] Cestino analizzato: 0 MB
+
+[14:27:38] Scansione file grandi...
+
+[14:27:43] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_14-27-28.txt
+
+[14:27:43] Analisi file .localized e system junk...
+
+[14:28:03] System junk analizzato
+
+[14:28:03] Analisi cache app...
+
+[14:28:04] Cache app analizzate: 317 MB
+
+[14:28:04] Analisi log da comprimere...
+
+[14:28:04] Log vecchi analizzati: 5 file
+
+[14:28:04] Analisi Download vecchi...
+
+[14:28:04] Download vecchi analizzati: 1 file, 1 MB
+
+[14:28:04] Analisi app non utilizzate...
+
+[14:28:04] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_14-27-28.txt
+
+[14:28:04] Backup configurazioni...
+
+[14:28:04] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_14-27-28
+
+[14:28:04] Scansione file duplicati...
+
+[14:28:09] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_14-27-28.txt
+
+[14:28:09] Ottimizzazione memoria...
+
+[14:28:09] RAM ottimizzata.
+
+[14:28:09] Ricostruzione LaunchServices...
+
+[14:28:52] LaunchServices ricostruito.
+
+[14:28:52] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[14:30:29] Permessi riparati.
+
+[14:30:29] Flush DNS...
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+sudo: a password is required
+
+
+[14:30:29] DNS cache resettato.
+
+[14:30:29] Reset Spotlight index...
+
+[14:30:31] Spotlight reset completato (reindicizzazione in background).
+
+[14:30:31] Ottimizzazione font cache...
+
+[14:30:32] Font cache ottimizzato.
+
+[14:30:32] Analisi cache package manager...
+
+[14:30:32] Cache package manager analizzate: 407 MB
+
+[14:30:32] Analisi Docker...
+
+[14:30:32] Docker non installato o non in esecuzione, skip
+
+[14:30:32] Analisi Homebrew...
+
+[14:30:32] Homebrew analizzato: 0 MB
+
+[14:30:32] ═══════════════════════════════════════════════════════════
+
+[14:30:32] ✅ DRY RUN COMPLETATO
+
+[14:30:32] ═══════════════════════════════════════════════════════════
+
+[14:30:32] 📊 Spazio liberabile: 1838 MB
+
+[14:30:32] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_14-27-28.txt
+
+[14:30:32] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+[15:50:52] ═══════════════════════════════════════════════════════════
+
+[15:50:52] CleanMac v4.0 — Avvio
+
+[15:50:52] ═══════════════════════════════════════════════════════════
+
+[15:50:52] Modalità: DRY RUN (analisi senza eliminazione)
+
+[15:50:52] Analisi spazio disco...
+
+[15:50:52] 📁 /Users/nf/Desktop:  21M
+
+[15:50:52] 📁 /Users/nf/Downloads:  30M
+
+[15:50:52] 📁 /Users/nf/Documents:  45M
+
+[15:50:52] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_15-50-52.txt
+
+[15:50:52] Analisi cache utente...
+
+[15:50:52] Cache utente analizzata: 1113 MB
+
+[15:50:52] Analisi cache sistema...
+
+[15:50:52] Cache sistema analizzata: 1 MB
+
+[15:50:52] Analisi file di log...
+
+[15:50:52] File di log analizzati: 27 file — 2 MB
+
+[15:50:52] Analisi Safari...
+
+[15:50:52] Safari analizzato: 1 MB
+
+[15:50:52] Analisi DerivedData...
+
+[15:50:52] DerivedData analizzato: 0 MB
+
+[15:50:52] Analisi .DS_Store...
+
+[15:51:01] .DS_Store analizzati: 37 file
+
+[15:51:01] Analisi cartelle temporanee...
+
+[15:51:01] Cartelle temporanee analizzate: 0 MB
+
+[15:51:01] Analisi Trash...
+
+[15:51:01] Cestino analizzato: 0 MB
+
+[15:51:01] Scansione file grandi...
+
+[15:51:06] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_15-50-52.txt
+
+[15:51:06] Analisi file .localized e system junk...
+
+[15:51:45] System junk analizzato
+
+[15:51:45] Analisi cache app...
+
+[15:51:45] Cache app analizzate: 332 MB
+
+[15:51:45] Analisi log da comprimere...
+
+[15:51:45] Log vecchi analizzati: 5 file
+
+[15:51:45] Analisi Download vecchi...
+
+[15:51:45] Download vecchi analizzati: 1 file, 1 MB
+
+[15:51:45] Analisi app non utilizzate...
+
+[15:51:45] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_15-50-52.txt
+
+[15:51:45] Backup configurazioni...
+
+[15:51:45] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_15-50-52
+
+[15:51:45] Scansione file duplicati...
+
+[15:51:51] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_15-50-52.txt
+
+[15:51:51] Ottimizzazione memoria...
+
+[15:51:51] RAM ottimizzata.
+
+[15:51:51] Ricostruzione LaunchServices...
+
+[15:52:37] LaunchServices ricostruito.
+
+[15:52:37] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[15:53:23] Permessi riparati.
+
+[15:53:23] Flush DNS...
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+[15:53:23] DNS cache resettato.
+
+[15:53:23] Reset Spotlight index...
+
+[15:53:25] Spotlight reset completato (reindicizzazione in background).
+
+[15:53:25] Ottimizzazione font cache...
+
+[15:53:26] Font cache ottimizzato.
+
+[15:53:26] Analisi cache package manager...
+
+[15:53:27] Cache package manager analizzate: 407 MB
+
+[15:53:27] Analisi Docker...
+
+[15:53:27] Docker non installato o non in esecuzione, skip
+
+[15:53:27] Analisi Homebrew...
+
+[15:53:27] Homebrew analizzato: 0 MB
+
+[15:53:27] ═══════════════════════════════════════════════════════════
+
+[15:53:27] ✅ DRY RUN COMPLETATO
+
+[15:53:27] ═══════════════════════════════════════════════════════════
+
+[15:53:27] 📊 Spazio liberabile: 1857 MB
+
+[15:53:27] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_15-50-52.txt
+
+[15:53:27] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client disconnected
+Client connected
+[15:56:11] ═══════════════════════════════════════════════════════════
+
+[15:56:11] CleanMac v4.0 — Avvio
+
+[15:56:11] ═══════════════════════════════════════════════════════════
+
+[15:56:11] Modalità: DRY RUN (analisi senza eliminazione)
+
+[15:56:11] Analisi spazio disco...
+
+[15:56:11] 📁 /Users/nf/Desktop:  21M
+
+[15:56:11] 📁 /Users/nf/Downloads:  30M
+
+[15:56:11] 📁 /Users/nf/Documents:  45M
+
+[15:56:11] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_15-56-11.txt
+
+[15:56:11] Analisi cache utente...
+
+[15:56:12] Cache utente analizzata: 1161 MB
+
+[15:56:12] Analisi cache sistema...
+
+[15:56:12] Cache sistema analizzata: 1 MB
+
+[15:56:12] Analisi file di log...
+
+[15:56:12] File di log analizzati: 27 file — 2 MB
+
+[15:56:12] Analisi Safari...
+
+[15:56:12] Safari analizzato: 1 MB
+
+[15:56:12] Analisi DerivedData...
+
+[15:56:12] DerivedData analizzato: 0 MB
+
+[15:56:12] Analisi .DS_Store...
+
+[15:56:21] .DS_Store analizzati: 37 file
+
+[15:56:21] Analisi cartelle temporanee...
+
+[15:56:21] Cartelle temporanee analizzate: 0 MB
+
+[15:56:21] Analisi Trash...
+
+[15:56:21] Cestino analizzato: 0 MB
+
+[15:56:21] Scansione file grandi...
+
+[15:56:30] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_15-56-11.txt
+
+[15:56:30] Analisi file .localized e system junk...
+
+[15:56:58] System junk analizzato
+
+[15:56:58] Analisi cache app...
+
+[15:56:58] Cache app analizzate: 372 MB
+
+[15:56:58] Analisi log da comprimere...
+
+[15:56:58] Log vecchi analizzati: 5 file
+
+[15:56:58] Analisi Download vecchi...
+
+[15:56:58] Download vecchi analizzati: 1 file, 1 MB
+
+[15:56:58] Analisi app non utilizzate...
+
+[15:56:59] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_15-56-11.txt
+
+[15:56:59] Backup configurazioni...
+
+[15:56:59] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_15-56-11
+
+[15:56:59] Scansione file duplicati...
+
+[15:57:04] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_15-56-11.txt
+
+[15:57:04] Ottimizzazione memoria...
+
+[15:57:04] RAM ottimizzata.
+
+[15:57:04] Ricostruzione LaunchServices...
+
+[15:57:48] LaunchServices ricostruito.
+
+[15:57:48] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[15:58:32] Permessi riparati.
+
+[15:58:32] Flush DNS...
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+[15:58:32] DNS cache resettato.
+
+[15:58:32] Reset Spotlight index...
+
+[15:58:34] Spotlight reset completato (reindicizzazione in background).
+
+[15:58:34] Ottimizzazione font cache...
+
+[15:58:35] Font cache ottimizzato.
+
+[15:58:35] Analisi cache package manager...
+
+[15:58:36] Cache package manager analizzate: 407 MB
+
+[15:58:36] Analisi Docker...
+
+[15:58:36] Docker non installato o non in esecuzione, skip
+
+[15:58:36] Analisi Homebrew...
+
+[15:58:36] Homebrew analizzato: 0 MB
+
+[15:58:36] ═══════════════════════════════════════════════════════════
+
+[15:58:36] ✅ DRY RUN COMPLETATO
+
+[15:58:36] ═══════════════════════════════════════════════════════════
+
+[15:58:36] 📊 Spazio liberabile: 1945 MB
+
+[15:58:36] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_15-56-11.txt
+
+[15:58:36] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client disconnected
+Client connected
+[17:17:19] ═══════════════════════════════════════════════════════════
+
+[17:17:19] CleanMac v4.0 — Avvio
+
+[17:17:19] ═══════════════════════════════════════════════════════════
+
+[17:17:20] Modalità: DRY RUN (analisi senza eliminazione)
+
+[17:17:20] Analisi spazio disco...
+
+[17:17:20] 📁 /Users/nf/Desktop:  21M
+
+[17:17:20] 📁 /Users/nf/Downloads:  30M
+
+[17:17:20] 📁 /Users/nf/Documents:  45M
+
+[17:17:20] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_17-17-19.txt
+
+[17:17:20] Analisi cache utente...
+
+[17:17:20] Cache utente analizzata: 1175 MB
+
+[17:17:20] Analisi cache sistema...
+
+[17:17:20] Cache sistema analizzata: 1 MB
+
+[17:17:20] Analisi file di log...
+
+[17:17:20] File di log analizzati: 27 file — 2 MB
+
+[17:17:20] Analisi Safari...
+
+[17:17:20] Safari analizzato: 1 MB
+
+[17:17:20] Analisi DerivedData...
+
+[17:17:20] DerivedData analizzato: 0 MB
+
+[17:17:20] Analisi .DS_Store...
+
+[17:17:29] .DS_Store analizzati: 37 file
+
+[17:17:29] Analisi cartelle temporanee...
+
+[17:17:29] Cartelle temporanee analizzate: 0 MB
+
+[17:17:29] Analisi Trash...
+
+[17:17:29] Cestino analizzato: 0 MB
+
+[17:17:29] Scansione file grandi...
+
+[17:17:34] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_17-17-19.txt
+
+[17:17:34] Analisi file .localized e system junk...
+
+[17:17:55] System junk analizzato
+
+[17:17:55] Analisi cache app...
+
+[17:17:55] Cache app analizzate: 381 MB
+
+[17:17:55] Analisi log da comprimere...
+
+[17:17:55] Log vecchi analizzati: 5 file
+
+[17:17:55] Analisi Download vecchi...
+
+[17:17:55] Download vecchi analizzati: 1 file, 1 MB
+
+[17:17:55] Analisi app non utilizzate...
+
+[17:17:55] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_17-17-19.txt
+
+[17:17:55] Backup configurazioni...
+
+[17:17:55] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_17-17-19
+
+[17:17:55] Scansione file duplicati...
+
+[17:18:00] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_17-17-19.txt
+
+[17:18:00] Ottimizzazione memoria...
+
+[17:18:01] RAM ottimizzata.
+
+[17:18:01] Ricostruzione LaunchServices...
+
+[17:18:44] LaunchServices ricostruito.
+
+[17:18:44] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+Client disconnected
+Client connected
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[18:25:32] Permessi riparati.
+
+[18:25:32] Flush DNS...
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+[18:25:32] DNS cache resettato.
+
+[18:25:32] Reset Spotlight index...
+
+[18:25:34] Spotlight reset completato (reindicizzazione in background).
+
+[18:25:34] Ottimizzazione font cache...
+
+[18:25:35] Font cache ottimizzato.
+
+[18:25:35] Analisi cache package manager...
+
+[18:25:35] Cache package manager analizzate: 407 MB
+
+[18:25:35] Analisi Docker...
+
+[18:25:35] Docker non installato o non in esecuzione, skip
+
+[18:25:35] Analisi Homebrew...
+
+[18:25:35] Homebrew analizzato: 0 MB
+
+[18:25:35] ═══════════════════════════════════════════════════════════
+
+[18:25:35] ✅ DRY RUN COMPLETATO
+
+[18:25:35] ═══════════════════════════════════════════════════════════
+
+[18:25:35] 📊 Spazio liberabile: 1968 MB
+
+[18:25:35] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_17-17-19.txt
+
+[18:25:35] 
+
+button returned:OK
+
+Script terminato con codice 0
+[18:25:49] ═══════════════════════════════════════════════════════════
+
+[18:25:49] CleanMac v4.0 — Avvio
+
+[18:25:49] ═══════════════════════════════════════════════════════════
+
+[18:25:49] Modalità: DRY RUN (analisi senza eliminazione)
+
+[18:25:49] Analisi spazio disco...
+
+[18:25:49] 📁 /Users/nf/Desktop:  21M
+
+[18:25:49] 📁 /Users/nf/Downloads:  30M
+
+[18:25:49] 📁 /Users/nf/Documents:  45M
+
+[18:25:49] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_18-25-49.txt
+
+[18:25:50] Analisi cache utente...
+
+[18:25:50] Cache utente analizzata: 1175 MB
+
+[18:25:50] Analisi cache sistema...
+
+[18:25:50] Cache sistema analizzata: 1 MB
+
+[18:25:50] Analisi file di log...
+
+[18:25:50] File di log analizzati: 27 file — 2 MB
+
+[18:25:50] Analisi Safari...
+
+[18:25:50] Safari analizzato: 1 MB
+
+[18:25:50] Analisi DerivedData...
+
+[18:25:50] DerivedData analizzato: 0 MB
+
+[18:25:50] Analisi .DS_Store...
+
+[18:25:58] .DS_Store analizzati: 37 file
+
+[18:25:58] Analisi cartelle temporanee...
+
+[18:25:58] Cartelle temporanee analizzate: 0 MB
+
+[18:25:58] Analisi Trash...
+
+[18:25:58] Cestino analizzato: 0 MB
+
+[18:25:58] Scansione file grandi...
+
+[18:26:03] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_18-25-49.txt
+
+[18:26:03] Analisi file .localized e system junk...
+
+[18:26:31] System junk analizzato
+
+[18:26:31] Analisi cache app...
+
+[18:26:31] Cache app analizzate: 385 MB
+
+[18:26:31] Analisi log da comprimere...
+
+[18:26:31] Log vecchi analizzati: 6 file
+
+[18:26:31] Analisi Download vecchi...
+
+[18:26:31] Download vecchi analizzati: 1 file, 1 MB
+
+[18:26:31] Analisi app non utilizzate...
+
+[18:26:31] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_18-25-49.txt
+
+[18:26:31] Backup configurazioni...
+
+[18:26:31] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_18-25-49
+
+[18:26:31] Scansione file duplicati...
+
+[18:26:36] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_18-25-49.txt
+
+[18:26:36] Ottimizzazione memoria...
+
+[18:26:36] RAM ottimizzata.
+
+[18:26:36] Ricostruzione LaunchServices...
+
+[18:27:20] LaunchServices ricostruito.
+
+[18:27:20] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[18:27:56] Permessi riparati.
+
+[18:27:56] Flush DNS...
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+sudo: a password is required
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+
+sudo: a password is required
+
+[18:27:56] DNS cache resettato.
+
+[18:27:56] Reset Spotlight index...
+
+[18:27:58] Spotlight reset completato (reindicizzazione in background).
+
+[18:27:58] Ottimizzazione font cache...
+
+[18:27:59] Font cache ottimizzato.
+
+[18:27:59] Analisi cache package manager...
+
+[18:28:00] Cache package manager analizzate: 407 MB
+
+[18:28:00] Analisi Docker...
+
+[18:28:00] Docker non installato o non in esecuzione, skip
+
+[18:28:00] Analisi Homebrew...
+
+[18:28:00] Homebrew analizzato: 0 MB
+
+[18:28:00] ═══════════════════════════════════════════════════════════
+
+[18:28:00] ✅ DRY RUN COMPLETATO
+
+[18:28:00] ═══════════════════════════════════════════════════════════
+
+[18:28:00] 📊 Spazio liberabile: 1972 MB
+
+[18:28:00] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_18-25-49.txt
+
+[18:28:00] 
+
+button returned:OK
+
+Script terminato con codice 0
+
+> cleanmac-web@1.0.0 start
+> node server.js
+
+
+╔════════════════════════════════════════╗
+║                                        ║
+║   🧹 CleanMac Web Interface v1.0      ║
+║                                        ║
+║   Server running on:                   ║
+║   http://localhost:3000                ║
+║                                        ║
+╚════════════════════════════════════════╝
+  
+Client connected
+[18:38:31] ═══════════════════════════════════════════════════════════
+
+[18:38:31] CleanMac v4.0 — Avvio
+
+[18:38:31] ═══════════════════════════════════════════════════════════
+
+[18:38:31] Modalità: DRY RUN (analisi senza eliminazione)
+
+[18:38:31] Analisi spazio disco...
+
+[18:38:31] 📁 /Users/nf/Desktop:  21M
+
+[18:38:31] 📁 /Users/nf/Downloads:  30M
+
+[18:38:31] 📁 /Users/nf/Documents:  45M
+
+[18:38:31] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-26_18-38-31.txt
+
+[18:38:31] Analisi cache utente...
+
+[18:38:32] Cache utente analizzata: 1188 MB
+
+[18:38:32] Analisi cache sistema...
+
+[18:38:32] Cache sistema analizzata: 1 MB
+
+[18:38:32] Analisi file di log...
+
+[18:38:32] File di log analizzati: 27 file — 2 MB
+
+[18:38:32] Analisi Safari...
+
+[18:38:32] Safari analizzato: 1 MB
+
+[18:38:32] Analisi DerivedData...
+
+[18:38:32] DerivedData analizzato: 0 MB
+
+[18:38:32] Analisi .DS_Store...
+
+[18:38:41] .DS_Store analizzati: 37 file
+
+[18:38:41] Analisi cartelle temporanee...
+
+[18:38:41] Cartelle temporanee analizzate: 0 MB
+
+[18:38:41] Analisi Trash...
+
+[18:38:41] Cestino analizzato: 0 MB
+
+[18:38:41] Scansione file grandi...
+
+[18:38:46] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-26_18-38-31.txt
+
+[18:38:46] Analisi file .localized e system junk...
+
+[18:39:14] System junk analizzato
+
+[18:39:14] Analisi cache app...
+
+[18:39:14] Cache app analizzate: 394 MB
+
+[18:39:14] Analisi log da comprimere...
+
+[18:39:14] Log vecchi analizzati: 6 file
+
+[18:39:14] Analisi Download vecchi...
+
+[18:39:14] Download vecchi analizzati: 1 file, 1 MB
+
+[18:39:14] Analisi app non utilizzate...
+
+[18:39:14] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-26_18-38-31.txt
+
+[18:39:14] Backup configurazioni...
+
+[18:39:14] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2025-12-26_18-38-31
+
+[18:39:14] Scansione file duplicati...
+
+[18:39:19] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-26_18-38-31.txt
+
+[18:39:19] Ottimizzazione memoria...
+
+[18:39:20] RAM ottimizzata.
+
+[18:39:20] Ricostruzione LaunchServices...
+
+[18:40:06] LaunchServices ricostruito.
+
+[18:40:06] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[18:40:45] Permessi riparati.
+
+[18:40:45] Flush DNS...
+
+sudo: unable to read password: Input/output error
+
+sudo: a password is required
+
+sudo: unable to read password: Input/output error
+
+sudo: a password is required
+
+[18:40:46] DNS cache resettato.
+
+[18:40:46] Reset Spotlight index...
+
+[18:40:48] Spotlight reset completato (reindicizzazione in background).
+
+[18:40:48] Ottimizzazione font cache...
+
+[18:40:49] Font cache ottimizzato.
+
+[18:40:49] Analisi cache package manager...
+
+[18:40:49] Cache package manager analizzate: 407 MB
+
+[18:40:49] Analisi Docker...
+
+[18:40:49] Docker non installato o non in esecuzione, skip
+
+[18:40:49] Analisi Homebrew...
+
+[18:40:49] Homebrew analizzato: 0 MB
+
+[18:40:49] ═══════════════════════════════════════════════════════════
+
+[18:40:49] ✅ DRY RUN COMPLETATO
+
+[18:40:49] ═══════════════════════════════════════════════════════════
+
+[18:40:49] 📊 Spazio liberabile: 1994 MB
+
+[18:40:49] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-26_18-38-31.txt
+
+[18:40:49] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+
+> cleanmac-web@1.0.0 start
+> node server.js
+
+
+╔════════════════════════════════════════╗
+║                                        ║
+║   🧹 CleanMac Web Interface v1.0      ║
+║                                        ║
+║   Server running on:                   ║
+║   http://localhost:3000                ║
+║                                        ║
+╚════════════════════════════════════════╝
+  
+Client connected
+Client connected
+Client disconnected
+[18:54:24] ═══════════════════════════════════════════════════════════
+
+[18:54:24] CleanMac v4.2 — Avvio
+
+[18:54:24] ═══════════════════════════════════════════════════════════
+
+[18:54:24] Mappatura operazioni inizializzata: 29 operazioni
+
+[18:54:24] Modalità: DRY RUN (analisi senza eliminazione)
+
+[18:54:24] Analisi spazio disco...
+
+[18:54:24] 📁 /Users/nf/Desktop:  11M
+
+[18:54:24] 📁 /Users/nf/Downloads:  59M
+
+[18:54:24] 📁 /Users/nf/Documents:  45M
+
+[18:54:24] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-31_18-54-24.txt
+
+[18:54:24] Analisi cache utente...
+
+[18:54:24] Cache utente analizzata: 709 MB
+
+[18:54:24] Analisi cache sistema...
+
+[18:54:24] Cache sistema analizzata: 1 MB
+
+[18:54:24] Analisi file di log...
+
+[18:54:25] File di log analizzati: 28 file — 2 MB
+
+[18:54:25] Analisi Safari...
+
+[18:54:25] Safari analizzato: 1 MB
+
+[18:54:25] Analisi Xcode...
+
+[18:54:25] Xcode analizzato: 0 MB (DerivedData: 0, Archives: 0, Simulator: 0)
+
+[18:54:25] Analisi .DS_Store...
+
+[18:54:44] .DS_Store analizzati: 38 file
+
+[18:54:44] Analisi cartelle temporanee...
+
+[18:54:44] Cartelle temporanee analizzate: 0 MB
+
+[18:54:44] Analisi Trash...
+
+[18:54:45] Cestino analizzato: 0 MB
+
+[18:54:45] Scansione file grandi...
+
+[18:55:00] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-31_18-54-24.txt
+
+[18:55:00] Analisi file .localized e system junk...
+
+[18:56:01] System junk analizzato
+
+[18:56:01] Analisi cache app...
+
+[18:56:01] Cache app analizzate: 575 MB
+
+[18:56:01] Analisi log da comprimere...
+
+[18:56:01] Log vecchi analizzati: 15 file
+
+[18:56:01] Analisi Download vecchi...
+
+[18:56:01] Download vecchi analizzati: 1 file, 1 MB
+
+[18:56:01] Analisi app non utilizzate...
+
+[18:56:02] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-31_18-54-24.txt
+
+[18:56:02] Backup configurazioni...
+
+[18:56:02] Scansione file duplicati...
+
+[18:56:08] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-31_18-54-24.txt
+
+[18:56:08] Ottimizzazione memoria...
+
+[18:56:08] RAM ottimizzata.
+
+[18:56:08] Ricostruzione LaunchServices...
+
+[18:56:08] LaunchServices ricostruito.
+
+[18:56:08] Riparazione permessi...
+
+[18:56:08] Permessi riparati.
+
+[18:56:08] Flush DNS...
+
+[18:56:08] DNS cache resettato.
+
+[18:56:08] Reset Spotlight index...
+
+[18:56:08] Spotlight reset completato (reindicizzazione in background).
+
+[18:56:08] Ottimizzazione font cache...
+
+[18:56:08] Font cache analizzato.
+
+[18:56:08] Analisi cache package manager...
+
+[18:56:08] Cache package manager analizzate: 549 MB
+
+[18:56:08] Analisi Docker...
+
+[18:56:08] Docker non installato o non in esecuzione, skip
+
+[18:56:08] Analisi Homebrew...
+
+[18:56:08] Homebrew analizzato: 0 MB
+
+[18:56:08] Analisi Time Machine snapshot locali...
+
+/Volumes/Dati/Dropbox/GitHub/CleanMac/.cleanmac_temp.sh: line 1406: [: 0
+0: integer expression expected
+
+[18:56:08] Time Machine: nessuno snapshot locale trovato
+
+[18:56:08] Analisi backup iOS/iPad...
+
+[18:56:08] Backup iOS: directory non esistente
+
+[18:56:08] Analisi file Swap e Sleepimage...
+
+[18:56:08] Swap/Sleepimage analizzati: 0 MB (Swap: 0, Sleep: 0)
+
+[18:56:08] ═══════════════════════════════════════════════════════════
+
+[18:56:08] ✅ DRY RUN COMPLETATO
+
+[18:56:08] ═══════════════════════════════════════════════════════════
+
+[18:56:08] 📊 Spazio liberabile: 1888 MB
+
+[18:56:08] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-31_18-54-24.txt
+
+[18:56:08] 
+
+[18:56:22] Categoria ANALISI abilitata
+
+[18:56:22] Modalità selettiva attivata
+
+button returned:OK
+
+[18:56:26] Preferenze salvate in: /Volumes/Dati/Dropbox/GitHub/CleanMac/.cleanmac_prefs_2025-12-31_18-54-24.tmp
+
+Script terminato con codice 0
+Client disconnected
+Client connected
+[19:00:09] ═══════════════════════════════════════════════════════════
+
+[19:00:09] CleanMac v4.2 — Avvio
+
+[19:00:09] ═══════════════════════════════════════════════════════════
+
+[19:00:09] Mappatura operazioni inizializzata: 29 operazioni
+
+[19:00:09] Modalità: DRY RUN (analisi senza eliminazione)
+
+[19:00:09] Analisi spazio disco...
+
+[19:00:09] 📁 /Users/nf/Desktop:  11M
+
+[19:00:09] 📁 /Users/nf/Downloads:  59M
+
+[19:00:09] 📁 /Users/nf/Documents:  45M
+
+[19:00:09] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-31_19-00-09.txt
+
+[19:00:09] Analisi cache utente...
+
+[19:00:09] Cache utente analizzata: 740 MB
+
+[19:00:09] Analisi cache sistema...
+
+[19:00:09] Cache sistema analizzata: 1 MB
+
+[19:00:09] Analisi file di log...
+
+[19:00:10] File di log analizzati: 28 file — 2 MB
+
+[19:00:10] Analisi Safari...
+
+[19:00:10] Safari analizzato: 1 MB
+
+[19:00:10] Analisi Xcode...
+
+[19:00:10] Xcode analizzato: 0 MB (DerivedData: 0, Archives: 0, Simulator: 0)
+
+[19:00:10] Analisi .DS_Store...
+
+[19:00:22] .DS_Store analizzati: 38 file
+
+[19:00:22] Analisi cartelle temporanee...
+
+[19:00:22] Cartelle temporanee analizzate: 0 MB
+
+[19:00:22] Analisi Trash...
+
+[19:00:22] Cestino analizzato: 0 MB
+
+[19:00:22] Scansione file grandi...
+
+[19:00:35] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-31_19-00-09.txt
+
+[19:00:35] Analisi file .localized e system junk...
+
+[19:01:31] System junk analizzato
+
+[19:01:31] Analisi cache app...
+
+[19:01:32] Cache app analizzate: 601 MB
+
+[19:01:32] Analisi log da comprimere...
+
+[19:01:32] Log vecchi analizzati: 15 file
+
+[19:01:32] Analisi Download vecchi...
+
+[19:01:32] Download vecchi analizzati: 1 file, 1 MB
+
+[19:01:32] Analisi app non utilizzate...
+
+[19:01:32] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-31_19-00-09.txt
+
+[19:01:32] Backup configurazioni...
+
+[19:01:32] Scansione file duplicati...
+
+[19:01:37] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-31_19-00-09.txt
+
+[19:01:37] Ottimizzazione memoria...
+
+[19:01:37] RAM ottimizzata.
+
+[19:01:37] Ricostruzione LaunchServices...
+
+[19:01:37] LaunchServices ricostruito.
+
+[19:01:37] Riparazione permessi...
+
+[19:01:37] Permessi riparati.
+
+[19:01:37] Flush DNS...
+
+[19:01:37] DNS cache resettato.
+
+[19:01:37] Reset Spotlight index...
+
+[19:01:37] Spotlight reset completato (reindicizzazione in background).
+
+[19:01:37] Ottimizzazione font cache...
+
+[19:01:37] Font cache analizzato.
+
+[19:01:37] Analisi cache package manager...
+
+[19:01:37] Cache package manager analizzate: 549 MB
+
+[19:01:37] Analisi Docker...
+
+[19:01:37] Docker non installato o non in esecuzione, skip
+
+[19:01:37] Analisi Homebrew...
+
+[19:01:37] Homebrew analizzato: 0 MB
+
+[19:01:37] Analisi Time Machine snapshot locali...
+
+/Volumes/Dati/Dropbox/GitHub/CleanMac/.cleanmac_temp.sh: line 1451: [: 0
+0: integer expression expected
+
+[19:01:37] Time Machine: nessuno snapshot locale trovato
+
+[19:01:37] Analisi backup iOS/iPad...
+
+[19:01:37] Backup iOS: directory non esistente
+
+[19:01:37] Analisi file Swap e Sleepimage...
+
+[19:01:37] Swap/Sleepimage analizzati: 0 MB (Swap: 0, Sleep: 0)
+
+[19:01:37] ═══════════════════════════════════════════════════════════
+
+[19:01:37] ✅ DRY RUN COMPLETATO
+
+[19:01:37] ═══════════════════════════════════════════════════════════
+
+[19:01:37] 📊 Spazio liberabile: 1945 MB
+
+[19:01:37] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-31_19-00-09.txt
+
+[19:01:37] 
+
+399:486: 
+execution error: Operazione annullata dall’utente. (-128)
+
+[19:01:43] Procedimento con pulizia completa...
+
+button returned:OK
+
+Script terminato con codice 0
+Client disconnected
+Client connected
+[19:17:35] ═══════════════════════════════════════════════════════════
+
+[19:17:35] CleanMac v4.2 — Avvio
+
+[19:17:35] ═══════════════════════════════════════════════════════════
+
+[19:17:35] Mappatura operazioni inizializzata: 29 operazioni
+
+[19:17:35] Modalità: DRY RUN (analisi senza eliminazione)
+
+[19:17:35] Analisi spazio disco...
+
+[19:17:35] 📁 /Users/nf/Desktop:  11M
+
+[19:17:35] 📁 /Users/nf/Downloads:  59M
+
+[19:17:35] 📁 /Users/nf/Documents:  45M
+
+[19:17:35] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2025-12-31_19-17-35.txt
+
+[19:17:35] Analisi cache utente...
+
+[19:17:36] Cache utente analizzata: 741 MB
+
+[19:17:36] Analisi cache sistema...
+
+[19:17:36] Cache sistema analizzata: 1 MB
+
+[19:17:36] Analisi file di log...
+
+[19:17:36] File di log analizzati: 28 file — 2 MB
+
+[19:17:36] Analisi Safari...
+
+[19:17:36] Safari analizzato: 1 MB
+
+[19:17:36] Analisi Xcode...
+
+[19:17:36] Xcode analizzato: 0 MB (DerivedData: 0, Archives: 0, Simulator: 0)
+
+[19:17:36] Analisi .DS_Store...
+
+[19:17:48] .DS_Store analizzati: 38 file
+
+[19:17:48] Analisi cartelle temporanee...
+
+[19:17:48] Cartelle temporanee analizzate: 0 MB
+
+[19:17:48] Analisi Trash...
+
+[19:17:48] Cestino analizzato: 0 MB
+
+[19:17:48] Scansione file grandi...
+
+[19:18:00] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2025-12-31_19-17-35.txt
+
+[19:18:00] Analisi file .localized e system junk...
+
+[19:18:49] System junk analizzato
+
+[19:18:49] Analisi cache app...
+
+[19:18:50] Cache app analizzate: 601 MB
+
+[19:18:50] Analisi log da comprimere...
+
+[19:18:50] Log vecchi analizzati: 15 file
+
+[19:18:50] Analisi Download vecchi...
+
+[19:18:50] Download vecchi analizzati: 1 file, 1 MB
+
+[19:18:50] Analisi app non utilizzate...
+
+[19:18:50] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2025-12-31_19-17-35.txt
+
+[19:18:50] Backup configurazioni...
+
+[19:18:50] Scansione file duplicati...
+
+[19:18:54] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2025-12-31_19-17-35.txt
+
+[19:18:54] Ottimizzazione memoria...
+
+[19:18:54] RAM ottimizzata.
+
+[19:18:54] Ricostruzione LaunchServices...
+
+[19:18:54] LaunchServices ricostruito.
+
+[19:18:54] Riparazione permessi...
+
+[19:18:54] Permessi riparati.
+
+[19:18:54] Flush DNS...
+
+[19:18:54] DNS cache resettato.
+
+[19:18:55] Reset Spotlight index...
+
+[19:18:55] Spotlight reset completato (reindicizzazione in background).
+
+[19:18:55] Ottimizzazione font cache...
+
+[19:18:55] Font cache analizzato.
+
+[19:18:55] Analisi cache package manager...
+
+[19:18:55] Cache package manager analizzate: 549 MB
+
+[19:18:55] Analisi Docker...
+
+[19:18:55] Docker non installato o non in esecuzione, skip
+
+[19:18:55] Analisi Homebrew...
+
+[19:18:55] Homebrew analizzato: 0 MB
+
+[19:18:55] Analisi Time Machine snapshot locali...
+
+/Volumes/Dati/Dropbox/GitHub/CleanMac/.cleanmac_temp.sh: line 1451: [: 0
+0: integer expression expected
+
+[19:18:55] Time Machine: nessuno snapshot locale trovato
+
+[19:18:55] Analisi backup iOS/iPad...
+
+[19:18:55] Backup iOS: directory non esistente
+
+[19:18:55] Analisi file Swap e Sleepimage...
+
+[19:18:55] Swap/Sleepimage analizzati: 0 MB (Swap: 0, Sleep: 0)
+
+[19:18:55] ═══════════════════════════════════════════════════════════
+
+[19:18:55] ✅ DRY RUN COMPLETATO
+
+[19:18:55] ═══════════════════════════════════════════════════════════
+
+[19:18:55] 📊 Spazio liberabile: 1946 MB
+
+[19:18:55] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2025-12-31_19-17-35.txt
+
+[19:18:55] 
+
+399:486: 
+execution error: 
+Operazione annullata dall’utente. (-128)
+
+[19:30:49] Procedimento con pulizia completa...
+
+button returned:OK
+
+Script terminato con codice 0
+Client disconnected
+
+> cleanmac-web@1.0.0 start
+> node server.js
+
+
+╔════════════════════════════════════════╗
+║                                        ║
+║   🧹 CleanMac Web Interface v1.0      ║
+║                                        ║
+║   Server running on:                   ║
+║   http://localhost:3000                ║
+║                                        ║
+╚════════════════════════════════════════╝
+  
+Client connected
+Esecuzione script con argomenti: [ '--dry-run', '--categories=CLEANUP,PERFORMANCE,ANALYSIS' ]
+[10:19:53] ═══════════════════════════════════════════════════════════
+
+[10:19:53] CleanMac v4.2 — Avvio
+
+[10:19:53] ═══════════════════════════════════════════════════════════
+
+[10:19:53] Mappatura operazioni inizializzata: 29 operazioni
+
+[10:19:53] Categorie abilitate via CLI: CLEANUP,PERFORMANCE,ANALYSIS
+
+[10:19:53] Modalità CLI: DRY RUN
+
+[10:19:53] Analisi spazio disco...
+
+[10:19:53] 📁 /Users/nf/Desktop:  11M
+
+[10:19:53] 📁 /Users/nf/Downloads: 187M
+
+[10:19:53] 📁 /Users/nf/Documents:  45M
+
+[10:19:53] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2026-01-03_10-19-53.txt
+
+[10:19:53] Analisi cache utente...
+
+[10:19:53] Cache utente analizzata: 1046 MB
+
+[10:19:53] Analisi cache sistema...
+
+[10:19:53] Cache sistema analizzata: 1 MB
+
+[10:19:53] Analisi file di log...
+
+[10:19:53] File di log analizzati: 30 file — 2 MB
+
+[10:19:53] Analisi Safari...
+
+[10:19:53] Safari analizzato: 1 MB
+
+[10:19:53] Analisi Xcode...
+
+[10:19:53] Xcode analizzato: 0 MB (DerivedData: 0, Archives: 0, Simulator: 0)
+
+[10:19:53] Analisi .DS_Store...
+
+[10:20:06] .DS_Store analizzati: 38 file
+
+[10:20:06] Analisi cartelle temporanee...
+
+[10:20:06] Cartelle temporanee analizzate: 0 MB
+
+[10:20:06] Analisi Trash...
+
+[10:20:06] Cestino analizzato: 0 MB
+
+[10:20:06] Scansione file grandi...
+
+[10:20:19] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2026-01-03_10-19-53.txt
+
+[10:20:19] Analisi file .localized e system junk...
+
+[10:21:09] System junk analizzato
+
+[10:21:09] Analisi cache app...
+
+[10:21:10] Cache app analizzate: 921 MB
+
+[10:21:10] Analisi log da comprimere...
+
+[10:21:10] Log vecchi analizzati: 23 file
+
+[10:21:10] Analisi Download vecchi...
+
+[10:21:10] Download vecchi analizzati: 1 file, 1 MB
+
+[10:21:10] Analisi app non utilizzate...
+
+[10:21:10] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2026-01-03_10-19-53.txt
+
+[10:21:10] Backup configurazioni...
+
+[10:21:10] Scansione file duplicati...
+
+[10:21:15] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2026-01-03_10-19-53.txt
+
+[10:21:15] Ottimizzazione memoria...
+
+[10:21:15] RAM ottimizzata.
+
+[10:21:15] Ricostruzione LaunchServices...
+
+[10:21:15] LaunchServices ricostruito.
+
+[10:21:16] Riparazione permessi...
+
+[10:21:16] Permessi riparati.
+
+[10:21:16] Flush DNS...
+
+[10:21:16] DNS cache resettato.
+
+[10:21:16] Reset Spotlight index...
+
+[10:21:16] Spotlight reset completato (reindicizzazione in background).
+
+[10:21:16] Ottimizzazione font cache...
+
+[10:21:16] Font cache analizzato.
+
+[10:21:16] Analisi cache package manager...
+
+[10:21:16] Cache package manager analizzate: 549 MB
+
+[10:21:16] Analisi Docker...
+
+[10:21:16] Docker non installato o non in esecuzione, skip
+
+[10:21:16] Analisi Homebrew...
+
+[10:21:16] Homebrew analizzato: 0 MB
+
+[10:21:16] Analisi Time Machine snapshot locali...
+
+/Volumes/Dati/Dropbox/GitHub/CleanMac/CleanMac.command: line 1453: [: 0
+0: integer expression expected
+
+[10:21:16] Time Machine: nessuno snapshot locale trovato
+
+[10:21:16] Analisi backup iOS/iPad...
+
+[10:21:16] Backup iOS: directory non esistente
+
+[10:21:16] Analisi file Swap e Sleepimage...
+
+[10:21:16] Swap/Sleepimage analizzati: 2048 MB (Swap: 0, Sleep: 2048)
+
+[10:21:16] ═══════════════════════════════════════════════════════════
+
+[10:21:16] ✅ DRY RUN COMPLETATO
+
+[10:21:16] ═══════════════════════════════════════════════════════════
+
+[10:21:16] 📊 Spazio liberabile: 2571 MB
+
+[10:21:16] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2026-01-03_10-19-53.txt
+
+[10:21:16] 
+
+Script terminato con codice 0
+Esecuzione script con argomenti: [ '--dry-run', '--categories=ANALYSIS' ]
+[10:24:29] ═══════════════════════════════════════════════════════════
+
+[10:24:29] CleanMac v4.2 — Avvio
+
+[10:24:29] ═══════════════════════════════════════════════════════════
+
+[10:24:29] Mappatura operazioni inizializzata: 29 operazioni
+
+[10:24:29] Categorie abilitate via CLI: ANALYSIS
+
+[10:24:29] Modalità CLI: DRY RUN
+
+[10:24:29] Analisi spazio disco...
+
+[10:24:29] 📁 /Users/nf/Desktop:  11M
+
+[10:24:29] 📁 /Users/nf/Downloads: 187M
+
+[10:24:29] 📁 /Users/nf/Documents:  45M
+
+[10:24:29] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2026-01-03_10-24-29.txt
+
+[10:24:29] Analisi cache utente...
+
+[10:24:30] Cache utente analizzata: 1051 MB
+
+[10:24:30] Analisi cache sistema...
+
+[10:24:30] Cache sistema analizzata: 1 MB
+
+[10:24:30] Analisi file di log...
+
+[10:24:30] File di log analizzati: 30 file — 2 MB
+
+[10:24:30] Analisi Safari...
+
+[10:24:30] Safari analizzato: 1 MB
+
+[10:24:30] Analisi Xcode...
+
+[10:24:30] Xcode analizzato: 0 MB (DerivedData: 0, Archives: 0, Simulator: 0)
+
+[10:24:30] Analisi .DS_Store...
+
+[10:24:43] .DS_Store analizzati: 38 file
+
+[10:24:43] Analisi cartelle temporanee...
+
+[10:24:43] Cartelle temporanee analizzate: 0 MB
+
+[10:24:43] Analisi Trash...
+
+[10:24:43] Cestino analizzato: 0 MB
+
+[10:24:43] Scansione file grandi...
+
+[10:24:56] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2026-01-03_10-24-29.txt
+
+[10:24:56] Analisi file .localized e system junk...
+
+Script terminato con codice null
+Password submitted by client
+Password ricevuta dal client
+Esecuzione script con argomenti: [ '--cleanup', '--categories=CLEANUP,PERFORMANCE' ]
+[10:25:15] ═══════════════════════════════════════════════════════════
+
+[10:25:15] CleanMac v4.2 — Avvio
+
+[10:25:15] ═══════════════════════════════════════════════════════════
+
+[10:25:15] Mappatura operazioni inizializzata: 29 operazioni
+
+[10:25:15] Categorie abilitate via CLI: CLEANUP,PERFORMANCE
+
+[10:25:15] Modalità CLI: PULIZIA DIRETTA
+
+[10:25:15] Analisi spazio disco...
+
+[10:25:15] 📁 /Users/nf/Desktop:  11M
+
+[10:25:15] 📁 /Users/nf/Downloads: 187M
+
+[10:25:15] 📁 /Users/nf/Documents:  45M
+
+[10:25:15] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2026-01-03_10-25-15.txt
+
+[10:25:15] Analisi cache utente...
+
+[10:25:25] Cache utente analizzata: 1060 MB
+
+[10:25:25] Analisi cache sistema...
+
+[10:25:25] Cache sistema analizzata: 1 MB
+
+[10:25:25] Analisi file di log...
+
+[10:25:26] File di log analizzati: 30 file — 2 MB
+
+[10:25:26] Analisi Safari...
+
+[10:25:26] Safari analizzato: 1 MB
+
+[10:25:26] Analisi Xcode...
+
+[10:25:26] Xcode analizzato: 0 MB (DerivedData: 0, Archives: 0, Simulator: 0)
+
+[10:25:26] Analisi .DS_Store...
+
+[10:25:43] .DS_Store analizzati: 38 file
+
+[10:25:43] Analisi cartelle temporanee...
+
+[10:25:44] Cartelle temporanee analizzate: 0 MB
+
+[10:25:44] Analisi Trash...
+
+[10:25:44] Cestino analizzato: 0 MB
+
+[10:25:44] Scansione file grandi...
+
+[10:25:55] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2026-01-03_10-25-15.txt
+
+[10:25:55] Analisi file .localized e system junk...
+
+[10:27:39] System junk analizzato
+
+[10:27:39] Analisi cache app...
+
+[10:27:39] Cache app analizzate: 69 MB
+
+[10:27:39] Analisi log da comprimere...
+
+[10:27:39] Log vecchi analizzati: 0 file
+
+[10:27:39] Analisi Download vecchi...
+
+[10:27:39] Download vecchi analizzati: 1 file, 1 MB
+
+[10:27:39] Analisi app non utilizzate...
+
+[10:27:40] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2026-01-03_10-25-15.txt
+
+[10:27:40] Backup configurazioni...
+
+[10:27:40] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2026-01-03_10-25-15
+
+[10:27:40] Scansione file duplicati...
+
+[10:27:45] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2026-01-03_10-25-15.txt
+
+[10:27:45] Ottimizzazione memoria...
+
+[10:27:47] RAM ottimizzata.
+
+[10:27:47] Ricostruzione LaunchServices...
+
+[10:28:38] LaunchServices ricostruito.
+
+[10:28:38] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[11:52:51] Permessi riparati.
+
+[11:52:51] Flush DNS...
+
+Password:
+[11:52:51] DNS cache resettato.
+
+[11:52:51] Reset Spotlight index...
+
+/:
+	Indexing disabled.
+/System/Volumes/Data:
+	Indexing disabled.
+/System/Volumes/Preboot:
+	Indexing disabled.
+/Volumes/Dati:
+	Indexing disabled.
+
+/:
+	Indexing enabled. 
+/System/Volumes/Data:
+	Indexing enabled. 
+/System/Volumes/Preboot:
+	Indexing enabled. 
+/Volumes/Dati:
+	Indexing enabled. 
+
+[11:52:55] Spotlight reset completato (reindicizzazione in background).
+
+[11:52:55] Ottimizzazione font cache...
+
+[11:52:57] Font cache analizzato.
+
+[11:52:57] Analisi cache package manager...
+
+[11:52:59] Cache package manager analizzate: 549 MB
+
+[11:52:59] Analisi Docker...
+
+[11:52:59] Docker non installato o non in esecuzione, skip
+
+[11:52:59] Analisi Homebrew...
+
+Removing: /usr/local/Homebrew/Library/Homebrew/vendor/portable-ruby/3.3.2... (2,391 files, 41MB)
+
+[11:53:13] Homebrew analizzato: 0 MB
+
+[11:53:13] Analisi Time Machine snapshot locali...
+
+/Volumes/Dati/Dropbox/GitHub/CleanMac/.cleanmac_temp.sh: line 1456: [: 0
+0: integer expression expected
+
+[11:53:13] Time Machine: nessuno snapshot locale trovato
+
+[11:53:13] Analisi backup iOS/iPad...
+
+[11:53:13] Backup iOS: directory non esistente
+
+[11:53:13] Analisi file Swap e Sleepimage...
+
+[11:53:13] Swap/Sleepimage analizzati: 2048 MB (Swap: 0, Sleep: 2048)
+
+[11:53:13] Generazione report HTML...
+
+[11:53:13] ═══════════════════════════════════════════════════════════
+
+[11:53:13] ✅ PULIZIA COMPLETATA
+
+[11:53:14] ═══════════════════════════════════════════════════════════
+
+[11:53:14] 📊 Spazio: 1733 MB
+
+[11:53:14] 📝 Report TXT: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2026-01-03_10-25-15.txt
+
+[11:53:14] 📄 Report HTML: /Volumes/Dati/Dropbox/GitHub/CleanMac/cleanmac_report_2026-01-03_10-25-15.html
+
+[11:53:14] 
+
+button returned:OK
+
+Script terminato con codice 0
+Password submitted by client
+Password ricevuta dal client
+Esecuzione script con argomenti: [ '--cleanup', '--categories=ANALYSIS' ]
+[13:36:09] ═══════════════════════════════════════════════════════════
+
+[13:36:09] CleanMac v4.2 — Avvio
+
+[13:36:09] ═══════════════════════════════════════════════════════════
+
+[13:36:09] Mappatura operazioni inizializzata: 29 operazioni
+
+[13:36:09] Categorie abilitate via CLI: ANALYSIS
+
+[13:36:09] Modalità CLI: PULIZIA DIRETTA
+
+[13:36:09] Analisi spazio disco...
+
+[13:36:09] 📁 /Users/nf/Desktop:  11M
+
+[13:36:09] 📁 /Users/nf/Downloads: 187M
+
+[13:36:10] 📁 /Users/nf/Documents:  45M
+
+[13:36:10] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2026-01-03_13-36-09.txt
+
+[13:36:10] Analisi cache utente...
+
+[13:36:10] Cache utente analizzata: 89 MB
+
+[13:36:10] Analisi cache sistema...
+
+[13:36:10] Cache sistema analizzata: 1 MB
+
+[13:36:10] Analisi file di log...
+
+[13:36:10] File di log analizzati: 0 file — 0 MB
+
+[13:36:10] Analisi Safari...
+
+[13:36:10] Safari analizzato: 0 MB
+
+[13:36:10] Analisi Xcode...
+
+[13:36:11] Xcode analizzato: 0 MB (DerivedData: 0, Archives: 0, Simulator: 0)
+
+[13:36:11] Analisi .DS_Store...
+
+[13:36:32] .DS_Store analizzati: 1 file
+
+[13:36:32] Analisi cartelle temporanee...
+
+[13:36:32] Cartelle temporanee analizzate: 0 MB
+
+[13:36:32] Analisi Trash...
+
+[13:36:32] Cestino analizzato: 0 MB
+
+[13:36:32] Scansione file grandi...
+
+[13:36:37] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2026-01-03_13-36-09.txt
+
+[13:36:37] Analisi file .localized e system junk...
+
+[13:37:52] System junk analizzato
+
+[13:37:52] Analisi cache app...
+
+[13:37:52] Cache app analizzate: 3 MB
+
+[13:37:52] Analisi log da comprimere...
+
+[13:37:52] Log vecchi analizzati: 0 file
+
+[13:37:52] Analisi Download vecchi...
+
+[13:37:52] Download vecchi analizzati: 0 file, 0 MB
+
+[13:37:52] Analisi app non utilizzate...
+
+[13:37:53] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2026-01-03_13-36-09.txt
+
+[13:37:53] Backup configurazioni...
+
+[13:37:53] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/config_backup_2026-01-03_13-36-09
+
+[13:37:53] Scansione file duplicati...
+
+[13:37:59] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2026-01-03_13-36-09.txt
+
+[13:37:59] Ottimizzazione memoria...
+
+[13:38:00] RAM ottimizzata.
+
+[13:38:00] Ricostruzione LaunchServices...
+
+[13:38:52] LaunchServices ricostruito.
+
+[13:38:52] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[13:39:31] Permessi riparati.
+
+[13:39:31] Flush DNS...
+
+[13:39:31] DNS cache resettato.
+
+[13:39:31] Reset Spotlight index...
+
+/:
+	Indexing disabled.
+/System/Volumes/Data:
+	Indexing disabled.
+/System/Volumes/Preboot:
+	Indexing disabled.
+/Volumes/Dati:
+	Indexing disabled.
+
+/:
+	Indexing enabled. 
+/System/Volumes/Data:
+	Indexing enabled. 
+/System/Volumes/Preboot:
+	Indexing enabled. 
+/Volumes/Dati:
+	Indexing enabled. 
+
+[13:39:35] Spotlight reset completato (reindicizzazione in background).
+
+[13:39:35] Ottimizzazione font cache...
+
+[13:39:37] Font cache analizzato.
+
+[13:39:37] Analisi cache package manager...
+
+[13:39:37] Cache package manager analizzate: 27 MB
+
+[13:39:37] Analisi Docker...
+
+[13:39:37] Docker non installato o non in esecuzione, skip
+
+[13:39:37] Analisi Homebrew...
+
+Removing: /usr/local/Homebrew/Library/Homebrew/vendor/portable-ruby/3.3.2... (2,391 files, 41MB)
+
+[13:39:53] Homebrew analizzato: 0 MB
+
+[13:39:53] Analisi Time Machine snapshot locali...
+
+/Volumes/Dati/Dropbox/GitHub/CleanMac/.cleanmac_temp.sh: line 1456: [: 0
+0: integer expression expected
+
+[13:39:53] Time Machine: nessuno snapshot locale trovato
+
+[13:39:53] Analisi backup iOS/iPad...
+
+[13:39:53] Backup iOS: directory non esistente
+
+[13:39:53] Analisi file Swap e Sleepimage...
+
+[13:39:53] Swap/Sleepimage analizzati: 2048 MB (Swap: 0, Sleep: 2048)
+
+[13:39:53] Generazione report HTML...
+
+[13:39:53] ═══════════════════════════════════════════════════════════
+
+[13:39:53] ✅ PULIZIA COMPLETATA
+
+[13:39:53] ═══════════════════════════════════════════════════════════
+
+[13:39:53] 📊 Spazio: 170 MB
+
+[13:39:53] 📝 Report TXT: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2026-01-03_13-36-09.txt
+
+[13:39:53] 📄 Report HTML: /Volumes/Dati/Dropbox/GitHub/CleanMac/cleanmac_report_2026-01-03_13-36-09.html
+
+[13:39:53] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+
+╔════════════════════════════════════════╗
+║                                        ║
+║   🧹 CleanMac Web Interface v1.0      ║
+║                                        ║
+║   Server running on:                   ║
+║   http://localhost:3000                ║
+║                                        ║
+╚════════════════════════════════════════╝
+  
+Client connected
+Esecuzione script con argomenti: [ '--dry-run', '--categories=CLEANUP,PERFORMANCE,ANALYSIS' ]
+[14:08:14] ═══════════════════════════════════════════════════════════
+
+[14:08:14] CleanMac v4.2 — Avvio
+
+[14:08:14] ═══════════════════════════════════════════════════════════
+
+[14:08:14] Mappatura operazioni inizializzata: 31 operazioni (v4.3)
+
+[14:08:14] Categorie abilitate via CLI: CLEANUP,PERFORMANCE,ANALYSIS
+
+[14:08:14] Modalità CLI: DRY RUN
+
+[14:08:14] Analisi spazio disco...
+
+[14:08:14] 📁 /Users/nf/Desktop: 1,2G
+
+[14:08:14] 📁 /Users/nf/Downloads: 7,0G
+
+[14:08:14] 📁 /Users/nf/Documents:  61M
+
+[14:08:14] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2026-04-25_14-08-14.txt
+
+[14:08:14] Analisi cache utente...
+
+[14:08:15] Cache utente analizzata: 1910 MB
+
+[14:08:15] Analisi cache sistema...
+
+[14:08:15] Cache sistema analizzata: 1 MB
+
+[14:08:15] Analisi file di log...
+
+[14:08:15] File di log analizzati: 27 file — 17 MB
+
+[14:08:15] Analisi Safari...
+
+[14:08:15] Safari analizzato: 1 MB
+
+[14:08:15] Analisi Xcode...
+
+[14:08:15] Xcode analizzato: 0 MB (DerivedData: 0, Archives: 0, Simulator: 0)
+
+[14:08:15] Analisi .DS_Store...
+
+[14:08:35] .DS_Store analizzati: 374 file
+
+[14:08:35] Analisi cartelle temporanee...
+
+[14:08:35] Cartelle temporanee analizzate: 279 MB
+
+[14:08:35] Analisi Trash...
+
+[14:08:35] Cestino analizzato: 0 MB
+
+[14:08:35] Scansione file grandi...
+
+[14:08:56] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2026-04-25_14-08-14.txt
+
+[14:08:56] Analisi file .localized e system junk...
+
+[14:10:56] System junk analizzato
+
+[14:10:56] Analisi cache app...
+
+[14:10:56] Cache app analizzate: 982 MB
+
+[14:10:56] Analisi log da comprimere...
+
+[14:10:56] Log vecchi analizzati: 9 file
+
+[14:10:56] Analisi Download vecchi...
+
+[14:11:07] Download vecchi analizzati: 1664 file, 7899 MB
+
+[14:11:07] Analisi app non utilizzate...
+
+[14:11:07] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2026-04-25_14-08-14.txt
+
+[14:11:07] Backup configurazioni...
+
+[14:11:07] Scansione file duplicati...
+
+[14:11:13] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2026-04-25_14-08-14.txt
+
+[14:11:13] Ottimizzazione memoria...
+
+[14:11:13] RAM ottimizzata.
+
+[14:11:13] Ricostruzione LaunchServices...
+
+[14:11:13] LaunchServices ricostruito.
+
+[14:11:13] Riparazione permessi...
+
+[14:11:13] Permessi riparati.
+
+[14:11:13] Flush DNS...
+
+[14:11:13] DNS cache resettato.
+
+[14:11:13] Reset Spotlight index...
+
+[14:11:13] Spotlight reset completato (reindicizzazione in background).
+
+[14:11:13] Ottimizzazione font cache...
+
+[14:11:13] Font cache analizzato.
+
+[14:11:13] Analisi cache package manager...
+
+[14:11:13] Cache package manager analizzate: 2130 MB
+
+[14:11:13] Analisi Docker...
+
+[14:11:13] Docker non installato o non in esecuzione, skip
+
+[14:11:13] Analisi Homebrew...
+
+[14:11:13] Homebrew analizzato: 52 MB
+
+[14:11:13] Analisi Time Machine snapshot locali...
+
+/Volumes/Dati/Dropbox/GitHub/CleanMac/CleanMac.command: line 1535: [: 0
+0: integer expression expected
+
+[14:11:13] Time Machine: nessuno snapshot locale trovato
+
+[14:11:13] Analisi backup iOS/iPad...
+
+[14:11:13] Backup iOS: cartella vuota o assente
+
+[14:11:13] Analisi file Swap e Sleepimage...
+
+[14:11:13] Swap/Sleepimage analizzati: 2048 MB (Swap: 0, Sleep: 2048)
+
+[14:11:13] Analisi Mail attachments...
+
+[14:11:14] Mail attachments analizzati: 0 file, 0 MB
+
+[14:11:14] Analisi spazio APFS purgeable...
+
+[14:11:14] APFS purgeable analizzato: 0 MB
+
+[14:11:14] ═══════════════════════════════════════════════════════════
+
+[14:11:14] ✅ DRY RUN COMPLETATO
+
+[14:11:14] ═══════════════════════════════════════════════════════════
+
+[14:11:14] 📊 Spazio liberabile: 13273 MB
+
+[14:11:14] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2026-04-25_14-08-14.txt
+
+[14:11:14] 
+
+Script terminato con codice 0
+Esecuzione script con argomenti: [ '--dry-run', '--categories=CLEANUP,PERFORMANCE,ANALYSIS' ]
+[14:27:40] ═══════════════════════════════════════════════════════════
+
+[14:27:40] CleanMac v4.2 — Avvio
+
+[14:27:40] ═══════════════════════════════════════════════════════════
+
+[14:27:41] Mappatura operazioni inizializzata: 31 operazioni (v4.3)
+
+[14:27:41] Categorie abilitate via CLI: CLEANUP,PERFORMANCE,ANALYSIS
+
+[14:27:41] Modalità CLI: DRY RUN
+
+[14:27:41] Analisi spazio disco...
+
+[14:27:41] 📁 /Users/nf/Desktop: 1,2G
+
+[14:27:41] 📁 /Users/nf/Downloads: 7,0G
+
+[14:27:41] 📁 /Users/nf/Documents:  61M
+
+[14:27:41] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/disk_analysis_2026-04-25_14-27-40.txt
+
+[14:27:41] Analisi cache utente...
+
+[14:27:42] Cache utente analizzata: 1912 MB
+
+[14:27:42] Analisi cache sistema...
+
+[14:27:42] Cache sistema analizzata: 1 MB
+
+[14:27:42] Analisi file di log...
+
+[14:27:42] File di log analizzati: 27 file — 17 MB
+
+[14:27:42] Analisi Safari...
+
+[14:27:42] Safari analizzato: 1 MB
+
+[14:27:42] Analisi Xcode...
+
+[14:27:42] Xcode analizzato: 0 MB (DerivedData: 0, Archives: 0, Simulator: 0)
+
+[14:27:42] Analisi .DS_Store...
+
+[14:28:02] .DS_Store analizzati: 374 file
+
+[14:28:02] Analisi cartelle temporanee...
+
+[14:28:02] Cartelle temporanee analizzate: 279 MB
+
+[14:28:02] Analisi Trash...
+
+[14:28:02] Cestino analizzato: 0 MB
+
+[14:28:02] Scansione file grandi...
+
+[14:28:23] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/large_files_2026-04-25_14-27-40.txt
+
+[14:28:23] Analisi file .localized e system junk...
+
+[14:29:41] System junk analizzato
+
+[14:29:41] Analisi cache app...
+
+[14:29:41] Cache app analizzate: 984 MB
+
+[14:29:41] Analisi log da comprimere...
+
+[14:29:41] Log vecchi analizzati: 9 file
+
+[14:29:41] Analisi Download vecchi...
+
+[14:29:52] Download vecchi analizzati: 1664 file, 7899 MB
+
+[14:29:52] Analisi app non utilizzate...
+
+[14:29:52] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/unused_apps_2026-04-25_14-27-40.txt
+
+[14:29:52] Backup configurazioni...
+
+[14:29:52] Scansione file duplicati...
+
+[14:29:58] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/duplicates_2026-04-25_14-27-40.txt
+
+[14:29:58] Ottimizzazione memoria...
+
+[14:29:58] RAM ottimizzata.
+
+[14:29:58] Ricostruzione LaunchServices...
+
+[14:29:58] LaunchServices ricostruito.
+
+[14:29:58] Riparazione permessi...
+
+[14:29:58] Permessi riparati.
+
+[14:29:58] Flush DNS...
+
+[14:29:58] DNS cache resettato.
+
+[14:29:58] Reset Spotlight index...
+
+[14:29:58] Spotlight reset completato (reindicizzazione in background).
+
+[14:29:58] Ottimizzazione font cache...
+
+[14:29:58] Font cache analizzato.
+
+[14:29:58] Analisi cache package manager...
+
+[14:29:58] Cache package manager analizzate: 2130 MB
+
+[14:29:58] Analisi Docker...
+
+[14:29:58] Docker non installato o non in esecuzione, skip
+
+[14:29:58] Analisi Homebrew...
+
+[14:29:58] Homebrew analizzato: 52 MB
+
+[14:29:58] Analisi Time Machine snapshot locali...
+
+/Volumes/Dati/Dropbox/GitHub/CleanMac/CleanMac.command: line 1535: [: 0
+0: integer expression expected
+
+[14:29:58] Time Machine: nessuno snapshot locale trovato
+
+[14:29:58] Analisi backup iOS/iPad...
+
+[14:29:58] Backup iOS: cartella vuota o assente
+
+[14:29:58] Analisi file Swap e Sleepimage...
+
+[14:29:58] Swap/Sleepimage analizzati: 2048 MB (Swap: 0, Sleep: 2048)
+
+[14:29:58] Analisi Mail attachments...
+
+[14:29:58] Mail attachments analizzati: 0 file, 0 MB
+
+[14:29:58] Analisi spazio APFS purgeable...
+
+[14:29:59] APFS purgeable analizzato: 0 MB
+
+[14:29:59] ═══════════════════════════════════════════════════════════
+
+[14:29:59] ✅ DRY RUN COMPLETATO
+
+[14:29:59] ═══════════════════════════════════════════════════════════
+
+[14:29:59] 📊 Spazio liberabile: 13277 MB
+
+[14:29:59] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/dryrun_report_2026-04-25_14-27-40.txt
+
+[14:29:59] 
+
+Script terminato con codice 0
+Client disconnected
+Client connected
+Esecuzione script con argomenti: [ '--dry-run', '--categories=CLEANUP,PERFORMANCE,ANALYSIS' ]
+[19:26:36] ═══════════════════════════════════════════════════════════
+
+[19:26:36] CleanMac v4.2 — Avvio
+
+[19:26:36] ═══════════════════════════════════════════════════════════
+
+[19:26:36] Mappatura operazioni inizializzata: 31 operazioni (v4.3)
+
+[19:26:36] Categorie abilitate via CLI: CLEANUP,PERFORMANCE,ANALYSIS
+
+[19:26:36] Modalità CLI: DRY RUN
+
+[19:26:36] Analisi spazio disco...
+
+[19:26:36] 📁 /Users/nf/Desktop: 1,2G
+
+[19:26:36] 📁 /Users/nf/Downloads: 7,0G
+
+[19:26:36] 📁 /Users/nf/Documents:  61M
+
+[19:26:36] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/reports/disk_analysis_2026-04-25_19-26-36.txt
+
+[19:26:36] Analisi cache utente...
+
+[19:26:37] Cache utente analizzata: 1877 MB
+
+[19:26:37] Analisi cache sistema...
+
+[19:26:37] Cache sistema analizzata: 1 MB
+
+[19:26:37] Analisi file di log...
+
+[19:26:37] File di log analizzati: 27 file — 17 MB
+
+[19:26:37] Analisi Safari...
+
+[19:26:37] Safari analizzato: 1 MB
+
+[19:26:37] Analisi Xcode...
+
+[19:26:37] Xcode analizzato: 0 MB (DerivedData: 0, Archives: 0, Simulator: 0)
+
+[19:26:37] Analisi .DS_Store...
+
+[19:27:09] .DS_Store analizzati: 238 file
+
+[19:27:12] Analisi cartelle temporanee...
+
+[19:27:20] Cartelle temporanee analizzate: 279 MB
+
+[19:27:20] Analisi Trash...
+
+[19:27:20] Cestino analizzato: 0 MB
+
+[19:27:20] Scansione file grandi...
+
+[19:27:43] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/reports/large_files_2026-04-25_19-26-36.txt
+
+[19:27:43] Analisi file .localized e system junk...
+
+[19:29:08] System junk analizzato
+
+[19:29:08] Analisi cache app...
+
+[19:29:08] Cache app analizzate: 947 MB
+
+[19:29:08] Analisi log da comprimere...
+
+[19:29:08] Log vecchi analizzati: 9 file
+
+[19:29:08] Analisi Download vecchi...
+
+[19:29:18] Download vecchi analizzati: 1664 file, 7899 MB
+
+[19:29:18] Analisi app non utilizzate...
+
+[19:29:18] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/reports/unused_apps_2026-04-25_19-26-36.txt
+
+[19:29:18] Backup configurazioni...
+
+[19:29:18] Scansione file duplicati...
+
+[19:29:24] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/reports/duplicates_2026-04-25_19-26-36.txt
+
+[19:29:24] Ottimizzazione memoria...
+
+[19:29:24] RAM ottimizzata.
+
+[19:29:24] Ricostruzione LaunchServices...
+
+[19:29:24] LaunchServices ricostruito.
+
+[19:29:24] Riparazione permessi...
+
+[19:29:24] Permessi riparati.
+
+[19:29:24] Flush DNS...
+
+[19:29:24] DNS cache resettato.
+
+[19:29:24] Reset Spotlight index...
+
+[19:29:24] Spotlight reset completato (reindicizzazione in background).
+
+[19:29:24] Ottimizzazione font cache...
+
+[19:29:24] Font cache analizzato.
+
+[19:29:24] Analisi cache package manager...
+
+[19:29:24] Cache package manager analizzate: 2130 MB
+
+[19:29:24] Analisi Docker...
+
+[19:29:24] Docker non installato o non in esecuzione, skip
+
+[19:29:24] Analisi Homebrew...
+
+[19:29:24] Homebrew analizzato: 52 MB
+
+[19:29:24] Analisi Time Machine snapshot locali...
+
+/Volumes/Dati/Dropbox/GitHub/CleanMac/CleanMac.command: line 1557: [: 0
+0: integer expression expected
+
+[19:29:24] Time Machine: nessuno snapshot locale trovato
+
+[19:29:24] Analisi backup iOS/iPad...
+
+[19:29:24] Backup iOS: cartella vuota o assente
+
+[19:29:24] Analisi file Swap e Sleepimage...
+
+[19:29:24] Swap/Sleepimage analizzati: 2048 MB (Swap: 0, Sleep: 2048)
+
+[19:29:24] Analisi Mail attachments...
+
+[19:29:24] Mail attachments analizzati: 0 file, 0 MB
+
+[19:29:24] Analisi spazio APFS purgeable...
+
+[19:29:25] APFS purgeable analizzato: 0 MB
+
+[19:29:25] ═══════════════════════════════════════════════════════════
+
+[19:29:25] ✅ DRY RUN COMPLETATO
+
+[19:29:25] ═══════════════════════════════════════════════════════════
+
+[19:29:25] 📊 Spazio liberabile: 13204 MB
+
+[19:29:25] 📄 Report salvato: /Volumes/Dati/Dropbox/GitHub/CleanMac/reports/dryrun_report_2026-04-25_19-26-36.txt
+
+[19:29:25] 
+
+Script terminato con codice 0
+Password submitted by client
+Password ricevuta dal client
+Esecuzione script con argomenti: [ '--cleanup', '--categories=PERFORMANCE' ]
+[19:32:44] ═══════════════════════════════════════════════════════════
+
+[19:32:45] CleanMac v4.2 — Avvio
+
+[19:32:45] ═══════════════════════════════════════════════════════════
+
+[19:32:45] Mappatura operazioni inizializzata: 31 operazioni (v4.3)
+
+[19:32:45] Categorie abilitate via CLI: PERFORMANCE
+
+[19:32:45] Modalità CLI: PULIZIA DIRETTA
+
+[19:32:45] Analisi spazio disco...
+
+[19:32:45] Analisi spazio disco: SALTATA (non selezionata)
+
+[19:32:45] Analisi salvata in /Volumes/Dati/Dropbox/GitHub/CleanMac/reports/disk_analysis_2026-04-25_19-32-44.txt
+
+[19:32:45] Analisi cache utente...
+
+[19:32:45] Cache utente: SALTATA (non selezionata)
+
+[19:32:45] Cache utente analizzata: 1877 MB
+
+[19:32:45] Analisi cache sistema...
+
+[19:32:45] Cache sistema: SALTATA (non selezionata)
+
+[19:32:45] Cache sistema analizzata: 1 MB
+
+[19:32:45] Analisi file di log...
+
+[19:32:45] File di log: SALTATI (non selezionati)
+
+[19:32:45] File di log analizzati: 27 file — 17 MB
+
+[19:32:45] Analisi Safari...
+
+[19:32:45] Safari cache: SALTATA (non selezionata)
+
+[19:32:45] Safari analizzato: 1 MB
+
+[19:32:45] Analisi Xcode...
+
+[19:32:45] Xcode: SALTATO (non selezionato)
+
+[19:32:45] Xcode analizzato: 0 MB (DerivedData: 0, Archives: 0, Simulator: 0)
+
+[19:32:45] Analisi .DS_Store...
+
+[19:33:06] .DS_Store: SALTATI (non selezionati)
+
+[19:33:06] .DS_Store analizzati: 374 file
+
+[19:33:06] Analisi cartelle temporanee...
+
+[19:33:06] Cartelle temporanee: SALTATE (non selezionate)
+
+[19:33:06] Cartelle temporanee analizzate: 279 MB
+
+[19:33:06] Analisi Trash...
+
+[19:33:06] Cestino: SALTATO (non selezionato)
+
+[19:33:06] Cestino analizzato: 0 MB
+
+[19:33:06] Scansione file grandi...
+
+[19:33:06] Scansione file grandi: SALTATA (non selezionata)
+
+[19:33:06] Scansione file grandi completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/reports/large_files_2026-04-25_19-32-44.txt
+
+[19:33:06] Analisi file .localized e system junk...
+
+[19:34:32] File .localized e junk: SALTATI (non selezionati)
+
+[19:34:32] System junk analizzato
+
+[19:34:32] Analisi cache app...
+
+[19:34:32] Cache app: SALTATE (non selezionate)
+
+[19:34:32] Cache app analizzate: 947 MB
+
+[19:34:32] Analisi log da comprimere...
+
+[19:34:32] Log vecchi: SALTATI (non selezionati)
+
+[19:34:32] Log vecchi analizzati: 9 file
+
+[19:34:32] Analisi Download vecchi...
+
+[19:34:42] Download vecchi: SALTATI (non selezionati)
+
+[19:34:42] Download vecchi analizzati: 1664 file, 7899 MB
+
+[19:34:42] Analisi app non utilizzate...
+
+[19:34:42] Analisi app non utilizzate: SALTATA (non selezionata)
+
+[19:34:42] Analisi app completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/reports/unused_apps_2026-04-25_19-32-44.txt
+
+[19:34:42] Backup configurazioni...
+
+[19:34:42] Backup salvato in /Volumes/Dati/Dropbox/GitHub/CleanMac/reports/config_backup_2026-04-25_19-32-44
+
+[19:34:42] Scansione file duplicati...
+
+[19:34:42] Scansione duplicati: SALTATA (non selezionata)
+
+[19:34:42] Scansione duplicati completata → /Volumes/Dati/Dropbox/GitHub/CleanMac/reports/duplicates_2026-04-25_19-32-44.txt
+
+[19:34:42] Ottimizzazione memoria...
+
+[19:34:43] RAM ottimizzata.
+
+[19:34:43] Ricostruzione LaunchServices...
+
+[19:35:34] LaunchServices ricostruito.
+
+[19:35:34] Riparazione permessi...
+
+Ready to reset user permissions on disk1s5 (Macintosh HD)
+Started verify/repair permissions on disk1s5 (Macintosh HD)
+
+User permissions have been reset
+
+Finished verify/repair permissions on disk1s5 (Macintosh HD)
+
+[19:36:36] Permessi riparati.
+
+[19:36:36] Flush DNS...
+
+Password:
+nf is not in the sudoers file.
+This incident has been reported to the administrator.
+
+Password:
+nf is not in the sudoers file.
+This incident has been reported to the administrator.
+
+[19:36:36] DNS cache resettato.
+
+[19:36:36] Reset Spotlight index...
+
+[19:36:39] Spotlight reset completato (reindicizzazione in background).
+
+[19:36:39] Ottimizzazione font cache...
+
+[19:36:39] Font cache: SALTATO (non selezionato)
+
+[19:36:39] Font cache analizzato.
+
+[19:36:39] Analisi cache package manager...
+
+[19:36:39] Cache package manager: SALTATE (non selezionate)
+
+[19:36:39] Cache package manager analizzate: 2130 MB
+
+[19:36:39] Analisi Docker...
+
+[19:36:39] Docker non installato o non in esecuzione, skip
+
+[19:36:39] Analisi Homebrew...
+
+[19:36:39] Homebrew: SALTATO (non selezionato)
+
+[19:36:39] Homebrew analizzato: 52 MB
+
+[19:36:39] Analisi Time Machine snapshot locali...
+
+/Volumes/Dati/Dropbox/GitHub/CleanMac/.cleanmac_temp.sh: line 1560: [: 0
+0: integer expression expected
+
+[19:36:39] Time Machine: nessuno snapshot locale trovato
+
+[19:36:39] Analisi backup iOS/iPad...
+
+[19:36:39] Backup iOS: cartella vuota o assente
+
+[19:36:39] Analisi file Swap e Sleepimage...
+
+[19:36:39] Analisi Swap/Sleepimage: SALTATA (non selezionata)
+
+[19:36:39] Swap/Sleepimage analizzati: 2048 MB (Swap: 0, Sleep: 2048)
+
+[19:36:39] Analisi Mail attachments...
+
+[19:36:39] Mail attachments analizzati: 0 file, 0 MB
+
+[19:36:39] Analisi spazio APFS purgeable...
+
+[19:36:40] APFS purgeable analizzato: 0 MB
+
+[19:36:40] Generazione report HTML...
+
+[19:36:40] ═══════════════════════════════════════════════════════════
+
+[19:36:40] ✅ PULIZIA COMPLETATA
+
+[19:36:40] ═══════════════════════════════════════════════════════════
+
+[19:36:40] 📊 Spazio: 0 MB
+
+[19:36:40] 📝 Report TXT: /Volumes/Dati/Dropbox/GitHub/CleanMac/reports/dryrun_report_2026-04-25_19-32-44.txt
+
+[19:36:40] 📄 Report HTML: /Volumes/Dati/Dropbox/GitHub/CleanMac/reports/cleanmac_report_2026-04-25_19-32-44.html
+
+[19:36:40] 
+
+button returned:OK
+
+Script terminato con codice 0
+Client disconnected
