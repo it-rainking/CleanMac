@@ -1046,3 +1046,60 @@ details[open] .output-summary span::before {
   gap: 12px; flex-wrap: wrap;
 }
 .selected-space { font-weight: 700; font-size: 1rem; }
+
+/* ── Smart Offload ─────────────────────────────────── */
+.offload-panel { margin-top: 16px; }
+.offload-intro { color: var(--muted); font-size: 0.88rem; margin: 8px 0 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.risk-legend { display: flex; gap: 8px; flex-wrap: wrap; }
+.risk-badge { font-size: 0.78rem; padding: 2px 8px; border-radius: 20px; background: rgba(0,0,0,0.06); }
+
+.offload-select {
+  padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.15);
+  background: var(--card); font-size: 0.88rem; color: var(--text); cursor: pointer;
+}
+.offload-health-badge {
+  font-size: 0.8rem; padding: 3px 10px; border-radius: 20px; font-weight: 600;
+}
+.offload-health-badge.healthy { background: #d1fae5; color: #065f46; }
+.offload-health-badge.warning { background: #fef3c7; color: #92400e; }
+
+.offload-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.offload-table th {
+  text-align: left; padding: 8px 10px; font-size: 0.75rem; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--muted); border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+.offload-table td { padding: 9px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: middle; }
+.offload-table tr:last-child td { border-bottom: none; }
+.offload-table tr:hover td { background: rgba(0,122,255,0.04); }
+
+.offload-path { font-family: monospace; font-size: 0.82rem; }
+.offload-size { font-weight: 700; color: var(--danger); white-space: nowrap; }
+.offload-size.zero { color: var(--muted); font-weight: 400; }
+
+.offload-status-badge {
+  display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 20px; font-weight: 600;
+}
+.offload-status-badge.present   { background: #e0e7ff; color: #3730a3; }
+.offload-status-badge.offloaded { background: #d1fae5; color: #065f46; }
+
+.offload-risk-delete   { color: #059669; font-size: 0.78rem; }
+.offload-risk-symlink  { color: #d97706; font-size: 0.78rem; }
+.offload-risk-caution  { color: #ea580c; font-size: 0.78rem; cursor: help; }
+.offload-risk-risky    { color: #dc2626; font-size: 0.78rem; font-weight: 600; cursor: help; }
+.offload-note          { font-size: 0.72rem; color: #ea580c; line-height: 1.4; display: block; margin-top: 3px; max-width: 300px; }
+.btn.offload-risky     { border-color: #fca5a5 !important; background: #fef2f2 !important; color: #b91c1c !important; }
+
+.offload-actions { display: flex; gap: 6px; }
+.btn.offload-symlink  { padding: 5px 12px; font-size: 0.8rem; border-radius: 8px; background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; cursor: pointer; }
+.btn.offload-symlink:hover  { background: #bfdbfe; }
+.btn.offload-delete   { padding: 5px 12px; font-size: 0.8rem; border-radius: 8px; background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; cursor: pointer; }
+.btn.offload-delete:hover   { background: #fecaca; }
+.btn.offload-restore  { padding: 5px 12px; font-size: 0.8rem; border-radius: 8px; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; cursor: pointer; }
+.btn.offload-restore:hover  { background: #fde68a; }
+.btn.offload-symlink:disabled, .btn.offload-delete:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.offload-progress { margin-top: 12px; border-radius: 10px; background: #0d1117; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
+.offload-progress-log { padding: 12px 14px; font-family: monospace; font-size: 0.82rem; color: #c9d1d9; max-height: 180px; overflow-y: auto; white-space: pre-wrap; }
+
+.offload-panel h3 { font-size: 0.95rem; font-weight: 600; margin: 16px 0 8px; }
+.offload-dest-path { font-family: monospace; font-size: 0.78rem; color: var(--muted); }

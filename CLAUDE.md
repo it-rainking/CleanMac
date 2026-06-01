@@ -129,7 +129,4 @@ Node.js >= 14.0.0
 ---
 
 ## Note
-- Esegui `/ottimizza-claude` dopo modifiche strutturali significative
-- Agenti disponibili: vibe-dev, code-reviewer, railway-ops
-- Skill disponibili: `/simplify`, `/commit`
 - Confronto con MyPureMac (SwiftUI): già integrati safe_remove, is_system_app, Mail Attachments, APFS Purgeable
