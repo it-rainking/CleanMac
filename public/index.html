@@ -187,6 +187,54 @@
     </div>
   </section>
 
+  <!-- SMART OFFLOAD -->
+  <section class="panel offload-panel">
+    <div class="output-header">
+      <h2>💾 Smart Offload — Sposta su Disco Esterno</h2>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span id="offloadHealthBadge" class="offload-health-badge" style="display:none;"></span>
+        <select id="offloadVolumeSelect" class="offload-select">
+          <option value="">— Seleziona volume —</option>
+        </select>
+        <button id="offloadScanBtn" class="btn ghost">🔍 Scansiona</button>
+      </div>
+    </div>
+    <p class="offload-intro">
+      Sposta cache e dati app su un disco esterno mantenendo un symlink trasparente.
+      <span class="risk-legend">
+        <span class="risk-badge safe">🟢 elimina sicuro</span>
+        <span class="risk-badge symlink">🟡 symlink safe</span>
+      </span>
+    </p>
+
+    <div id="offloadScanResults" style="display:none;">
+      <table class="offload-table">
+        <thead>
+          <tr><th>Percorso</th><th>Dimensione</th><th>Tipo</th><th>Stato</th><th>Azione</th></tr>
+        </thead>
+        <tbody id="offloadTableBody"></tbody>
+      </table>
+    </div>
+
+    <div id="offloadEmpty" class="empty-state" style="display:none;">
+      <p>Nessun target trovato. Clicca "Scansiona" per analizzare il disco.</p>
+    </div>
+
+    <div id="offloadProgress" class="offload-progress" style="display:none;">
+      <div class="offload-progress-log" id="offloadProgressLog"></div>
+    </div>
+
+    <div id="offloadRegistry" style="display:none;">
+      <h3 style="margin-top:16px;">📋 Symlink attivi</h3>
+      <table class="offload-table">
+        <thead>
+          <tr><th>Originale</th><th>Destinazione</th><th>Data</th><th>Stato</th><th>Azione</th></tr>
+        </thead>
+        <tbody id="offloadRegistryBody"></tbody>
+      </table>
+    </div>
+  </section>
+
   <!-- OUTPUT FULL WIDTH -->
   <section class="panel output-full">
     <details open>

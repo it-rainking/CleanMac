@@ -1519,4 +1519,325 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // ── Smart Offload ──────────────────────────────────────────
+    initOffloadModule();
 });
+
+// ── Smart Offload Module ───────────────────────────────────────
+
+// FIX: helper per HTML attribute escaping — usare SEMPRE per valori dinamici in innerHTML
+function escAttr(s) {
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function escText(s) {
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function initOffloadModule() {
+    loadOffloadVolumes();
+    loadOffloadRegistry();
+    checkOffloadHealth();
+
+    document.getElementById('offloadScanBtn').addEventListener('click', runOffloadScan);
+
+    // FIX: event delegation invece di onclick inline — nessun dato interpolato in attributi JS
+    document.getElementById('offloadTableBody').addEventListener('click', handleOffloadTableClick);
+    document.getElementById('offloadRegistryBody').addEventListener('click', handleRegistryTableClick);
+
+    socket.on('offload:progress', ({ targetPath, message }) => {
+        appendOffloadLog(message);
+    });
+
+    socket.on('offload:complete', ({ targetPath, message, restored }) => {
+        appendOffloadLog(`✅ ${message}`);
+        setTimeout(() => {
+            runOffloadScan();
+            loadOffloadRegistry();
+        }, 800);
+    });
+
+    socket.on('offload:error', ({ targetPath, message }) => {
+        appendOffloadLog(`❌ ${message}`);
+        showToast(message, 'error');
+    });
+}
+
+async function loadOffloadVolumes() {
+    try {
+        const volumes = await fetch('/api/offload/volumes').then(r => r.json());
+        const sel = document.getElementById('offloadVolumeSelect');
+        sel.innerHTML = '<option value="">— Seleziona volume —</option>';
+        volumes.forEach(v => {
+            const opt = document.createElement('option');
+            opt.value = v.path;
+            opt.textContent = v.name;
+            sel.appendChild(opt);
+        });
+        // Auto-seleziona se c'è un solo volume esterno
+        if (volumes.length === 1) sel.value = volumes[0].path;
+    } catch (e) {
+        console.error('loadOffloadVolumes:', e);
+    }
+}
+
+async function runOffloadScan() {
+    const btn = document.getElementById('offloadScanBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Scansione…';
+    document.getElementById('offloadScanResults').style.display = 'none';
+    document.getElementById('offloadEmpty').style.display = 'none';
+
+    try {
+        const targets = await fetch('/api/offload/scan').then(r => r.json());
+
+        if (targets.length === 0) {
+            document.getElementById('offloadEmpty').style.display = 'block';
+            return;
+        }
+
+        const tbody = document.getElementById('offloadTableBody');
+        const selectedVolume = document.getElementById('offloadVolumeSelect').value;
+        tbody.innerHTML = '';
+
+        targets.forEach(t => {
+            const tr = document.createElement('tr');
+            const sizeClass = t.sizeBytes === 0 ? 'zero' : '';
+            const statusBadge = t.isSymlink
+                ? `<span class="offload-status-badge offloaded">✓ offloaded</span>`
+                : `<span class="offload-status-badge present">presente</span>`;
+
+            // Colonna rischio: delete-safe | caution | risky | safe
+            let riskHtml;
+            if (t.risk === 'delete-safe') {
+                riskHtml = `<span class="offload-risk-delete">🟢 elimina</span>`;
+            } else if (t.riskLevel === 'risky') {
+                riskHtml = `<span class="offload-risk-risky" title="${t.note || ''}">🔴 rischioso</span>`;
+            } else if (t.riskLevel === 'caution') {
+                riskHtml = `<span class="offload-risk-caution" title="${t.note || ''}">🟠 attenzione</span>`;
+            } else {
+                riskHtml = `<span class="offload-risk-symlink">🟡 symlink</span>`;
+            }
+
+            // Nota inline se presente — escText per sicurezza
+            const noteHtml = t.note
+                ? `<br><span class="offload-note">${escText(t.note)}</span>`
+                : '';
+
+            // FIX: data attributes invece di onclick inline — nessun valore dinamico in JS string
+            let actions = '';
+            if (t.isSymlink) {
+                actions = `<span style="color:var(--muted);font-size:0.8rem;">—</span>`;
+            } else if (t.risk === 'delete-safe') {
+                actions = `<div class="offload-actions">
+                    <button class="btn offload-delete"
+                        data-action="delete"
+                        data-path="${escAttr(t.fullPath)}">🗑 Elimina</button>
+                </div>`;
+            } else {
+                const noVol = !selectedVolume;
+                const isRisky = t.riskLevel === 'risky';
+                const btnClass = isRisky ? 'btn offload-symlink offload-risky' : 'btn offload-symlink';
+                actions = `<div class="offload-actions">
+                    <button class="${btnClass}"
+                        data-action="symlink"
+                        data-path="${escAttr(t.fullPath)}"
+                        data-risk="${escAttr(t.riskLevel || 'safe')}"
+                        data-note="${escAttr(t.note || '')}"
+                        ${noVol ? 'disabled title="Seleziona un volume prima"' : ''}>
+                        ${isRisky ? '⚠️ Offload' : '💾 Offload'}
+                    </button>
+                </div>`;
+            }
+
+            tr.innerHTML = `
+                <td><span class="offload-path" title="${escAttr(t.fullPath)}">${escText(t.label)}</span><br>
+                    <span style="font-size:0.72rem;color:var(--muted);">~/${escText(t.relPath)}</span>
+                    ${noteHtml}</td>
+                <td><span class="offload-size ${sizeClass}">${escText(t.sizeDisplay)}</span></td>
+                <td>${riskHtml}</td>
+                <td>${statusBadge}</td>
+                <td>${actions}</td>`;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('offloadScanResults').style.display = 'block';
+    } catch (e) {
+        showToast('Errore scansione: ' + e.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '🔍 Scansiona';
+    }
+}
+
+function handleOffloadTableClick(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn || btn.disabled) return;
+    const action = btn.dataset.action;
+    const path = btn.dataset.path;
+    if (action === 'delete') doOffloadDelete(path);
+    else if (action === 'symlink') doOffloadSymlink(path, btn.dataset.risk, btn.dataset.note);
+}
+
+function handleRegistryTableClick(e) {
+    const btn = e.target.closest('[data-action="restore"]');
+    if (!btn) return;
+    doOffloadRestore(btn.dataset.id, btn.dataset.original);
+}
+
+async function doOffloadSymlink(targetPath, riskLevel = 'safe', note = '') {
+    const destVolume = document.getElementById('offloadVolumeSelect').value;
+    if (!destVolume) { showToast('Seleziona un volume di destinazione', 'warning'); return; }
+
+    // Conferma extra per target rischiosi
+    if (riskLevel === 'risky' || riskLevel === 'caution') {
+        const msg = note
+            ? `⚠️ ${note}\n\nVuoi procedere comunque?`
+            : `⚠️ Questo target richiede attenzione. Continuare?`;
+        if (!confirm(msg)) return;
+    }
+
+    showOffloadProgress();
+    appendOffloadLog(`Avvio offload: ${targetPath}`);
+
+    try {
+        const res = await fetch('/api/offload/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ targetPath, destVolume, action: 'symlink' })
+        });
+
+        if (res.status === 409) {
+            const err = await res.json();
+            appendOffloadLog(`❌ ${err.error}`);
+            appendOffloadLog(`   → ${err.detail || ''}`);
+            showToast(err.error, 'error');
+            return;
+        }
+        if (!res.ok) {
+            const err = await res.json();
+            appendOffloadLog(`❌ ${err.error}`);
+            showToast(err.error || 'Errore offload', 'error');
+        }
+    } catch (e) {
+        appendOffloadLog(`❌ Errore: ${e.message}`);
+    }
+}
+
+async function doOffloadDelete(targetPath) {
+    if (!confirm(`Eliminare definitivamente:\n${targetPath}\n\nQuesta operazione è irreversibile.`)) return;
+
+    showOffloadProgress();
+    appendOffloadLog(`Eliminazione: ${targetPath}`);
+
+    try {
+        const res = await fetch('/api/offload/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ targetPath, action: 'delete' })
+        }).then(r => r.json());
+
+        if (res.success) {
+            appendOffloadLog(`✅ ${res.message}`);
+            showToast(res.message, 'success');
+            setTimeout(runOffloadScan, 500);
+        } else {
+            appendOffloadLog(`❌ ${res.error}`);
+        }
+    } catch (e) {
+        appendOffloadLog(`❌ Errore: ${e.message}`);
+    }
+}
+
+async function doOffloadRestore(id, originalPath) {
+    if (!confirm(`Ripristinare ${originalPath} dal disco esterno?\n\nIl symlink verrà rimosso e i dati copiati localmente.`)) return;
+
+    showOffloadProgress();
+    appendOffloadLog(`Restore: ${originalPath}`);
+
+    try {
+        await fetch('/api/offload/restore', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+        });
+    } catch (e) {
+        appendOffloadLog(`❌ Errore: ${e.message}`);
+    }
+}
+
+async function loadOffloadRegistry() {
+    try {
+        const registry = await fetch('/api/offload/registry').then(r => r.json());
+        const container = document.getElementById('offloadRegistry');
+        const tbody = document.getElementById('offloadRegistryBody');
+
+        if (registry.length === 0) { container.style.display = 'none'; return; }
+
+        tbody.innerHTML = '';
+        registry.forEach(entry => {
+            const name = escText(entry.original.split('/').pop());
+            // FIX: usa replace sul path string, non su location.href che include l'URL del browser
+            const shortOrig = escText(entry.original.replace(/^\/Users\/[^/]+/, '~'));
+            const destShort = escText(entry.dest.replace(/^\/Volumes\//, '').replace('/MacSymlinks/', '/…/'));
+            const date = new Date(entry.created).toLocaleDateString('it-IT');
+            const isPending = entry.status === 'pending';
+            const tr = document.createElement('tr');
+            // FIX: data attributes invece di onclick inline
+            tr.innerHTML = `
+                <td><span class="offload-path">${name}</span><br>
+                    <span class="offload-dest-path" title="${escAttr(entry.original)}">${shortOrig}</span></td>
+                <td><span class="offload-dest-path" title="${escAttr(entry.dest)}">${destShort}</span></td>
+                <td style="white-space:nowrap;color:var(--muted);font-size:0.8rem;">${date}</td>
+                <td><span class="offload-status-badge ${isPending ? 'present' : 'offloaded'}">${isPending ? '⏳ pending' : 'attivo'}</span></td>
+                <td><button class="btn offload-restore"
+                    data-action="restore"
+                    data-id="${escAttr(entry.id)}"
+                    data-original="${escAttr(entry.original)}"
+                    ${isPending ? 'disabled title="Offload incompleto — verifica il path manualmente"' : ''}>
+                    ↩ Restore</button></td>`;
+            tbody.appendChild(tr);
+        });
+
+        container.style.display = 'block';
+    } catch (e) {
+        console.error('loadOffloadRegistry:', e);
+    }
+}
+
+async function checkOffloadHealth() {
+    try {
+        const { checks, healthy } = await fetch('/api/offload/health').then(r => r.json());
+        if (checks.length === 0) return;
+
+        const badge = document.getElementById('offloadHealthBadge');
+        badge.style.display = 'inline-block';
+        if (healthy) {
+            badge.className = 'offload-health-badge healthy';
+            badge.textContent = `✓ ${checks.length} symlink OK`;
+        } else {
+            const broken = checks.filter(c => !c.healthy).length;
+            badge.className = 'offload-health-badge warning';
+            badge.textContent = `⚠ ${broken} symlink rotto${broken > 1 ? 'i' : ''}`;
+        }
+    } catch (e) { /* silenzioso */ }
+}
+
+function showOffloadProgress() {
+    document.getElementById('offloadProgress').style.display = 'block';
+}
+
+function appendOffloadLog(msg) {
+    const log = document.getElementById('offloadProgressLog');
+    log.textContent += msg + '\n';
+    log.scrollTop = log.scrollHeight;
+}
