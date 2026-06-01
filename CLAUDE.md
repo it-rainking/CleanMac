@@ -82,6 +82,39 @@ CLEANUP → is_operation_enabled() → legge OPERATIONS_DATA_FILE (init_operatio
 
 ---
 
+## Smart Offload Module
+
+Modulo per spostare directory pesanti su disco esterno con symlink trasparente.
+
+### API endpoints
+| Endpoint | Descrizione |
+|----------|-------------|
+| `GET /api/offload/volumes` | Volumi esterni montati (`fs.readdirSync('/Volumes')`) |
+| `GET /api/offload/scan` | Scansiona `OFFLOAD_TARGETS` con `du -sk`, rileva symlink esistenti |
+| `POST /api/offload/execute` | Pipeline: pre-flight pgrep → rsync → verifica count → rm → ln -s |
+| `GET /api/offload/registry` | Legge `~/.config/cleanmac/symlinks.json` |
+| `POST /api/offload/restore` | rsync inverso + verifica lstatSync symlink + rimozione registry |
+| `GET /api/offload/health` | Verifica integrità tutti i symlink nel registry |
+
+### Invarianti critici (non rimuovere)
+- **Write-ahead registry**: entry `status:'pending'` salvata PRIMA di `rmSync`+`symlinkSync`; aggiornata ad `active` dopo. Se crash tra i due, la UI mostra entry pending con restore disabilitato.
+- **Lock concorrenza**: `activeOffloads` Set blocca doppie esecuzioni sullo stesso path.
+- **Pre-flight**: `pgrep -xi processName` blocca offload se l'app è aperta — LevelDB/IndexedDB corrompono su rsync con file aperti.
+- **Restore guard**: `lstatSync` verifica che il path sia symlink prima di `unlinkSync`; ENOENT distinto da altri errori.
+- **Sicurezza HTML**: `escAttr()`/`escText()` su tutti i valori dinamici in innerHTML; event delegation invece di onclick inline.
+
+### Risk levels in OFFLOAD_TARGETS
+- `safe` — cache CLI rigenerabili, dati app senza lock (OpenEmu, Kodi, Google, ecc.)
+- `caution` — Electron/LevelDB: VSCode, Claude App, Microsoft Edge, Python 3.10
+- `risky` — Firefox Application Support (profiles.ini, LevelDB aperto)
+
+### Registry
+- Path: `~/.config/cleanmac/symlinks.json`
+- Struttura entry: `{ id, original, dest, created, status: 'pending'|'active' }`
+- Destinazione default: `/Volumes/<disco>/MacSymlinks/<nome>`
+
+---
+
 ## Regole specifiche progetto
 
 ### Bash (CleanMac.command)

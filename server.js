@@ -540,29 +540,38 @@ const OFFLOAD_TARGETS = [
   { relPath: '.cache/node-gyp',                  label: 'node-gyp cache',   type: 'cache',    risk: 'delete-safe',  riskLevel: 'safe' },
   { relPath: 'Library/Caches/pip',               label: 'pip cache',        type: 'cache',    risk: 'delete-safe',  riskLevel: 'safe' },
   { relPath: 'Library/Caches/Homebrew',          label: 'Homebrew cache',   type: 'cache',    risk: 'delete-safe',  riskLevel: 'safe' },
-  // Firefox cache in ~/Library/Caches — rigenerabile, sicuro da eliminare
   { relPath: 'Library/Caches/Firefox',           label: 'Firefox cache',    type: 'cache',    risk: 'delete-safe',  riskLevel: 'safe' },
+  { relPath: 'Library/Caches/GeoServices',       label: 'GeoServices cache',type: 'cache',    risk: 'delete-safe',  riskLevel: 'safe' },
+  { relPath: 'Library/Caches/bun',               label: 'bun cache',        type: 'cache',    risk: 'delete-safe',  riskLevel: 'safe' },
 
   // ── Dati app — symlink su volume esterno ─────────────────────────────────
-  { relPath: '.cache/uv',                        label: 'uv cache',         type: 'cache',    risk: 'symlink-safe', riskLevel: 'safe' },
-  { relPath: '.npm',                             label: 'npm cache',        type: 'deps',     risk: 'symlink-safe', riskLevel: 'safe' },
-  { relPath: 'Library/Application Support/Steam',   label: 'Steam',        type: 'app-data', risk: 'symlink-safe', riskLevel: 'safe', processName: 'steam_osx' },
-  { relPath: 'Library/Application Support/OpenEmu', label: 'OpenEmu',      type: 'app-data', risk: 'symlink-safe', riskLevel: 'safe', processName: 'OpenEmu' },
+  { relPath: '.cache/uv',                              label: 'uv cache',          type: 'cache',    risk: 'symlink-safe', riskLevel: 'safe' },
+  { relPath: '.npm',                                   label: 'npm cache',         type: 'deps',     risk: 'symlink-safe', riskLevel: 'safe' },
+  { relPath: 'Library/Application Support/OpenEmu',    label: 'OpenEmu',          type: 'app-data', risk: 'symlink-safe', riskLevel: 'safe',    processName: 'OpenEmu' },
+  { relPath: 'Library/Application Support/Kodi',       label: 'Kodi',             type: 'app-data', risk: 'symlink-safe', riskLevel: 'safe',    processName: 'Kodi' },
+  { relPath: 'Library/Application Support/Google',     label: 'Google (Chrome)',  type: 'app-data', risk: 'symlink-safe', riskLevel: 'safe',    processName: 'Google Chrome' },
+  { relPath: 'Library/Application Support/ChromeGeminiProfile', label: 'Chrome Gemini Profile', type: 'app-data', risk: 'symlink-safe', riskLevel: 'safe', processName: 'Google Chrome' },
+  { relPath: 'Library/Application Support/BitTorrent Web', label: 'BitTorrent Web', type: 'app-data', risk: 'symlink-safe', riskLevel: 'safe',  processName: 'BitTorrent Web' },
+
+  // Python user packages — safe ma solo se nessuno script Python è in esecuzione
+  { relPath: 'Library/Python/3.10',                    label: 'Python 3.10 packages', type: 'deps', risk: 'symlink-safe', riskLevel: 'caution',
+    processName: 'Python',
+    note: 'Chiudi tutti gli script Python prima. I pacchetti pip --user vengono risolti da questo path.' },
 
   // ── Dati app Electron/browser — chiudere l'app prima ─────────────────────
-  // VSCode: extensions e workspaceStorage sono safe, ma deve essere chiuso
-  { relPath: 'Library/Application Support/Code', label: 'VSCode data',     type: 'app-data', risk: 'symlink-safe', riskLevel: 'caution',
+  { relPath: 'Library/Application Support/Code',       label: 'VSCode data',      type: 'app-data', risk: 'symlink-safe', riskLevel: 'caution',
     processName: 'Electron',
     note: 'Chiudi VS Code prima. Il symlink funziona correttamente una volta che il processo è terminato.' },
 
-  // Claude App: IndexedDB/LevelDB — richiede app chiusa + rsync completo
-  { relPath: 'Library/Application Support/Claude', label: 'Claude App',    type: 'app-data', risk: 'symlink-safe', riskLevel: 'caution',
+  { relPath: 'Library/Application Support/Claude',     label: 'Claude App',       type: 'app-data', risk: 'symlink-safe', riskLevel: 'caution',
     processName: 'Claude',
     note: 'Chiudi Claude prima. LevelDB aperto durante la copia causa corruzione dei dati.' },
 
-  // Firefox Application Support: profiles.ini usa path relativi quindi il symlink funziona,
-  // MA Firefox deve essere completamente chiuso (inclusi processi background) durante rsync
-  { relPath: 'Library/Application Support/Firefox', label: 'Firefox profilo', type: 'app-data', risk: 'symlink-safe', riskLevel: 'risky',
+  { relPath: 'Library/Application Support/Microsoft Edge', label: 'Microsoft Edge', type: 'app-data', risk: 'symlink-safe', riskLevel: 'caution',
+    processName: 'Microsoft Edge',
+    note: 'Chiudi Microsoft Edge prima. Browser Chromium con LevelDB.' },
+
+  { relPath: 'Library/Application Support/Firefox',    label: 'Firefox profilo',  type: 'app-data', risk: 'symlink-safe', riskLevel: 'risky',
     processName: 'firefox',
     note: 'ATTENZIONE: muovere il profilo Firefox è rischioso. Preferisci spostare solo la cache (Firefox cache sopra). Se procedi, Firefox deve essere completamente chiuso.' },
 ];
