@@ -4,8 +4,22 @@ from __future__ import annotations
 
 import pytest
 
+import pytest as _pytest
+
 from core import report
-from web.app import create_app
+from web.app import _host_only, create_app
+
+
+@_pytest.mark.parametrize("header,expected", [
+    ("127.0.0.1:7787", "127.0.0.1"),
+    ("localhost:7787", "localhost"),
+    ("localhost", "localhost"),
+    ("[::1]:7787", "[::1]"),
+    ("[::1]", "[::1]"),
+    ("evil.com:7787", "evil.com"),
+])
+def test_host_only_parsing(header, expected):
+    assert _host_only(header) == expected
 
 
 @pytest.fixture
@@ -24,7 +38,29 @@ def test_scan_endpoint(client):
     assert docker["executable_from_web"] is False  # require_explicit: solo da CLI
     review = next(e for e in data["entries"] if e["id"] == "downloads_installers")
     assert review["executable_from_web"] is False  # glob_review: solo da CLI
+    system = next(e for e in data["entries"] if e["id"] == "system_caches")
+    assert system["executable_from_web"] is False  # sudo: solo da CLI
     assert data["df_free_gb"] > 0
+
+
+def test_foreign_host_rejected(client):
+    """Difesa DNS rebinding: Host non locale → 403 su qualunque endpoint."""
+    assert client.get("/api/scan", headers={"Host": "evil.com:7787"}).status_code == 403
+    assert client.post("/api/execute", headers={"Host": "evil.com"},
+                       json={"entries": ["user_caches"], "dry_run": False}).status_code == 403
+
+
+def test_local_hosts_accepted(client):
+    for host in ("127.0.0.1:7787", "localhost:7787", "localhost"):
+        assert client.get("/api/scan", headers={"Host": host}).status_code == 200
+
+
+def test_execute_filters_sudo_entries(client):
+    """Selezionare solo voci sudo dal web → 400, nessuna voce eseguibile."""
+    resp = client.post("/api/execute",
+                       json={"entries": ["system_caches", "var_log_rotated"],
+                             "dry_run": True})
+    assert resp.status_code == 400
 
 
 def test_execute_real_blocked_without_backup(client, fake_home):

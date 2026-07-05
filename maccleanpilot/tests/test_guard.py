@@ -131,6 +131,14 @@ def test_check_child_symlink_escape_via_ancestor(fake_home):
     assert "symlink escape" in verdict.reason
 
 
+def test_check_child_rejects_dotdot(fake_home):
+    """Difesa in profondità: componenti '..' rifiutati esplicitamente."""
+    root = fake_home / "Library/Caches"
+    verdict = guard.check_child(root / "app1" / ".." / "app2", root)
+    assert not verdict
+    assert "'..'" in verdict.reason
+
+
 def test_check_child_blocked_pattern(fake_home):
     root = fake_home / "Library/Caches"
     bad = root / "x.photoslibrary"

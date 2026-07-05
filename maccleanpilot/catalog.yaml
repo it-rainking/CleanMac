@@ -50,7 +50,7 @@ categories:
         command: "brew cleanup --prune=all"
       - id: pip
         mode: delegate
-        command: "pip cache purge"
+        command: "python3 -m pip cache purge"   # robusto anche se 'pip' non è sul PATH
       - id: npm
         mode: delegate
         command: "npm cache clean --force"

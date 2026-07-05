@@ -129,6 +129,11 @@ def check_child(child: str | os.PathLike, entry_root: str | os.PathLike) -> Guar
     child_p = _expand(str(child))
     root_resolved = Path(os.path.realpath(_expand(str(entry_root))))
 
+    # Difesa in profondità: mai path con '..' (il realpath finale li
+    # catturerebbe comunque, ma qui il rifiuto è esplicito e testabile).
+    if ".." in child_p.parts:
+        return GuardVerdict(False, f"path con '..' rifiutato: '{child}'")
+
     # Il figlio deve essere lessicalmente un discendente diretto della radice.
     if not _is_under(child_p, root_resolved) and not _is_under(
         child_p, _expand(str(entry_root))

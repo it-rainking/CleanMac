@@ -105,7 +105,7 @@ def rsync_backup(paths: list[str], dest_root: Path | None = None, _run_cmd=None)
     for src in paths:
         if not Path(src).exists():
             continue
-        proc = runner(["rsync", "-a", "--delete-excluded", src, str(dest) + "/"])
+        proc = runner(["rsync", "-a", src, str(dest) + "/"])
         if proc.returncode != 0:
             errors.append(f"{src}: {proc.stderr.strip()[:200]}")
     return (not errors), str(dest), ("; ".join(errors) or None)

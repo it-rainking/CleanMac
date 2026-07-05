@@ -60,29 +60,39 @@ def _load_catalog_or_die() -> list[scanner.Entry]:
 
 
 def _scan_table(results: list[scanner.ScanResult]) -> Table:
-    table = Table(title="MacCleanPilot — spazio recuperabile per voce (F2)")
-    table.add_column("Categoria", style="cyan")
-    table.add_column("Voce")
-    table.add_column("Path / comando", overflow="fold")
-    table.add_column("Modo", style="dim")
-    table.add_column("Recuperabile", justify="right", style="green")
-    table.add_column("File", justify="right")
-    table.add_column("Note", style="dim")
+    table = Table(title="MacCleanPilot — spazio recuperabile (F2)", expand=True)
+    table.add_column("Voce", no_wrap=True)
+    table.add_column("Path / comando", overflow="fold", ratio=2, style="dim")
+    table.add_column("Modo", no_wrap=True, style="dim")
+    table.add_column("Recuperabile", justify="right", style="green", no_wrap=True)
+    table.add_column("File", justify="right", no_wrap=True)
+    table.add_column("Note", ratio=1, style="yellow")
 
-    for r in sorted(results, key=lambda r: (r.entry.category, -r.bytes_total)):
-        e = r.entry
-        note = r.note
-        if not e.enabled:
-            note = f"DISABILITATA: {'; '.join(e.disabled_reasons)}"
-        table.add_row(
-            e.category_label,
-            e.id,
-            e.path or e.command or "",
-            e.mode,
-            scanner.human(r.bytes_total) if e.mode != "delegate" else "—",
-            str(r.file_count) if e.mode != "delegate" else "—",
-            note,
-        )
+    by_cat: dict[str, list[scanner.ScanResult]] = {}
+    for r in results:
+        by_cat.setdefault(r.entry.category_label, []).append(r)
+
+    first = True
+    for label, cat_results in by_cat.items():
+        if not first:
+            table.add_section()
+        first = False
+        subtotal = sum(r.bytes_total for r in cat_results if r.entry.enabled)
+        table.add_row(f"[bold cyan]{label}[/bold cyan]", "", "",
+                      f"[bold]{scanner.human(subtotal)}[/bold]", "", "")
+        for r in sorted(cat_results, key=lambda r: -r.bytes_total):
+            e = r.entry
+            note = r.note if r.exists or e.mode == "delegate" else "voce morta (vedi doctor)"
+            if not e.enabled:
+                note = f"DISABILITATA: {'; '.join(e.disabled_reasons)}"
+            table.add_row(
+                f"  {e.id}",
+                e.path or e.command or "",
+                e.mode,
+                scanner.human(r.bytes_total) if e.mode != "delegate" else "—",
+                str(r.file_count) if e.mode != "delegate" else "—",
+                note,
+            )
     return table
 
 
@@ -104,6 +114,7 @@ def scan(only: str = typer.Option(None, "--only", help="Categorie, separate da v
 def backup_cmd():
     """F3 — snapshot APFS + rsync mirato su /Volumes/Dati/Backup_PrePulizia/<data>."""
     log = _setup_logging()
+    started = dt.datetime.now()
     try:
         status = backup.run_backup(scanner.rsync_paths())
     except backup.BackupError as exc:
@@ -116,7 +127,7 @@ def backup_cmd():
     else:
         console.print(f"[yellow]rsync non riuscito:[/yellow] {status.rsync_error}")
         console.print("[yellow]Lo snapshot APFS esiste comunque, ma `clean --execute` resterà bloccato finché il volume di backup non è disponibile (§6).[/yellow]")
-    verified = backup.verify(dt.datetime.now() - dt.timedelta(minutes=2))
+    verified = backup.verify(started)
     console.print(f"Verifica gate: {'[green]OK[/green] — ' + verified if verified else '[red]snapshot non trovato[/red]'}")
 
 
@@ -239,6 +250,18 @@ def clean(
                 raise typer.Exit(1)
             console.print(f"Gate backup: [green]OK[/green] ({snapshot_id})")
 
+    # Avviso bloccante cloud-sync (§6): nessuna API affidabile per pausarli,
+    # quindi si chiede la pausa manuale prima di procedere con l'esecuzione.
+    if execute:
+        syncing = guard.running_conflicts(["Dropbox", "Google Drive", "OneDrive"])
+        if syncing:
+            console.print(f"\n[yellow bold]⚠ Client di sync attivi: {', '.join(syncing)}[/yellow bold]")
+            console.print("[yellow]Metti in pausa la sincronizzazione manualmente prima di continuare.[/yellow]")
+            if not Confirm.ask("Sincronizzazione in pausa: procedo?", default=False):
+                console.print("Esecuzione annullata.")
+                raise typer.Exit(0)
+        console.print("[dim]Se usi iCloud Drive (Desktop e Documenti), verifica che la sync sia inattiva.[/dim]")
+
     # APPROVE (default: tutto OFF)
     mode_label = "[red bold]ESECUZIONE REALE[/red bold]" if execute else "[green]dry-run (simulazione)[/green]"
     console.print(f"\n[bold]APPROVE[/bold] — modalità {mode_label}. Nulla è selezionato di default.")
@@ -253,28 +276,34 @@ def clean(
     session_id = history.start_session(df_before / 1024**3, snapshot_id)
     console.print(f"\n[bold]EXECUTE[/bold] — sessione #{session_id}, {len(approved)} voci")
     total_freed = 0
-    for entry in approved:
-        result = executor.run_entry(
-            entry,
-            execute=execute,
-            selected=review_selection.get(entry.id),
-            confirmed=entry.id in explicit_ok,
-        )
-        total_freed += result.bytes_freed
-        history.record_action(
-            session_id, result.entry_id, result.path, result.mode,
-            result.bytes_freed, result.status, result.error,
-        )
-        for line in result.details:
-            log.info("[%s] %s", entry.id, line)
-        color = {"OK": "green", "DRY_RUN": "cyan", "SKIPPED": "yellow", "ERROR": "red"}[result.status]
-        console.print(
-            f"  [{color}]{result.status:8}[/{color}] {entry.id:24} "
-            f"{scanner.human(result.bytes_freed):>10}"
-            + (f"  [dim]{result.error}[/dim]" if result.error else "")
-        )
-        log.info("%s %s %s freed=%d err=%s", result.status, entry.id, result.path,
-                 result.bytes_freed, result.error or "-")
+    try:
+        for entry in approved:
+            result = executor.run_entry(
+                entry,
+                execute=execute,
+                selected=review_selection.get(entry.id),
+                confirmed=entry.id in explicit_ok,
+            )
+            total_freed += result.bytes_freed
+            history.record_action(
+                session_id, result.entry_id, result.path, result.mode,
+                result.bytes_freed, result.status, result.error,
+            )
+            for line in result.details:
+                log.info("[%s] %s", entry.id, line)
+            color = {"OK": "green", "DRY_RUN": "cyan", "SKIPPED": "yellow", "ERROR": "red"}[result.status]
+            console.print(
+                f"  [{color}]{result.status:8}[/{color}] {entry.id:24} "
+                f"{scanner.human(result.bytes_freed):>10}"
+                + (f"  [dim]{result.error}[/dim]" if result.error else "")
+            )
+            log.info("%s %s %s freed=%d err=%s", result.status, entry.id, result.path,
+                     result.bytes_freed, result.error or "-")
+    except KeyboardInterrupt:
+        # Safe (§6): le operazioni sono per-voce e idempotenti. Si chiude
+        # comunque la sessione così `history` mostra lo stato parziale.
+        console.print("\n[yellow]Interrotto (Ctrl-C): stato parziale salvato in history.[/yellow]")
+        log.warning("sessione %d interrotta da Ctrl-C", session_id)
 
     # VERIFY
     df_after = scanner.df_free_bytes("/")
@@ -334,11 +363,13 @@ def doctor():
     fda: bool | None = None
     if is_mac:
         probe = Path.home() / "Library" / "Safari"
-        try:
-            list(probe.iterdir()) if probe.exists() else None
-            fda = True
-        except PermissionError:
-            fda = False
+        if probe.exists():
+            try:
+                list(probe.iterdir())
+                fda = True
+            except PermissionError:
+                fda = False
+        # probe assente: impossibile determinare → resta n/d, mai falso OK
     checks.append(("Full Disk Access", fda, "necessario per cache/log protetti da TCC"))
 
     sudo_ok: bool | None = None

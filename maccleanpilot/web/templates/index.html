@@ -17,8 +17,8 @@
          color: var(--text); padding: 1rem; max-width: 760px; margin: 0 auto; }
   h1 { font-size: 1.4rem; margin: .5rem 0 1rem; }
   .banner { border-radius: 12px; padding: .8rem 1rem; margin-bottom: 1rem; font-size: .9rem; }
-  .banner.ok   { background: color-mix(in srgb, var(--green) 15%, var(--card)); }
-  .banner.warn { background: color-mix(in srgb, var(--yellow) 18%, var(--card)); }
+  .banner.ok   { background: var(--card); background: color-mix(in srgb, var(--green) 15%, var(--card)); }
+  .banner.warn { background: var(--card); background: color-mix(in srgb, var(--yellow) 18%, var(--card)); }
   .card { background: var(--card); border-radius: 14px; padding: 1rem; margin-bottom: .8rem;
           box-shadow: 0 1px 3px rgba(0,0,0,.08); }
   .cat-head { display: flex; justify-content: space-between; align-items: baseline; }
@@ -27,6 +27,8 @@
   .entry { display: flex; align-items: center; gap: .7rem; padding: .5rem 0;
            border-top: 1px solid color-mix(in srgb, var(--dim) 25%, transparent); }
   .entry:first-of-type { border-top: none; margin-top: .4rem; }
+  .hist { font-size: .85rem; color: var(--dim); display: flex;
+          justify-content: space-between; padding: .3rem 0; }
   .entry .info { flex: 1; min-width: 0; }
   .entry .path { font-size: .78rem; color: var(--dim); overflow: hidden;
                  text-overflow: ellipsis; white-space: nowrap; }
@@ -50,6 +52,10 @@
 <h1>🧹 MacCleanPilot</h1>
 <div id="gate" class="banner warn">Verifica backup…</div>
 <div id="cards">Scansione in corso…</div>
+<div class="card" id="history-card" style="display:none">
+  <div class="cat-head"><h2>Storico sessioni</h2></div>
+  <div id="history"></div>
+</div>
 <div class="actions">
   <button id="btn-backup">1 · Backup (snapshot APFS + rsync)</button>
   <button id="btn-dry">2 · Simula (dry-run)</button>
@@ -130,12 +136,21 @@ async function run(dry) {
   if (!r.ok) return logLine(`❌ ${r.error}`);
   for (const a of r.actions) logLine(`  ${a.status.padEnd(8)} ${a.id}  ${a.human}${a.error ? '  (' + a.error + ')' : ''}`);
   logLine(`Δ spazio libero: ${r.df_delta_gb} GB — sessione #${r.session_id}`);
-  loadScan();
+  loadScan(); loadHistory();
 }
 $('#btn-dry').onclick = () => run(true);
 $('#btn-exec').onclick = () => run(false);
 
-loadScan(); refreshGate();
+async function loadHistory() {
+  const data = await (await fetch('/api/history')).json();
+  if (!data.sessions.length) return;
+  $('#history-card').style.display = 'block';
+  $('#history').innerHTML = data.sessions.slice(0, 10).map(s =>
+    `<div class="hist"><span>#${s.id} · ${s.started_at}${s.snapshot ? ' · 📸' : ''}</span>
+     <span>${s.freed} · ${s.done} ok / ${s.skipped} skip</span></div>`).join('');
+}
+
+loadScan(); refreshGate(); loadHistory();
 </script>
 </body>
 </html>

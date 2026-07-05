@@ -50,9 +50,18 @@ Il gate backup si bypassa solo con `--skip-backup --i-know-what-i-am-doing`
 ### Dashboard web
 
 `mcp web` serve una single page mobile-first su `127.0.0.1:7787` (mai
-`0.0.0.0`; dall'iPhone: tunnel SSH). Le voci `glob_review` (Downloads/
-Desktop) e `require_explicit` (docker prune) sono eseguibili **solo dalla
-CLI**: richiedono selezione file per file o conferma dedicata.
+`0.0.0.0`; dall'iPhone: tunnel SSH). Difese attive:
+
+- **allowlist header Host** (`127.0.0.1`/`localhost`/`::1`): richieste con
+  Host estranei → 403, contro attacchi DNS rebinding da pagine web malevole;
+- **gate con scadenza**: il backup verificato sblocca "Esegui" per 2 ore,
+  poi va rifatto;
+- le voci `glob_review` (Downloads/Desktop), `require_explicit` (docker
+  prune) e `sudo` (cache/log di sistema) sono eseguibili **solo dalla CLI**:
+  richiedono selezione file per file, conferma dedicata o TTY per sudo.
+
+Prima dell'esecuzione reale la CLI rileva i client di sync attivi
+(Dropbox, Google Drive, OneDrive) e chiede la pausa manuale (§6 spec).
 
 ## Catalogo (`catalog.yaml`)
 

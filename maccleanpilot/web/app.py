@@ -17,16 +17,45 @@ import datetime as dt
 import sys
 from pathlib import Path
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, abort, jsonify, render_template, request
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from core import backup, executor, report, scanner  # noqa: E402
 
+# Difesa da DNS rebinding: il bind su 127.0.0.1 non basta, perché una pagina
+# malevola può rebindare il proprio dominio su 127.0.0.1 e parlare col server
+# come richiesta same-origin. Si accettano solo Host locali espliciti.
+ALLOWED_HOSTS = {"127.0.0.1", "localhost", "[::1]", "::1"}
+
+# Il gate backup scade: uno snapshot di ore prima non giustifica più
+# un'esecuzione "coperta da backup" (il server può vivere per giorni).
+GATE_TTL = dt.timedelta(hours=2)
+
+
+def _host_only(host_header: str) -> str:
+    """'127.0.0.1:7787' → '127.0.0.1'; '[::1]:7787' → '[::1]'."""
+    if host_header.startswith("["):
+        return host_header.split("]", 1)[0] + "]"
+    return host_header.rsplit(":", 1)[0] if ":" in host_header else host_header
+
 
 def create_app() -> Flask:
     app = Flask(__name__)
-    state: dict = {"session_start": dt.datetime.now(), "snapshot_id": None, "rsync_ok": False}
+    state: dict = {"session_start": dt.datetime.now(), "snapshot_id": None,
+                   "rsync_ok": False, "backup_time": None}
+
+    @app.before_request
+    def _reject_foreign_hosts():
+        if _host_only(request.host or "") not in ALLOWED_HOSTS:
+            abort(403, description="Host non consentito (protezione DNS rebinding)")
+
+    def _gate_open() -> bool:
+        if not state["rsync_ok"] or state["backup_time"] is None:
+            return False
+        if dt.datetime.now() - state["backup_time"] > GATE_TTL:
+            return False
+        return bool(backup.verify(state["session_start"]))
 
     @app.get("/")
     def index():
@@ -49,8 +78,10 @@ def create_app() -> Flask:
                 "human": scanner.human(r.bytes_total),
                 "files": r.file_count,
                 "enabled": e.enabled,
+                # Dal web: niente glob_review (selezione file per file), niente
+                # require_explicit (conferma dedicata), niente sudo (nessun TTY).
                 "executable_from_web": e.enabled and e.mode in ("empty_children", "glob_delete", "delegate")
-                                        and not e.require_explicit,
+                                        and not e.require_explicit and not e.sudo,
                 "note": r.note or ("; ".join(e.disabled_reasons) if not e.enabled else ""),
             })
         return jsonify({"entries": payload, "warnings": warnings,
@@ -61,7 +92,7 @@ def create_app() -> Flask:
         snap = backup.verify(state["session_start"])
         state["snapshot_id"] = snap
         return jsonify({
-            "verified": bool(snap) and state["rsync_ok"],
+            "verified": _gate_open(),
             "snapshot_id": snap,
             "rsync_ok": state["rsync_ok"],
             "volume_mounted": backup.volume_mounted(),
@@ -75,6 +106,7 @@ def create_app() -> Flask:
             return jsonify({"ok": False, "error": str(exc)}), 500
         state["snapshot_id"] = status.snapshot_id
         state["rsync_ok"] = status.rsync_ok
+        state["backup_time"] = dt.datetime.now()
         return jsonify({"ok": True, "snapshot_id": status.snapshot_id,
                         "rsync_ok": status.rsync_ok, "rsync_error": status.rsync_error})
 
@@ -86,17 +118,17 @@ def create_app() -> Flask:
         dry_run = bool(body.get("dry_run", True))
 
         if not dry_run:
-            snap = backup.verify(state["session_start"])
-            if not snap or not state["rsync_ok"]:
+            if not _gate_open():
                 return jsonify({"ok": False,
-                                "error": "gate: backup non verificato per questa sessione"}), 409
-            state["snapshot_id"] = snap
+                                "error": "gate: backup non verificato (o scaduto) per questa sessione"}), 409
+            state["snapshot_id"] = backup.verify(state["session_start"])
 
         entries, _ = scanner.load_catalog()
         todo = [e for e in entries if e.id in approved_ids]
-        # Dal web niente glob_review né require_explicit (vedi docstring).
+        # Dal web niente glob_review, require_explicit né sudo (vedi docstring).
         todo = [e for e in todo
-                if e.mode in ("empty_children", "glob_delete", "delegate") and not e.require_explicit]
+                if e.mode in ("empty_children", "glob_delete", "delegate")
+                and not e.require_explicit and not e.sudo]
         if not todo:
             return jsonify({"ok": False, "error": "nessuna voce eseguibile selezionata"}), 400
 

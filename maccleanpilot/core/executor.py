@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import fnmatch
 import os
+import shlex
 import shutil
 import subprocess
 from dataclasses import dataclass, field
@@ -95,8 +96,13 @@ def empty_children(entry: Entry, execute: bool = False) -> ActionResult:
 
     freed = 0
     errors: list[str] = []
-    with os.scandir(root) as it:
-        children = [Path(c.path) for c in it]
+    try:
+        with os.scandir(root) as it:
+            children = [Path(c.path) for c in it]
+    except OSError as exc:  # permesso negato sulla radice: ERROR, non crash (§6)
+        result.status = "ERROR"
+        result.error = f"impossibile leggere '{root}': {exc}"
+        return result
     for child in children:
         verdict = guard.check_child(child, root)
         if not verdict:
@@ -138,13 +144,18 @@ def glob_delete(entry: Entry, execute: bool = False) -> ActionResult:
 
     freed = 0
     errors: list[str] = []
-    with os.scandir(root) as it:
-        candidates = [
-            Path(c.path)
-            for c in it
-            if c.is_file(follow_symlinks=False)
-            and any(fnmatch.fnmatch(c.name.lower(), p.lower()) for p in entry.patterns)
-        ]
+    try:
+        with os.scandir(root) as it:
+            candidates = [
+                Path(c.path)
+                for c in it
+                if c.is_file(follow_symlinks=False)
+                and any(fnmatch.fnmatch(c.name.lower(), p.lower()) for p in entry.patterns)
+            ]
+    except OSError as exc:
+        result.status = "ERROR"
+        result.error = f"impossibile leggere '{root}': {exc}"
+        return result
     for child in candidates:
         verdict = guard.check_child(child, root)
         if not verdict:
@@ -238,15 +249,13 @@ def delegate(entry: Entry, execute: bool = False, confirmed: bool = False) -> Ac
         result.details.append(f"[dry-run] eseguirei: {entry.command}")
         return result
 
-    tool = entry.command.split()[0]
-    if shutil.which(tool) is None:
+    argv = shlex.split(entry.command)
+    if shutil.which(argv[0]) is None:
         result.status = "SKIPPED"
-        result.error = f"'{tool}' non installato"
+        result.error = f"'{argv[0]}' non installato"
         return result
     try:
-        proc = subprocess.run(
-            entry.command.split(), capture_output=True, text=True, timeout=1800
-        )
+        proc = subprocess.run(argv, capture_output=True, text=True, timeout=1800)
         result.details.extend(proc.stdout.strip().splitlines()[-20:])
         if proc.returncode != 0:
             result.status = "ERROR"

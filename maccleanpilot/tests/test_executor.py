@@ -68,6 +68,28 @@ def test_empty_children_missing_path(fake_home):
     assert result.status == "SKIPPED"
 
 
+def test_empty_children_unreadable_root_is_error_not_crash(fake_home, monkeypatch):
+    """PermissionError sulla radice → ERROR, la sessione continua (§6)."""
+    import os as os_mod
+    def deny(path):
+        raise PermissionError(13, "Permission denied", str(path))
+    monkeypatch.setattr(os_mod, "scandir", deny)
+    result = executor.empty_children(_entry(path="~/Library/Caches"), execute=True)
+    assert result.status == "ERROR"
+    assert "impossibile leggere" in result.error
+
+
+def test_glob_delete_unreadable_root_is_error_not_crash(fake_home, monkeypatch):
+    import os as os_mod
+    def deny(path):
+        raise PermissionError(13, "Permission denied", str(path))
+    monkeypatch.setattr(os_mod, "scandir", deny)
+    result = executor.glob_delete(
+        _entry(path="~/Library/Logs/DiagnosticReports", mode="glob_delete",
+               patterns=["*.crash"]), execute=True)
+    assert result.status == "ERROR"
+
+
 # --- glob_delete ------------------------------------------------------------------
 
 def test_glob_delete_only_matching_files(fake_home):
