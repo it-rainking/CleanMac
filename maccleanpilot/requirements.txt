@@ -1,0 +1,9 @@
+# MacCleanPilot v1.0 — Python 3.11+
+typer>=0.12
+rich>=13.0
+flask>=3.0
+PyYAML>=6.0
+
+# dev / test
+pytest>=8.0
+pytest-cov>=5.0

@@ -1,0 +1,103 @@
+# catalog.yaml — whitelist MacCleanPilot (traduzione 1:1 Sez. 3–6 della guida)
+#
+# Tutto ciò che NON è in questo file è invisibile all'engine di cancellazione.
+# La blocklist e le radici ammesse sono hard-coded in core/guard.py: una voce
+# aggiunta qui che le viola viene disabilitata al load (WARN nel log).
+#
+# Modi operativi:
+#   empty_children  → rm contenuti della dir (mai la dir) — solo sotto
+#                     ~/Library, /Library/Caches, /Library/Logs, /private/var/log
+#   glob_delete     → elimina solo i file che matchano i pattern
+#   glob_review     → lista i file, eliminazione SOLO per selezione manuale
+#   delegate        → comando nativo del tool (mai rm diretti)
+
+version: 1
+
+backup:
+  # Copia rsync mirata pre-pulizia (F3) su /Volumes/Dati/Backup_PrePulizia/<data>
+  rsync_paths:
+    - "~/Downloads"
+    - "~/Desktop"
+
+categories:
+  cache_utente:
+    label: "Cache utente e sistema"
+    entries:
+      - id: user_caches
+        path: "~/Library/Caches"
+        mode: empty_children
+        sudo: false
+        conflicts: ["Safari", "Google Chrome", "firefox", "Mail", "Dropbox"]
+      - id: system_caches
+        path: "/Library/Caches"
+        mode: empty_children
+        sudo: true
+        conflicts: []
+
+  cache_dev:
+    label: "Cache di sviluppo"
+    entries:
+      - id: xcode_derived
+        path: "~/Library/Developer/Xcode/DerivedData"
+        mode: empty_children
+        conflicts: ["Xcode"]
+      - id: xcode_device_support
+        path: "~/Library/Developer/Xcode/iOS DeviceSupport"
+        mode: empty_children
+        conflicts: ["Xcode"]
+      - id: brew
+        mode: delegate
+        command: "brew cleanup --prune=all"
+      - id: pip
+        mode: delegate
+        command: "pip cache purge"
+      - id: npm
+        mode: delegate
+        command: "npm cache clean --force"
+      - id: docker
+        mode: delegate
+        command: "docker system prune -a --force"
+        require_explicit: true   # conferma dedicata anche in modalità "tutto"
+        conflicts: []
+
+  log:
+    label: "Log di sistema e utente"
+    entries:
+      - id: user_logs
+        path: "~/Library/Logs"
+        mode: empty_children
+        sudo: false
+      - id: system_logs
+        path: "/Library/Logs"
+        mode: empty_children
+        sudo: true
+      - id: var_log_rotated
+        path: "/private/var/log"
+        mode: glob_delete
+        patterns: ["*.gz", "*.bz2"]
+        sudo: true
+
+  temp:
+    label: "File temporanei e diagnostica"
+    entries:
+      - id: diagnostic_reports
+        path: "~/Library/Logs/DiagnosticReports"
+        mode: glob_delete
+        patterns: ["*.crash", "*.ips", "*.diag", "*.spin", "*.hang"]
+      - id: saved_app_state
+        path: "~/Library/Saved Application State"
+        mode: empty_children
+
+  download:
+    label: "Download e installer"
+    entries:
+      - id: downloads_installers
+        path: "~/Downloads"
+        mode: glob_review          # i file sono dati, non cache: selezione obbligatoria
+        patterns: ["*.dmg", "*.pkg", "*.ipsw", "*.iso"]
+        min_size_flag: "500M"      # evidenzia i pesanti
+      - id: desktop_installers
+        path: "~/Desktop"
+        mode: glob_review
+        patterns: ["*.dmg", "*.pkg", "*.zip"]
+        min_size_flag: "500M"
