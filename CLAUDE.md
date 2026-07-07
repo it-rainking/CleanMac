@@ -3,7 +3,13 @@
 ## Descrizione
 Script di pulizia e manutenzione macOS con doppia interfaccia: GUI tradizionale via osascript e dashboard web real-time via Node.js + Socket.IO.
 
-**Versione attuale**: v4.3 + Web Interface v1.0
+**Versione attuale**: v5.0 (Synthesis Edition) + Web Interface v5.0
+
+> **v5.0 Synthesis Edition**: fusione di CleanMac (bash + web) e MyPureMac (SwiftUI).
+> Da MyPureMac sono state integrate: Boot Optimization (op32), Orphaned Files finder (op33),
+> rilevamento HOMEBREW_CACHE personalizzato (op26), discovery dinamica cache (op02) e il motore
+> euristico multi-livello `AppPathFinder` (ora `appPathFinder.js`) per l'uninstaller completo.
+> Vedi `SYNTHESIS.md` per la matrice funzionale completa e le scelte di merge.
 
 ---
 
@@ -18,8 +24,11 @@ Script di pulizia e manutenzione macOS con doppia interfaccia: GUI tradizionale 
 ## Struttura progetto
 ```
 CleanMac/
-├── CleanMac.command      # Script bash principale (v4.3, ~2100 righe)
+├── CleanMac.command      # Script bash principale (v5.0, 33 operazioni)
 ├── server.js             # Backend web (Express + Socket.IO)
+├── appPathFinder.js      # Motore euristico uninstaller (porting AppPathFinder da MyPureMac) NEW v5.0
+├── schedule.command      # Scheduler pulizia via LaunchAgent (porting SchedulerService) NEW v5.0
+├── SYNTHESIS.md          # Matrice funzionale e scelte di merge CleanMac↔MyPureMac NEW v5.0
 ├── start-web.command     # Launcher interfaccia web
 ├── stop-web.command      # Stop server web
 ├── package.json          # Dipendenze Node.js
@@ -38,13 +47,17 @@ CleanMac/
 
 ---
 
-## Operazioni Disponibili (31 totali)
+## Operazioni Disponibili (33 totali)
 
-### Categorie v4.3
-- **CLEANUP** (19 ops): Cache utente/sistema, log, Safari, Xcode, DS_Store, temp, trash, localized, cache app (Slack/Discord/VSCode/Chrome/Firefox/Spotify/Teams/Zoom/Telegram/Notion/WhatsApp), log vecchi, download >30gg, npm/yarn/pip/pnpm, Docker, Homebrew, Time Machine, iOS backup, **Mail Attachments (NEW)**
-- **PERFORMANCE** (5 ops): RAM purge, LaunchServices rebuild, permessi utente, DNS flush, Spotlight reset
-- **ANALYSIS** (6 ops): Spazio disco, file >500MB, app non usate, duplicati, swap/sleepimage, **APFS Purgeable (NEW)**
+### Categorie v5.0
+- **CLEANUP** (19 ops): Cache utente/sistema, log, Safari, Xcode, DS_Store, temp, trash, localized, cache app (Slack/Discord/VSCode/Chrome/Firefox/Spotify/Teams/Zoom/Telegram/Notion/WhatsApp), log vecchi, download >30gg, npm/yarn/pip/pnpm, Docker, Homebrew (con HOMEBREW_CACHE custom), Time Machine, iOS backup, Mail Attachments
+- **PERFORMANCE** (6 ops): RAM purge, LaunchServices rebuild, permessi utente, DNS flush, Spotlight reset, **Boot Optimization (op32, NEW v5.0 da MyPureMac)**
+- **ANALYSIS** (7 ops): Spazio disco, file >500MB, app non usate, duplicati, swap/sleepimage, APFS Purgeable, **Orphaned Files (op33, NEW v5.0 da MyPureMac)**
 - **UTILITY** (1 op): Backup config (sempre attiva)
+
+### Operazioni NEW v5.0 (dalla sintesi con MyPureMac)
+- **op32 Boot Optimization** (PERFORMANCE): rileva LaunchAgents/LaunchDaemons noti come problematici (keystone, dropbox updater, CleanMyMac, ecc.) + item orfani (eseguibile mancante). In cleanup mette in **quarantena reversibile** SOLO gli agent utente noti (mai daemon di sistema). Output: `boot_optimization_TS.txt`, backup in `boot_quarantine_TS/`.
+- **op33 Orphaned Files** (ANALYSIS): file/cartelle residui in `~/Library` (Preferences/Application Support/Containers/Caches) di app non più installate, confrontando gli identificatori con le app presenti. Solo analisi (nessuna eliminazione automatica). Output: `orphaned_files_TS.txt`.
 
 ---
 
@@ -76,7 +89,7 @@ CLEANUP → is_operation_enabled() → legge OPERATIONS_DATA_FILE (init_operatio
 
 - **URL**: `http://localhost:3000`
 - **Avvio**: `./start-web.command` oppure `node server.js`
-- **API REST**: `/api/run`, `/api/stop`, `/api/reports`, `/api/analysis-files`, `/api/delete-files`, `/api/uninstall-apps`
+- **API REST**: `/api/run`, `/api/stop`, `/api/reports`, `/api/analysis-files`, `/api/delete-files`, `/api/uninstall-apps` (con `includeRelated`/`sensitivity`), `/api/uninstall-scan` (NEW v5.0), `/api/offload/*` (smart offload symlink)
 - **WebSocket events**: `execution:start`, `execution:stdout`, `execution:stderr`, `execution:complete`, `execution:error`, `request:password`
 - **Features**: Real-time log, statistiche live, modal file grandi, modal app non usate, cronologia report HTML
 

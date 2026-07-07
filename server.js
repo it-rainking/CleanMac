@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// CleanMac Web Interface Server v1.2
-// Compatible with CleanMac v4.2 (29 operations + category selection)
+// CleanMac Web Interface Server v5.0 (Synthesis Edition)
+// Compatible with CleanMac v5.0 (33 operations + category selection)
+// Include uninstaller euristico multi-livello (porting AppPathFinder da MyPureMac)
 
 const express = require('express');
 const { spawn, exec } = require('child_process');
@@ -9,11 +10,13 @@ const fs = require('fs');
 const http = require('http');
 const os = require('os');
 const { Server } = require('socket.io');
+const appPathFinder = require('./appPathFinder');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const PORT = 3000;
+const HOME_DIR = os.homedir();
 
 // Middleware
 app.use(express.json());
@@ -234,47 +237,107 @@ app.post('/api/delete-files', (req, res) => {
   }
 });
 
+// Risolve il percorso di un'app dal suo nome (solo location note).
+function resolveAppPath(appName) {
+  if (!appName.endsWith('.app') || appName.includes('/') || appName.includes('..')) return null;
+  const candidates = [
+    path.join('/Applications', appName),
+    path.join(HOME_DIR, 'Applications', appName)
+  ];
+  for (const c of candidates) {
+    try {
+      if (fs.lstatSync(c).isDirectory()) return c;
+    } catch (e) { /* not here */ }
+  }
+  return null;
+}
+
+// Aree in cui è consentito eliminare file correlati durante l'uninstall.
+const UNINSTALL_SAFE_ROOTS = [
+  path.join(HOME_DIR, 'Library') + path.sep,
+  '/Applications' + path.sep,
+  path.join(HOME_DIR, 'Applications') + path.sep,
+];
+
+// Valida che un percorso correlato sia sicuro da eliminare: dentro un'area nota,
+// senza componenti '..', e senza attraversare symlink verso l'esterno.
+function isSafeRelatedPath(p) {
+  if (typeof p !== 'string' || !p.startsWith('/') || p.includes('..')) return false;
+  const inSafeRoot = UNINSTALL_SAFE_ROOTS.some(root => p.startsWith(root));
+  if (!inSafeRoot) return false;
+  try {
+    const real = fs.realpathSync(p);
+    // Dopo la risoluzione dei symlink, deve restare in un'area sicura.
+    return UNINSTALL_SAFE_ROOTS.some(root => (real + path.sep).startsWith(root) || real.startsWith(root));
+  } catch (e) {
+    // Se non risolvibile (es. broken symlink) non eliminare.
+    return false;
+  }
+}
+
+// GET /api/uninstall-scan?app=Foo.app[&sensitivity=enhanced]
+// Restituisce il bundle + i file correlati scoperti (senza eliminare nulla).
+app.get('/api/uninstall-scan', (req, res) => {
+  const appName = req.query.app;
+  const sensitivity = ['strict', 'enhanced', 'deep'].includes(req.query.sensitivity)
+    ? req.query.sensitivity : 'enhanced';
+
+  if (!appName) return res.status(400).json({ error: 'Parametro "app" mancante' });
+
+  const appPath = resolveAppPath(appName);
+  if (!appPath) return res.status(404).json({ error: 'App non trovata nelle location note' });
+
+  try {
+    const result = appPathFinder.findRelatedFiles(appPath, sensitivity);
+    // Non includere il bundle .app stesso tra i "related"
+    result.files = result.files.filter(f => f.path !== appPath);
+    let appSize = 0;
+    try { appSize = parseInt(require('child_process').execFileSync('/usr/bin/du', ['-sk', appPath], { encoding: 'utf8' }).trim().split(/\s+/)[0], 10) * 1024; } catch (e) {}
+    res.json({ app: appName, appPath, appSizeBytes: appSize, ...result });
+  } catch (error) {
+    console.error(`Errore scan uninstall ${appName}:`, error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/api/uninstall-apps', (req, res) => {
-  const { apps } = req.body;
+  const { apps, includeRelated = false, sensitivity = 'enhanced' } = req.body;
 
   if (!apps || !Array.isArray(apps) || apps.length === 0) {
     return res.status(400).json({ error: 'No apps specified' });
   }
 
   let deletedCount = 0;
+  let relatedDeleted = 0;
   const errors = [];
 
   apps.forEach(appName => {
     try {
-      // Security check: ensure app name ends with .app
-      if (!appName.endsWith('.app')) {
-        errors.push({ app: appName, error: 'Invalid app name' });
+      const appPath = resolveAppPath(appName);
+      if (!appPath) {
+        errors.push({ app: appName, error: 'App not found or invalid name' });
         return;
       }
 
-      // Common app locations
-      const appPaths = [
-        path.join('/Applications', appName),
-        path.join(process.env.HOME, 'Applications', appName)
-      ];
-
-      let found = false;
-      for (const appPath of appPaths) {
-        if (fs.existsSync(appPath)) {
-          const stat = fs.statSync(appPath);
-          if (stat.isDirectory()) {
-            // Remove app directory recursively
-            fs.rmSync(appPath, { recursive: true, force: true });
-            deletedCount++;
-            found = true;
-            break;
-          }
+      // v5.0: rimuovi anche i file correlati (porting AppPathFinder da MyPureMac)
+      if (includeRelated) {
+        try {
+          const related = appPathFinder.findRelatedFiles(appPath, sensitivity);
+          related.files.forEach(f => {
+            if (f.path === appPath) return; // il bundle lo gestiamo dopo
+            if (isSafeRelatedPath(f.path)) {
+              try { fs.rmSync(f.path, { recursive: true, force: true }); relatedDeleted++; }
+              catch (e) { errors.push({ app: appName, file: f.path, error: e.message }); }
+            }
+          });
+        } catch (e) {
+          console.error(`Errore scoperta file correlati ${appName}:`, e);
         }
       }
 
-      if (!found) {
-        errors.push({ app: appName, error: 'App not found' });
-      }
+      // Rimuovi il bundle .app
+      fs.rmSync(appPath, { recursive: true, force: true });
+      deletedCount++;
     } catch (error) {
       console.error(`Error uninstalling ${appName}:`, error);
       errors.push({ app: appName, error: error.message });
@@ -285,8 +348,9 @@ app.post('/api/uninstall-apps', (req, res) => {
     res.json({
       success: true,
       deleted: deletedCount,
+      relatedDeleted,
       errors: errors.length > 0 ? errors : undefined,
-      message: `${deletedCount} applicazioni disinstallate${errors.length > 0 ? ` (${errors.length} errori)` : ''}`
+      message: `${deletedCount} applicazioni disinstallate${includeRelated ? ` + ${relatedDeleted} file correlati` : ''}${errors.length > 0 ? ` (${errors.length} errori)` : ''}`
     });
   } else {
     res.status(500).json({
@@ -843,7 +907,7 @@ server.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════╗
 ║                                        ║
-║   🧹 CleanMac Web Interface v1.0      ║
+║   🧹 CleanMac Web Interface v5.0      ║
 ║                                        ║
 ║   Server running on:                   ║
 ║   http://localhost:${PORT}                ║

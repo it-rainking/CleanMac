@@ -1,7 +1,7 @@
 {
   "name": "cleanmac-web",
-  "version": "1.0.0",
-  "description": "Interfaccia web per CleanMac - Gestione pulizia e manutenzione macOS",
+  "version": "5.0.0",
+  "description": "Interfaccia web per CleanMac v5.0 (Synthesis Edition) - pulizia, manutenzione e uninstaller euristico macOS",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
