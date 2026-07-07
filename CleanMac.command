@@ -1,6 +1,13 @@
 #!/bin/bash
-# CleanMac.command — versione 4.3
+# CleanMac.command — versione 5.0 (Synthesis Edition)
 # Salvataggio automatico nella cartella dello script
+# Changelog v5.0 (2026-07-07) — SINTESI CleanMac + MyPureMac:
+#   - op32 Boot Optimization: rileva LaunchAgents/LaunchDaemons problematici e orfani (da MyPureMac)
+#   - op33 Orphaned Files: file residui in ~/Library da app disinstallate (da MyPureMac)
+#   - op26 Homebrew: rileva HOMEBREW_CACHE personalizzato via `brew --cache` (da MyPureMac)
+#   - op02 Cache utente: discovery dinamica di ~/Library/Caches (da MyPureMac) oltre ai path noti
+#   - Uninstaller euristico multi-livello nel server web (porting AppPathFinder)
+#   - Totale operazioni: 33
 # Changelog v4.2 (2025-12-31):
 #   - Aggiunta selezione interattiva operazioni post-DryRun
 #   - Categorizzazione operazioni (Pulizia, Performance, Analisi)
@@ -92,6 +99,7 @@ init_operations_map() {
     echo "op20:0:PERFORMANCE:Permissions" >> "$OPERATIONS_DATA_FILE"
     echo "op21:0:PERFORMANCE:DNS flush" >> "$OPERATIONS_DATA_FILE"
     echo "op22:0:PERFORMANCE:Spotlight" >> "$OPERATIONS_DATA_FILE"
+    echo "op32:0:PERFORMANCE:Boot optimization" >> "$OPERATIONS_DATA_FILE"
 
     # ANALYSIS (solo report)
     echo "op01:0:ANALYSIS:Disk analysis" >> "$OPERATIONS_DATA_FILE"
@@ -100,6 +108,7 @@ init_operations_map() {
     echo "op17:0:ANALYSIS:Duplicates" >> "$OPERATIONS_DATA_FILE"
     echo "op29:0:ANALYSIS:Swap analysis" >> "$OPERATIONS_DATA_FILE"
     echo "op31:0:ANALYSIS:APFS Purgeable Space" >> "$OPERATIONS_DATA_FILE"
+    echo "op33:0:ANALYSIS:Orphaned files" >> "$OPERATIONS_DATA_FILE"
 
     # UTILITY (sempre ON)
     echo "op16:0:UTILITY:Config backup" >> "$OPERATIONS_DATA_FILE"
@@ -255,12 +264,12 @@ is_operation_enabled() {
 }
 
 log "═══════════════════════════════════════════════════════════"
-log "CleanMac v4.2 — Avvio"
+log "CleanMac v5.0 (Synthesis Edition) — Avvio"
 log "═══════════════════════════════════════════════════════════"
 
 # Inizializzo mappatura operazioni (NEW v4.2)
 init_operations_map
-log "Mappatura operazioni inizializzata: 31 operazioni (v4.3)"
+log "Mappatura operazioni inizializzata: 33 operazioni (v5.0)"
 
 # Supporto parametri CLI (NEW v4.2 - Web Interface)
 # Uso: ./CleanMac.command --dry-run --categories="CLEANUP,PERFORMANCE"
@@ -330,7 +339,7 @@ fi
 
 # Inizializza report dry run
 echo "═══════════════════════════════════════════════════════════" > "$DRY_RUN_REPORT"
-echo "CLEANMAC v4.0 — DRY RUN REPORT" >> "$DRY_RUN_REPORT"
+echo "CLEANMAC v5.0 — DRY RUN REPORT" >> "$DRY_RUN_REPORT"
 echo "Data: $(date)" >> "$DRY_RUN_REPORT"
 echo "═══════════════════════════════════════════════════════════" >> "$DRY_RUN_REPORT"
 echo "" >> "$DRY_RUN_REPORT"
@@ -420,6 +429,11 @@ log "Analisi cache utente..."
         append_dryrun "────────────────────────────────────────"
         append_dryrun "Spazio che sarebbe liberato: $CACHE_MB MB"
         append_dryrun "Percorso: ~/Library/Caches/*"
+        # v5.0 (da MyPureMac): discovery dinamica — mostra le 10 cache più grandi
+        append_dryrun "Cache più grandi rilevate (discovery dinamica):"
+        du -sm ~/Library/Caches/*/ 2>/dev/null | sort -rn | head -10 | while read -r _sz _path; do
+            append_dryrun "    • $(basename "$_path"): ${_sz} MB"
+        done
         calculate_freed "$CACHE_BYTES" "Cache Utente"
     else
         # Verifica se operazione è abilitata (NEW v4.2)
@@ -1502,7 +1516,13 @@ log "Analisi Homebrew..."
     # Verifica se Homebrew è installato
     if command -v brew &> /dev/null; then
 
-        BREW_CACHE_MB=$(get_dir_size_mb ~/Library/Caches/Homebrew)
+        # v5.0 (da MyPureMac): rileva HOMEBREW_CACHE personalizzato invece di assumere il default.
+        # `brew --cache` restituisce il path effettivo (rispetta HOMEBREW_CACHE env var).
+        BREW_CACHE_PATH=$(brew --cache 2>/dev/null)
+        if [ -z "$BREW_CACHE_PATH" ] || [ ! -d "$BREW_CACHE_PATH" ]; then
+            BREW_CACHE_PATH="$HOME/Library/Caches/Homebrew"
+        fi
+        BREW_CACHE_MB=$(get_dir_size_mb "$BREW_CACHE_PATH")
 
         if [ "$DRY_RUN" = true ]; then
             register_operation "op26" "$BREW_CACHE_MB" "CLEANUP" "Homebrew (cache + old versions)"
@@ -1511,6 +1531,7 @@ log "Analisi Homebrew..."
             append_dryrun "🍺 HOMEBREW (DRY RUN)"
             append_dryrun "────────────────────────────────────────"
             append_dryrun "Cache Homebrew: $BREW_CACHE_MB MB"
+            append_dryrun "Percorso cache: $BREW_CACHE_PATH"
             append_dryrun ""
             append_dryrun "La pulizia eseguirà:"
             append_dryrun "    - brew cleanup --prune=all"
@@ -1853,6 +1874,254 @@ log "Analisi spazio APFS purgeable..."
 }
 
 #############################################
+# 32. BOOT OPTIMIZATION (NEW v5.0 - da MyPureMac)
+# Rileva LaunchAgents/LaunchDaemons noti come problematici + item orfani
+# (il cui eseguibile non esiste più). Sicurezza: NON rimuove mai daemon di
+# sistema automaticamente; in cleanup mette in quarantena (backup) solo gli
+# agent utente noti come problematici, in modo reversibile.
+#############################################
+log "Analisi boot optimization (launch agents/daemons)..."
+{
+    BOOT_FILE="$REPORTS_DIR/boot_optimization_${TIMESTAMP}.txt"
+    BOOT_QUARANTINE="$REPORTS_DIR/boot_quarantine_${TIMESTAMP}"
+
+    # Liste note (portate da MyPureMac ScanEngine.scanBootOptimization)
+    KNOWN_PROBLEMATIC_AGENTS="com.google.keystone.agent.plist com.google.keystone.xpcservice.plist com.google.GoogleUpdater.wake.plist com.valvesoftware.steamclean.plist com.dropbox.DropboxUpdater.wake.plist com.dropbox.dropboxmacupdate.agent.plist com.dropbox.dropboxmacupdate.xpcservice.plist com.macpaw.CleanMyMac4.Updater.plist com.epicgames.launcher.plist"
+    KNOWN_PROBLEMATIC_DAEMONS="com.macpaw.CleanMyMac4.Agent.plist com.muse.authservice.plist"
+
+    # Helper: verifica se un launch item è orfano (eseguibile inesistente)
+    is_orphan_launch_item() {
+        local plist="$1"
+        local prog
+        prog=$(/usr/libexec/PlistBuddy -c "Print :Program" "$plist" 2>/dev/null)
+        if [ -z "$prog" ]; then
+            prog=$(/usr/libexec/PlistBuddy -c "Print :ProgramArguments:0" "$plist" 2>/dev/null)
+        fi
+        [ -z "$prog" ] && return 1        # nessun programma → non classificabile come orfano
+        [ -e "$prog" ] && return 1        # eseguibile esiste → non orfano
+        return 0                          # orfano
+    }
+
+    # Helper: appende all'elenco; matches known → known, altrimenti orphan
+    scan_launch_dir() {
+        local dir="$1"
+        local known_list="$2"
+        local scope="$3"   # "user" | "system"
+        [ -d "$dir" ] || return 0
+        [ -r "$dir" ] || return 0
+        for plist in "$dir"/*.plist; do
+            [ -e "$plist" ] || continue
+            local base
+            base=$(basename "$plist")
+            local flagged=0
+            case " $known_list " in
+                *" $base "*)
+                    echo "⚠️  [NOTO] $base — $dir (scope: $scope)" >> "$BOOT_FILE"
+                    flagged=1
+                    if [ "$scope" = "user" ]; then
+                        echo "$plist" >> "${BOOT_FILE}.userknown"
+                    fi
+                    ;;
+            esac
+            if [ "$flagged" -eq 0 ] && is_orphan_launch_item "$plist"; then
+                echo "🔍 [ORFANO] $base — $dir (eseguibile mancante)" >> "$BOOT_FILE"
+            fi
+        done
+    }
+
+    if [ "$DRY_RUN" = true ]; then
+        register_operation "op32" "0" "PERFORMANCE" "Boot optimization"
+        : > "$BOOT_FILE"
+        echo "═══════════════════════════════════════════" >> "$BOOT_FILE"
+        echo "BOOT OPTIMIZATION — Launch Agents/Daemons"      >> "$BOOT_FILE"
+        echo "$(date)"                                        >> "$BOOT_FILE"
+        echo "═══════════════════════════════════════════" >> "$BOOT_FILE"
+        echo "" >> "$BOOT_FILE"
+        rm -f "${BOOT_FILE}.userknown"
+
+        scan_launch_dir "$HOME/Library/LaunchAgents" "$KNOWN_PROBLEMATIC_AGENTS" "user"
+        scan_launch_dir "/Library/LaunchAgents" "$KNOWN_PROBLEMATIC_AGENTS" "system"
+        scan_launch_dir "/Library/LaunchDaemons" "$KNOWN_PROBLEMATIC_DAEMONS" "system"
+
+        BOOT_COUNT=$(grep -c -E "^(⚠️|🔍)" "$BOOT_FILE" 2>/dev/null | tr -d ' ')
+        BOOT_COUNT=${BOOT_COUNT:-0}
+        echo "" >> "$BOOT_FILE"
+        echo "Totale elementi segnalati: $BOOT_COUNT" >> "$BOOT_FILE"
+
+        append_dryrun ""
+        append_dryrun "🚀 BOOT OPTIMIZATION (ANALISI)"
+        append_dryrun "────────────────────────────────────────"
+        append_dryrun "Launch item problematici/orfani rilevati: $BOOT_COUNT"
+        append_dryrun "Dettaglio: $BOOT_FILE"
+        append_dryrun "ℹ️  In pulizia verranno messi in quarantena SOLO gli agent utente noti (reversibile)."
+    else
+        if is_operation_enabled "op32"; then
+            : > "$BOOT_FILE"
+            echo "BOOT OPTIMIZATION — $(date)" >> "$BOOT_FILE"
+            rm -f "${BOOT_FILE}.userknown"
+            scan_launch_dir "$HOME/Library/LaunchAgents" "$KNOWN_PROBLEMATIC_AGENTS" "user"
+            scan_launch_dir "/Library/LaunchAgents" "$KNOWN_PROBLEMATIC_AGENTS" "system"
+            scan_launch_dir "/Library/LaunchDaemons" "$KNOWN_PROBLEMATIC_DAEMONS" "system"
+
+            QUARANTINED=0
+            if [ -f "${BOOT_FILE}.userknown" ]; then
+                mkdir -p "$BOOT_QUARANTINE"
+                while IFS= read -r plist; do
+                    [ -e "$plist" ] || continue
+                    # Scarica l'agent prima di spostarlo (best effort)
+                    launchctl unload "$plist" 2>/dev/null
+                    if mv "$plist" "$BOOT_QUARANTINE/" 2>/dev/null; then
+                        QUARANTINED=$(( QUARANTINED + 1 ))
+                    fi
+                done < "${BOOT_FILE}.userknown"
+            fi
+
+            if [ "$QUARANTINED" -gt 0 ]; then
+                add_to_report "✅ Boot optimization: $QUARANTINED agent utente noti messi in quarantena → $BOOT_QUARANTINE (reversibile)"
+            else
+                add_to_report "ℹ️  Boot optimization: nessun agent utente noto da mettere in quarantena (vedi $BOOT_FILE per orfani/sistema)"
+            fi
+        else
+            log "Boot optimization: SALTATO (non selezionato)"
+            add_to_report "⏭️  Boot optimization saltato (non selezionato)"
+        fi
+    fi
+
+    rm -f "${BOOT_FILE}.userknown" 2>/dev/null
+    log "Boot optimization analizzato → $BOOT_FILE"
+}
+
+#############################################
+# 33. ORPHANED FILES FINDER (NEW v5.0 - da MyPureMac)
+# Rileva file/cartelle residui in ~/Library appartenenti ad app disinstallate,
+# confrontando gli identificatori con quelli delle app effettivamente installate.
+# Solo ANALISI (nessuna eliminazione automatica: troppo rischioso per euristica).
+#############################################
+log "Analisi orphaned files (residui app disinstallate)..."
+{
+    ORPHAN_FILE="$REPORTS_DIR/orphaned_files_${TIMESTAMP}.txt"
+    INSTALLED_IDS=$(mktemp)
+
+    # Costruisci l'insieme degli identificatori installati (bundle id + nome normalizzato)
+    while IFS= read -r app; do
+        [ -n "$app" ] || continue
+        bid=$(/usr/bin/defaults read "$app/Contents/Info" CFBundleIdentifier 2>/dev/null)
+        if [ -n "$bid" ]; then
+            # Forma normalizzata (solo lettere/numeri minuscoli) per il matching a substring:
+            # is_installed_identifier() normalizza il candidato allo stesso modo.
+            bidnorm=$(echo "$bid" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+            [ -n "$bidnorm" ] && echo "$bidnorm" >> "$INSTALLED_IDS"
+        fi
+        # Nome app normalizzato (solo lettere/numeri minuscoli)
+        aname=$(basename "$app" .app | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+        [ -n "$aname" ] && echo "$aname" >> "$INSTALLED_IDS"
+    done < <(find /Applications "$HOME/Applications" -maxdepth 2 -type d -name "*.app" 2>/dev/null)
+
+    # Verifica se un identificatore candidato corrisponde a un'app installata
+    is_installed_identifier() {
+        local candidate
+        candidate=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+        local norm
+        norm=$(echo "$candidate" | tr -cd 'a-z0-9')
+        [ -z "$norm" ] && return 0   # non classificabile → non segnalare
+        # match diretto su bundle id o su nome (grep case-insensitive, match parziale)
+        if grep -qi -- "$norm" "$INSTALLED_IDS" 2>/dev/null; then
+            return 0
+        fi
+        return 1
+    }
+
+    if [ "$DRY_RUN" = true ]; then
+        register_operation "op33" "0" "ANALYSIS" "Orphaned files"
+    fi
+
+    if { [ "$DRY_RUN" = true ]; } || is_operation_enabled "op33"; then
+        : > "$ORPHAN_FILE"
+        echo "═══════════════════════════════════════════" >> "$ORPHAN_FILE"
+        echo "ORPHANED FILES — residui di app disinstallate"  >> "$ORPHAN_FILE"
+        echo "$(date)"                                        >> "$ORPHAN_FILE"
+        echo "═══════════════════════════════════════════" >> "$ORPHAN_FILE"
+        echo "" >> "$ORPHAN_FILE"
+        echo "ℹ️  Elenco euristico: verifica prima di eliminare manualmente." >> "$ORPHAN_FILE"
+        echo "" >> "$ORPHAN_FILE"
+
+        ORPHAN_COUNT=0
+        ORPHAN_MB=0
+
+        # Robustezza: se la scoperta delle app installate è fallita, non produrre
+        # un report fuorviante (segnalerebbe TUTTO come orfano).
+        if [ ! -s "$INSTALLED_IDS" ]; then
+            echo "⚠️  Impossibile determinare le app installate — analisi orfani saltata." >> "$ORPHAN_FILE"
+            if [ "$DRY_RUN" = true ]; then
+                append_dryrun ""
+                append_dryrun "👻 ORPHANED FILES (ANALISI)"
+                append_dryrun "────────────────────────────────────────"
+                append_dryrun "⚠️  Scoperta app installate fallita — analisi saltata."
+            else
+                add_to_report "⚠️  Orphaned files: scoperta app installate fallita, analisi saltata"
+            fi
+            log "Orphaned files: set app installate vuoto, skip"
+        else
+            # Preferences: file *.plist nominati per bundle id
+            for plist in "$HOME/Library/Preferences"/*.plist; do
+                [ -e "$plist" ] || continue
+                id=$(basename "$plist" .plist)
+                case "$id" in
+                    com.apple.*|.GlobalPreferences*|MobileMeAccounts*|loginwindow*) continue ;;
+                esac
+                if ! is_installed_identifier "$id"; then
+                    sz=$(get_dir_size_mb "$plist")
+                    echo "🔍 ~/Library/Preferences/$(basename "$plist")  (${sz} MB)" >> "$ORPHAN_FILE"
+                    ORPHAN_COUNT=$(( ORPHAN_COUNT + 1 ))
+                    ORPHAN_MB=$(( ORPHAN_MB + sz ))
+                fi
+            done
+
+            # Application Support + Containers + Caches (cartelle top-level)
+            for base in "$HOME/Library/Application Support" "$HOME/Library/Containers" "$HOME/Library/Caches"; do
+                [ -d "$base" ] || continue
+                for entry in "$base"/*; do
+                    [ -e "$entry" ] || continue
+                    name=$(basename "$entry")
+                    case "$name" in
+                        com.apple.*|Apple*|CrashReporter*|CloudDocs*) continue ;;
+                    esac
+                    if ! is_installed_identifier "$name"; then
+                        sz=$(get_dir_size_mb "$entry")
+                        # Ignora voci minuscole (<1 MB) per ridurre rumore
+                        if [ "$sz" -ge 1 ]; then
+                            echo "🔍 ${base/#$HOME/~}/$name  (${sz} MB)" >> "$ORPHAN_FILE"
+                            ORPHAN_COUNT=$(( ORPHAN_COUNT + 1 ))
+                            ORPHAN_MB=$(( ORPHAN_MB + sz ))
+                        fi
+                    fi
+                done
+            done
+
+            echo "" >> "$ORPHAN_FILE"
+            echo "Totale candidati orfani: $ORPHAN_COUNT (~${ORPHAN_MB} MB)" >> "$ORPHAN_FILE"
+
+            if [ "$DRY_RUN" = true ]; then
+                append_dryrun ""
+                append_dryrun "👻 ORPHANED FILES (ANALISI)"
+                append_dryrun "────────────────────────────────────────"
+                append_dryrun "Candidati residui rilevati: $ORPHAN_COUNT (~${ORPHAN_MB} MB)"
+                append_dryrun "Dettaglio: $ORPHAN_FILE"
+                append_dryrun "ℹ️  Solo analisi: nessun file eliminato automaticamente."
+            else
+                add_to_report "✅ Analisi orphaned files ($ORPHAN_COUNT candidati, ~${ORPHAN_MB} MB) → $ORPHAN_FILE"
+            fi
+            log "Orphaned files analizzati: $ORPHAN_COUNT candidati"
+        fi
+    else
+        log "Orphaned files: SALTATO (non selezionato)"
+        add_to_report "⏭️  Orphaned files saltato (non selezionato)"
+    fi
+
+    rm -f "$INSTALLED_IDS"
+}
+
+#############################################
 # RIEPILOGO FINALE
 #############################################
 
@@ -1913,7 +2182,7 @@ if [ "$DRY_RUN" = true ]; then
     log ""
 
     # Notifica Notification Center
-    send_notification "CleanMac v4.2" "DRY RUN completato. Spazio liberabile: ${SPACE_FREED_MB} MB"
+    send_notification "CleanMac v5.0" "DRY RUN completato. Spazio liberabile: ${SPACE_FREED_MB} MB"
 
     # NUOVO v4.2: Dialog con selezione categorie (solo se non in CLI mode)
     if [ "$CLI_MODE" = false ]; then
@@ -2004,7 +2273,7 @@ cat > "$REPORT_HTML" <<HTMLEOF
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CleanMac v4.0 Report</title>
+    <title>CleanMac v5.0 Report</title>
     <style>
         * {
             margin: 0;
@@ -2163,7 +2432,7 @@ cat > "$REPORT_HTML" <<HTMLEOF
 <body>
     <div class="container">
         <div class="header">
-            <h1>🧹 CleanMac v4.2 Report</h1>
+            <h1>🧹 CleanMac v5.0 Report</h1>
             <p>Manutenzione e pulizia sistema</p>
         </div>
 
@@ -2202,7 +2471,7 @@ cat > "$REPORT_HTML" <<HTMLEOF
         </div>
 
         <div class="footer">
-            <p>CleanMac v4.2 — Report generato automaticamente</p>
+            <p>CleanMac v5.0 — Report generato automaticamente</p>
         </div>
     </div>
 </body>
@@ -2223,7 +2492,7 @@ sed -i '' "s|SPACE_PLACEHOLDER|$SPACE_FREED_MB|g" "$REPORT_HTML"
 sed -i '' "s|OPERATIONS_PLACEHOLDER|$OPERATIONS_LOG|g" "$REPORT_HTML"
 sed -i '' "s|<div class=\"MODE_BADGE_PLACEHOLDER\"></div>|$MODE_BADGE|g" "$REPORT_HTML"
 
-add_to_report "✅ Report HTML v4.2 generato → $REPORT_HTML"
+add_to_report "✅ Report HTML v5.0 generato → $REPORT_HTML"
 
 log "═══════════════════════════════════════════════════════════"
 if [ "$DRY_RUN" = true ]; then
@@ -2231,7 +2500,7 @@ if [ "$DRY_RUN" = true ]; then
 else
     log "✅ PULIZIA COMPLETATA"
     # Notifica Notification Center
-    send_notification "CleanMac v4.2" "Pulizia completata! Spazio liberato: ${SPACE_FREED_MB} MB"
+    send_notification "CleanMac v5.0" "Pulizia completata! Spazio liberato: ${SPACE_FREED_MB} MB"
     # Cleanup file preferenze temporaneo
     rm -f "$REPORTS_DIR/.cleanmac_prefs_"*.tmp 2>/dev/null
     rm -f "$OPERATIONS_DATA_FILE" 2>/dev/null

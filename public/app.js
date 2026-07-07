@@ -1477,17 +1477,51 @@ document.addEventListener('DOMContentLoaded', () => {
         const confirmed = confirm(`Sei sicuro di voler disinstallare ${selected.length} applicazioni?\n\nQuesta operazione è irreversibile!`);
         if (!confirmed) return;
 
+        // v5.0 (sintesi da MyPureMac): disinstallazione completa opzionale che
+        // rimuove anche cache, preferenze e container correlati (motore euristico).
+        // Prima di procedere mostriamo un'anteprima di quanti file correlati verrebbero
+        // rimossi, interrogando /api/uninstall-scan per ciascuna app selezionata.
+        let includeRelated = false;
+        let totalRelated = 0;
+        let totalRelatedBytes = 0;
+        try {
+            for (const appName of selected) {
+                const scanResp = await fetch(`/api/uninstall-scan?app=${encodeURIComponent(appName)}&sensitivity=enhanced`);
+                if (!scanResp.ok) continue;
+                const scan = await scanResp.json();
+                if (Array.isArray(scan.files)) {
+                    totalRelated += scan.files.length;
+                    totalRelatedBytes += scan.files.reduce((sum, f) => sum + (f.sizeBytes || 0), 0);
+                }
+            }
+        } catch (e) {
+            console.warn('Anteprima file correlati non disponibile:', e);
+        }
+
+        if (totalRelated > 0) {
+            const mb = (totalRelatedBytes / 1048576).toFixed(0);
+            includeRelated = confirm(
+                `Rimuovere anche i ${totalRelated} file/cartelle correlati (~${mb} MB)?\n\n` +
+                'Include cache, preferenze e container delle app selezionate.\n\n' +
+                'OK = disinstallazione completa (consigliato)\n' +
+                'Annulla = rimuovi solo il bundle .app'
+            );
+        }
+
         try {
             const response = await fetch('/api/uninstall-apps', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ apps: selected })
+                body: JSON.stringify({ apps: selected, includeRelated, sensitivity: 'enhanced' })
             });
 
             const result = await response.json();
 
             if (result.success) {
                 let message = `${result.deleted} applicazioni disinstallate con successo`;
+                if (typeof result.relatedDeleted === 'number' && result.relatedDeleted > 0) {
+                    message += ` (+${result.relatedDeleted} file correlati)`;
+                }
                 if (result.errors && result.errors.length > 0) {
                     message += `\n${result.errors.length} errori durante la disinstallazione`;
                     console.log('Errori disinstallazione app:', result.errors);
