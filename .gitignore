@@ -34,3 +34,11 @@ Thumbs.db
 # Environment
 .env
 .env.local
+
+# MacCleanPilot (output runtime)
+maccleanpilot/data/history.db
+maccleanpilot/data/logs/*
+!maccleanpilot/data/logs/.gitkeep
+maccleanpilot/**/__pycache__/
+.pytest_cache/
+.coverage

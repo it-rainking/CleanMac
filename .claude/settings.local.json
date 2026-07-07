@@ -38,7 +38,8 @@
       "Bash(sed -i '' 's|BIG_FILES=\"\\\\$SCRIPT_DIR/large_files_|BIG_FILES=\"$REPORTS_DIR/large_files_|g' /Volumes/Dati/Dropbox/GitHub/CleanMac/CleanMac.command)",
       "Bash(sed -i '' 's|APPS_FILE=\"\\\\$SCRIPT_DIR/unused_apps_|APPS_FILE=\"$REPORTS_DIR/unused_apps_|g' /Volumes/Dati/Dropbox/GitHub/CleanMac/CleanMac.command)",
       "Bash(sed -i '' 's|DUPES_FILE=\"\\\\$SCRIPT_DIR/duplicates_|DUPES_FILE=\"$REPORTS_DIR/duplicates_|g' /Volumes/Dati/Dropbox/GitHub/CleanMac/CleanMac.command)",
-      "Bash(sed -i '' 's|PREFS_FILE=\"\\\\$SCRIPT_DIR/.cleanmac_prefs_|PREFS_FILE=\"$REPORTS_DIR/.cleanmac_prefs_|g' /Volumes/Dati/Dropbox/GitHub/CleanMac/CleanMac.command)"
+      "Bash(sed -i '' 's|PREFS_FILE=\"\\\\$SCRIPT_DIR/.cleanmac_prefs_|PREFS_FILE=\"$REPORTS_DIR/.cleanmac_prefs_|g' /Volumes/Dati/Dropbox/GitHub/CleanMac/CleanMac.command)",
+      "mcp__Claude_Code_Remote__send_later"
     ],
     "deny": [],
     "ask": []

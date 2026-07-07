@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MacCleanPilot</title>
+<style>
+  :root {
+    --bg: #f5f5f7; --card: #fff; --text: #1d1d1f; --dim: #6e6e73;
+    --accent: #0071e3; --green: #34c759; --red: #ff3b30; --yellow: #ff9500;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #161617; --card: #1d1d1f; --text: #f5f5f7; --dim: #86868b; }
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { font: 16px/1.5 -apple-system, system-ui, sans-serif; background: var(--bg);
+         color: var(--text); padding: 1rem; max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: .5rem 0 1rem; }
+  .banner { border-radius: 12px; padding: .8rem 1rem; margin-bottom: 1rem; font-size: .9rem; }
+  .banner.ok   { background: var(--card); background: color-mix(in srgb, var(--green) 15%, var(--card)); }
+  .banner.warn { background: var(--card); background: color-mix(in srgb, var(--yellow) 18%, var(--card)); }
+  .card { background: var(--card); border-radius: 14px; padding: 1rem; margin-bottom: .8rem;
+          box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .cat-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .cat-head h2 { font-size: 1.05rem; }
+  .cat-head .gb { font-weight: 700; color: var(--green); }
+  .entry { display: flex; align-items: center; gap: .7rem; padding: .5rem 0;
+           border-top: 1px solid color-mix(in srgb, var(--dim) 25%, transparent); }
+  .entry:first-of-type { border-top: none; margin-top: .4rem; }
+  .hist { font-size: .85rem; color: var(--dim); display: flex;
+          justify-content: space-between; padding: .3rem 0; }
+  .entry .info { flex: 1; min-width: 0; }
+  .entry .path { font-size: .78rem; color: var(--dim); overflow: hidden;
+                 text-overflow: ellipsis; white-space: nowrap; }
+  .entry .size { font-size: .9rem; font-weight: 600; white-space: nowrap; }
+  .entry .note { font-size: .75rem; color: var(--yellow); }
+  input[type=checkbox] { width: 1.3rem; height: 1.3rem; accent-color: var(--accent); flex: none; }
+  input[type=checkbox]:disabled { opacity: .3; }
+  .actions { position: sticky; bottom: 0; background: var(--bg); padding: .8rem 0; }
+  button { width: 100%; padding: .9rem; border: 0; border-radius: 12px; font-size: 1rem;
+           font-weight: 600; cursor: pointer; margin-top: .5rem; }
+  #btn-backup { background: var(--card); color: var(--accent); }
+  #btn-dry { background: var(--accent); color: #fff; }
+  #btn-exec { background: var(--red); color: #fff; }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  #log { font: .78rem/1.5 ui-monospace, monospace; white-space: pre-wrap;
+         background: var(--card); border-radius: 12px; padding: .8rem; margin-top: .8rem;
+         max-height: 40vh; overflow-y: auto; display: none; }
+</style>
+</head>
+<body>
+<h1>🧹 MacCleanPilot</h1>
+<div id="gate" class="banner warn">Verifica backup…</div>
+<div id="cards">Scansione in corso…</div>
+<div class="card" id="history-card" style="display:none">
+  <div class="cat-head"><h2>Storico sessioni</h2></div>
+  <div id="history"></div>
+</div>
+<div class="actions">
+  <button id="btn-backup">1 · Backup (snapshot APFS + rsync)</button>
+  <button id="btn-dry">2 · Simula (dry-run)</button>
+  <button id="btn-exec" disabled>3 · Esegui davvero</button>
+</div>
+<div id="log"></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let gateOk = false;
+
+function selected() {
+  return [...document.querySelectorAll('input[data-id]:checked')].map(c => c.dataset.id);
+}
+
+async function refreshGate() {
+  const st = await (await fetch('/api/backup-status')).json();
+  gateOk = st.verified;
+  const g = $('#gate');
+  if (gateOk) {
+    g.className = 'banner ok';
+    g.textContent = `✅ Backup verificato — snapshot ${st.snapshot_id}. Esecuzione sbloccata.`;
+  } else {
+    g.className = 'banner warn';
+    g.textContent = st.volume_mounted
+      ? '⚠️ Nessun backup in questa sessione: crea il backup per sbloccare "Esegui".'
+      : '⚠️ /Volumes/Dati non montato: lo snapshot APFS è possibile, ma l\'esecuzione resta bloccata.';
+  }
+  $('#btn-exec').disabled = !gateOk;
+}
+
+async function loadScan() {
+  const data = await (await fetch('/api/scan')).json();
+  const byCat = {};
+  for (const e of data.entries) (byCat[e.category_label] ??= []).push(e);
+  let html = '';
+  for (const [label, entries] of Object.entries(byCat)) {
+    const tot = entries.reduce((s, e) => s + e.bytes, 0);
+    html += `<div class="card"><div class="cat-head"><h2>${label}</h2>
+             <span class="gb">${(tot / 1073741824).toFixed(2)} GB</span></div>`;
+    for (const e of entries) {
+      const disabled = e.executable_from_web ? '' : 'disabled';
+      const note = e.executable_from_web ? (e.note || '')
+                 : (e.note || 'solo da CLI (selezione manuale / conferma dedicata)');
+      html += `<label class="entry">
+        <input type="checkbox" data-id="${e.id}" ${disabled}>
+        <div class="info"><div>${e.id} <span style="color:var(--dim)">· ${e.mode}</span></div>
+          <div class="path">${e.path || ''}</div>
+          ${note ? `<div class="note">${note}</div>` : ''}</div>
+        <div class="size">${e.mode === 'delegate' ? '—' : e.human}</div>
+      </label>`;
+    }
+    html += '</div>';
+  }
+  $('#cards').innerHTML = html + `<div class="banner ok">Spazio libero: ${data.df_free_gb} GB
+    <small style="color:var(--dim)"> (include purgeable APFS: misura indicativa)</small></div>`;
+}
+
+function logLine(t) { const l = $('#log'); l.style.display = 'block'; l.textContent += t + '\n'; }
+
+$('#btn-backup').onclick = async () => {
+  logLine('▶ backup: snapshot APFS + rsync…');
+  const r = await (await fetch('/api/backup', { method: 'POST' })).json();
+  logLine(r.ok ? `✅ snapshot ${r.snapshot_id}` + (r.rsync_ok ? ' · rsync ok' : ` · rsync FALLITO: ${r.rsync_error}`)
+               : `❌ ${r.error}`);
+  refreshGate();
+};
+
+async function run(dry) {
+  const entries = selected();
+  if (!entries.length) return logLine('⚠️ nessuna voce selezionata');
+  if (!dry && !confirm(`Eliminare davvero i contenuti di ${entries.length} voci?`)) return;
+  logLine(`▶ ${dry ? 'dry-run' : 'ESECUZIONE'}: ${entries.join(', ')}`);
+  const r = await (await fetch('/api/execute', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ entries, dry_run: dry }),
+  })).json();
+  if (!r.ok) return logLine(`❌ ${r.error}`);
+  for (const a of r.actions) logLine(`  ${a.status.padEnd(8)} ${a.id}  ${a.human}${a.error ? '  (' + a.error + ')' : ''}`);
+  logLine(`Δ spazio libero: ${r.df_delta_gb} GB — sessione #${r.session_id}`);
+  loadScan(); loadHistory();
+}
+$('#btn-dry').onclick = () => run(true);
+$('#btn-exec').onclick = () => run(false);
+
+async function loadHistory() {
+  const data = await (await fetch('/api/history')).json();
+  if (!data.sessions.length) return;
+  $('#history-card').style.display = 'block';
+  $('#history').innerHTML = data.sessions.slice(0, 10).map(s =>
+    `<div class="hist"><span>#${s.id} · ${s.started_at}${s.snapshot ? ' · 📸' : ''}</span>
+     <span>${s.freed} · ${s.done} ok / ${s.skipped} skip</span></div>`).join('');
+}
+
+loadScan(); refreshGate(); loadHistory();
+</script>
+</body>
+</html>
