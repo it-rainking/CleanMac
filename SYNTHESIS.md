@@ -1,4 +1,4 @@
-# CleanMac v5.1 — Synthesis Edition
+# CleanMac v5.2 — Synthesis Edition
 
 Documento di sintesi della fusione tra le due repository:
 
@@ -123,9 +123,63 @@ MyPureMac rimasti fuori:
 - `server.js`: endpoint `GET /api/fda-status`; la dashboard mostra un banner
   se il processo non ha FDA (senza il quale Mail/Safari/Cestino non sono pulibili).
 
+## v5.2 — Moduli Uninstaller e Residui (chiusura della fusione)
+
+Con la v5.1 il *motore* era allineato, ma due **moduli utente** di MyPureMac non
+avevano equivalente in CleanMac: la vista uninstaller (`AppListView` +
+`AppFilesView`) e la vista residui (`OrphanListView`). Erano le ultime funzioni
+presenti solo nella app SwiftUI. La v5.2 le porta nella dashboard web.
+
+### Nuovi moduli backend
+- **`appInventory.js`** — porting di `AppInfoFetcher.swift`: elenco di tutte le
+  app installate (`/Applications`, `~/Applications`, `/System/Applications`) con
+  bundle id, dimensione (`du`), ultimo utilizzo (Spotlight `kMDItemLastUsedDate`
+  con fallback su mtime) e giorni di inutilizzo. Le 39 app Apple di
+  `PROTECTED_BUNDLE_IDS` e tutto `/System/Applications` sono marcati
+  `removable: false` e non selezionabili.
+- **`orphanFinder.js`** — porting di `AppState.findOrphans()`: ricerca inversa
+  sulle `reverseSearchPaths` di `conditions.js`, con `skipReverse`, confronto
+  con l'inventario installato e soglia dimensionale.
+
+### Nuovi endpoint
+| Endpoint | Funzione |
+|---|---|
+| `GET /api/apps[?fast=1]` | Inventario app (cache 60 s; `fast=1` salta `du`/`mdls`) |
+| `GET /api/orphans[?minSizeMB=N]` | Residui candidati, ognuno con flag `deletable` |
+| `POST /api/orphans/delete` | Eliminazione residui — **rivalida ogni path lato server** |
+| `GET /api/disk-info` | Spazio totale/libero/usato (porting `getDiskInfo`) |
+
+### Guard-rail dei residui
+`isDeletableOrphan` è più stretto delle location scandite: consente solo i
+**figli** di 9 directory dentro `~/Library`, rifiuta `..`, path relativi,
+qualunque bundle `.app`, symlink non risolvibili e ogni percorso che dopo
+`realpath` esce dall'area consentita. `/Library`, `PrivilegedHelperTools` e
+`/Users/Shared` vengono **scanditi e segnalati ma mai eliminati**.
+La lista di path inviata dal client non è mai considerata attendibile: ogni
+percorso viene rivalidato in `POST /api/orphans/delete` e i rifiuti sono
+riportati nella risposta.
+
+### UI
+- **Pannello Uninstaller**: lista app con ricerca, badge "non usata da Ng" e
+  "🔒 protetta"; selezione di un'app → elenco dei file correlati con dimensioni,
+  selettore di precisione (`strict`/`enhanced`/`deep`) e conteggio del selezionato.
+  Gli elementi non eliminabili sono marcati `manuale` e disabilitati.
+- **Pannello Residui**: soglia MB configurabile, selezione multipla dei soli
+  item eliminabili, totale selezionato ed eliminazione con conferma.
+
+### Difetto trovato dai test
+`skipReverse` confronta **prefissi** del nome normalizzato: un item
+`com.apple.X` diventa `comappleX` e **non** veniva intercettato dal prefisso
+`apple` (l'op33 bash aveva invece un `case com.apple.*` esplicito). Senza la
+guardia, ogni file di sistema Apple sarebbe stato classificato come residuo.
+Aggiunta `SYSTEM_NAME_PREFIXES` in `orphanFinder.js` + test di regressione.
+
 ## Test
+- `test/orphanFinder.test.js`: **15 test** su guard-rail di eliminazione,
+  classificazione e inventario app (NEW v5.2).
 - `test/appPathFinder.test.js`: **29 test unitari** committati sulla logica pura
   (normalizzazione, 9 livelli di matching, condizioni per-app, skip logic,
-  filterSubpaths, parser codesign/entitlements) — eseguibili senza macOS: `npm test`.
+  filterSubpaths, parser codesign/entitlements) — eseguibili senza macOS.
+- **Totale: 44 test**, `npm test` esegue entrambe le suite.
 - `CleanMac.command`: `bash -n` pulito.
 - `server.js`, `app.js`, moduli: `node --check` puliti.

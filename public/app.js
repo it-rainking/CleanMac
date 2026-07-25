@@ -1578,7 +1578,307 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Smart Offload ──────────────────────────────────────────
     initOffloadModule();
+
+    // ── Uninstaller + Residui (v5.2) ───────────────────────────
+    initUninstallerModule();
+    initOrphansModule();
 });
+
+// ── Uninstaller Module (v5.2 — porting AppListView/AppFilesView) ───────────
+
+let appInventory = [];
+let currentAppFiles = [];
+let currentAppPath = null;
+
+function initUninstallerModule() {
+    const loadBtn = document.getElementById('loadAppsBtn');
+    const search = document.getElementById('appSearchInput');
+    if (!loadBtn) return;
+
+    loadBtn.addEventListener('click', loadAppInventory);
+    search.addEventListener('input', () => renderAppInventory(search.value));
+    document.getElementById('appSensitivitySelect').addEventListener('change', () => {
+        if (currentAppPath) scanAppFiles(currentAppPath);
+    });
+}
+
+async function loadAppInventory() {
+    const list = document.getElementById('appInventoryList');
+    list.innerHTML = '<div class="empty-state"><p>Lettura applicazioni in corso…</p></div>';
+    try {
+        const resp = await fetch('/api/apps');
+        if (!resp.ok) throw new Error('richiesta fallita');
+        const data = await resp.json();
+        appInventory = Array.isArray(data.apps) ? data.apps : [];
+        renderAppInventory(document.getElementById('appSearchInput').value);
+    } catch (e) {
+        list.innerHTML = '<div class="empty-state"><p>Impossibile leggere le applicazioni installate.</p></div>';
+        showToast('error', 'Errore', 'Inventario app non disponibile');
+    }
+}
+
+function renderAppInventory(filter) {
+    const list = document.getElementById('appInventoryList');
+    const q = (filter || '').trim().toLowerCase();
+    const apps = q ? appInventory.filter(a => a.name.toLowerCase().includes(q)) : appInventory;
+
+    if (apps.length === 0) {
+        list.innerHTML = '<div class="empty-state"><p>Nessuna app corrisponde alla ricerca.</p></div>';
+        return;
+    }
+
+    list.innerHTML = apps.map(a => {
+        const size = a.sizeBytes ? formatBytes(a.sizeBytes) : '—';
+        const unused = typeof a.daysUnused === 'number' && a.daysUnused > 90
+            ? `<span class="app-unused-badge">non usata da ${a.daysUnused}g</span>` : '';
+        const lock = a.removable ? '' : '<span class="app-protected-badge">🔒 protetta</span>';
+        return `
+        <div class="app-row${a.removable ? '' : ' protected'}" data-path="${escAttr(a.appPath)}">
+          <div class="app-row-main">
+            <strong>${escText(a.name)}</strong>
+            <small>${escText(a.bundleId || 'bundle id non disponibile')}</small>
+          </div>
+          <div class="app-row-meta">${unused}${lock}<span class="app-size">${size}</span></div>
+        </div>`;
+    }).join('');
+
+    list.querySelectorAll('.app-row').forEach(row => {
+        row.addEventListener('click', () => {
+            list.querySelectorAll('.app-row').forEach(r => r.classList.remove('selected'));
+            row.classList.add('selected');
+            scanAppFiles(row.dataset.path);
+        });
+    });
+}
+
+async function scanAppFiles(appPath) {
+    currentAppPath = appPath;
+    const panel = document.getElementById('appFilesPanel');
+    const appName = appPath.split('/').pop();
+    const sensitivity = document.getElementById('appSensitivitySelect').value;
+
+    panel.innerHTML = '<div class="empty-state"><p>Ricerca file correlati in corso…</p></div>';
+    try {
+        const resp = await fetch(`/api/uninstall-scan?app=${encodeURIComponent(appName)}&sensitivity=${sensitivity}`);
+        if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err.error || 'scan fallito');
+        }
+        const data = await resp.json();
+        currentAppFiles = data.files || [];
+        renderAppFiles(data);
+    } catch (e) {
+        panel.innerHTML = `<div class="empty-state"><p>${escText(e.message)}</p></div>`;
+    }
+}
+
+function renderAppFiles(data) {
+    const panel = document.getElementById('appFilesPanel');
+    const app = appInventory.find(a => a.appPath === currentAppPath);
+    const removable = !app || app.removable;
+
+    const rows = currentAppFiles.map((f, i) => {
+        const badge = f.deletable === false
+            ? '<span class="file-manual-badge" title="Fuori dalle aree eliminabili: solo segnalato">manuale</span>' : '';
+        return `
+        <label class="orphan-row${f.deletable === false ? ' not-deletable' : ''}">
+          <input type="checkbox" class="app-file-checkbox" data-index="${i}"
+                 ${f.deletable === false ? 'disabled' : 'checked'}>
+          <span class="orphan-path">${escText(f.path)}</span>
+          ${badge}
+          <span class="orphan-size">${formatBytes(f.sizeBytes || 0)}</span>
+        </label>`;
+    }).join('');
+
+    const totalBytes = currentAppFiles.reduce((s, f) => s + (f.sizeBytes || 0), 0);
+    panel.innerHTML = `
+      <div class="app-files-header">
+        <strong>${escText(data.appName || '')}</strong>
+        <small>${escText(data.bundleId || '')}</small>
+        <div class="app-files-summary">
+          Bundle ${formatBytes(data.appSizeBytes || 0)} + ${currentAppFiles.length} elementi correlati (${formatBytes(totalBytes)})
+        </div>
+      </div>
+      <div class="file-list app-files-list">${rows || '<div class="empty-state"><p>Nessun file correlato trovato.</p></div>'}</div>
+      <div class="modal-controls">
+        <span id="appFilesSelectionCount" class="selection-count"></span>
+        <button id="uninstallAppBtn" class="btn danger small" ${removable ? '' : 'disabled title="App di sistema protetta"'}>
+          🗑️ Disinstalla app + selezionati
+        </button>
+      </div>`;
+
+    panel.querySelectorAll('.app-file-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateAppFilesSelection);
+    });
+    updateAppFilesSelection();
+
+    const btn = document.getElementById('uninstallAppBtn');
+    if (btn && removable) btn.addEventListener('click', uninstallCurrentApp);
+}
+
+function updateAppFilesSelection() {
+    const checked = Array.from(document.querySelectorAll('.app-file-checkbox:checked'));
+    const bytes = checked.reduce((s, cb) => s + (currentAppFiles[cb.dataset.index]?.sizeBytes || 0), 0);
+    const label = document.getElementById('appFilesSelectionCount');
+    if (label) label.textContent = `${checked.length} selezionati (${formatBytes(bytes)})`;
+}
+
+async function uninstallCurrentApp() {
+    const appName = currentAppPath.split('/').pop();
+    const checked = Array.from(document.querySelectorAll('.app-file-checkbox:checked'));
+    const includeRelated = checked.length > 0;
+
+    // Se l'utente ha deselezionato qualcosa, l'eliminazione dei correlati sarebbe
+    // comunque completa lato server: avvisiamo esplicitamente.
+    const deletableTotal = currentAppFiles.filter(f => f.deletable !== false).length;
+    const partial = includeRelated && checked.length < deletableTotal;
+    const msg = `Disinstallare "${appName}"?\n\n` +
+        (includeRelated
+            ? (partial
+                ? `⚠️ La rimozione dei file correlati è tutto-o-niente: verranno rimossi tutti i ${deletableTotal} elementi eliminabili, non solo i ${checked.length} selezionati.\n\n`
+                : `Verranno rimossi anche i ${deletableTotal} elementi correlati.\n\n`)
+            : 'Verrà rimosso solo il bundle .app.\n\n') +
+        'Operazione irreversibile.';
+    if (!confirm(msg)) return;
+
+    try {
+        const resp = await fetch('/api/uninstall-apps', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                apps: [appName],
+                includeRelated,
+                sensitivity: document.getElementById('appSensitivitySelect').value,
+            }),
+        });
+        const result = await resp.json();
+        if (result.success) {
+            showToast('success', 'App disinstallata',
+                `${appName}${result.relatedDeleted ? ` (+${result.relatedDeleted} file correlati)` : ''}`);
+            currentAppPath = null;
+            currentAppFiles = [];
+            document.getElementById('appFilesPanel').innerHTML =
+                '<div class="empty-state"><p>Seleziona un\'app per vedere i file correlati.</p></div>';
+            loadAppInventory();
+        } else {
+            showToast('error', 'Errore', result.error || 'Disinstallazione fallita');
+        }
+    } catch (e) {
+        showToast('error', 'Errore', 'Disinstallazione fallita');
+    }
+}
+
+// ── Orphans Module (v5.2 — porting OrphanListView) ─────────────────────────
+
+let orphanItems = [];
+
+function initOrphansModule() {
+    const scanBtn = document.getElementById('scanOrphansBtn');
+    if (!scanBtn) return;
+
+    scanBtn.addEventListener('click', scanOrphans);
+    document.getElementById('selectAllOrphansBtn').addEventListener('click', () => {
+        document.querySelectorAll('.orphan-checkbox:not(:disabled)').forEach(cb => { cb.checked = true; });
+        updateOrphanSelection();
+    });
+    document.getElementById('deselectAllOrphansBtn').addEventListener('click', () => {
+        document.querySelectorAll('.orphan-checkbox').forEach(cb => { cb.checked = false; });
+        updateOrphanSelection();
+    });
+    document.getElementById('deleteOrphansBtn').addEventListener('click', deleteSelectedOrphans);
+}
+
+async function scanOrphans() {
+    const results = document.getElementById('orphansResults');
+    const empty = document.getElementById('orphansEmpty');
+    const minSize = document.getElementById('orphanMinSize').value || 1;
+
+    results.style.display = 'none';
+    empty.style.display = 'block';
+    empty.innerHTML = '<p>Ricerca residui in corso…</p>';
+
+    try {
+        const resp = await fetch(`/api/orphans?minSizeMB=${encodeURIComponent(minSize)}`);
+        const data = await resp.json();
+
+        if (data.error) {
+            empty.innerHTML = `<p>${escText(data.error)}</p>`;
+            return;
+        }
+        orphanItems = data.items || [];
+        if (orphanItems.length === 0) {
+            empty.innerHTML = '<p>Nessun residuo rilevato sopra la soglia impostata.</p>';
+            return;
+        }
+
+        empty.style.display = 'none';
+        results.style.display = 'block';
+        renderOrphans();
+    } catch (e) {
+        empty.innerHTML = '<p>Ricerca residui non disponibile.</p>';
+    }
+}
+
+function renderOrphans() {
+    const list = document.getElementById('orphansList');
+    list.innerHTML = orphanItems.map((item, i) => {
+        const badge = item.deletable
+            ? ''
+            : '<span class="file-manual-badge" title="Fuori dalle aree eliminabili: verifica manuale">manuale</span>';
+        return `
+        <label class="orphan-row${item.deletable ? '' : ' not-deletable'}">
+          <input type="checkbox" class="orphan-checkbox" data-index="${i}" ${item.deletable ? '' : 'disabled'}>
+          <span class="orphan-path">${escText(item.path)}</span>
+          ${badge}
+          <span class="orphan-size">${formatBytes(item.sizeBytes || 0)}</span>
+        </label>`;
+    }).join('');
+
+    list.querySelectorAll('.orphan-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateOrphanSelection);
+    });
+    updateOrphanSelection();
+}
+
+function updateOrphanSelection() {
+    const checked = Array.from(document.querySelectorAll('.orphan-checkbox:checked'));
+    const bytes = checked.reduce((s, cb) => s + (orphanItems[cb.dataset.index]?.sizeBytes || 0), 0);
+    document.getElementById('orphanSelectionCount').textContent =
+        `${checked.length} selezionati (${formatBytes(bytes)})`;
+    document.getElementById('deleteOrphansBtn').disabled = checked.length === 0;
+}
+
+async function deleteSelectedOrphans() {
+    const checked = Array.from(document.querySelectorAll('.orphan-checkbox:checked'));
+    const paths = checked.map(cb => orphanItems[cb.dataset.index]?.path).filter(Boolean);
+    if (paths.length === 0) return;
+
+    if (!confirm(`Eliminare ${paths.length} residui?\n\nOperazione irreversibile.`)) return;
+
+    try {
+        const resp = await fetch('/api/orphans/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paths }),
+        });
+        const result = await resp.json();
+        showToast(result.deleted > 0 ? 'success' : 'error', 'Residui', result.message || 'Nessun elemento eliminato');
+        if (result.rejected) console.warn('Percorsi rifiutati per sicurezza:', result.rejected);
+        scanOrphans();
+    } catch (e) {
+        showToast('error', 'Errore', 'Eliminazione residui fallita');
+    }
+}
+
+// Formattazione dimensioni condivisa dai moduli v5.2
+function formatBytes(bytes) {
+    if (!bytes || bytes < 1024) return `${bytes || 0} B`;
+    const units = ['KB', 'MB', 'GB', 'TB'];
+    let value = bytes / 1024;
+    let i = 0;
+    while (value >= 1024 && i < units.length - 1) { value /= 1024; i++; }
+    return `${value.toFixed(value >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
+}
 
 // ── Smart Offload Module ───────────────────────────────────────
 

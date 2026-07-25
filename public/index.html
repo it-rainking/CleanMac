@@ -195,6 +195,69 @@
     </div>
   </section>
 
+  <!-- UNINSTALLER (v5.2 — porting AppListView/AppFilesView da MyPureMac) -->
+  <section class="panel uninstaller-panel">
+    <div class="output-header">
+      <h2>🗑️ Uninstaller — Rimozione completa app</h2>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="search" id="appSearchInput" class="offload-select" placeholder="Cerca app…" style="min-width:180px;">
+        <select id="appSensitivitySelect" class="offload-select" title="Ampiezza della ricerca dei file correlati">
+          <option value="strict">Precisione: alta</option>
+          <option value="enhanced" selected>Precisione: bilanciata</option>
+          <option value="deep">Precisione: ampia</option>
+        </select>
+        <button id="loadAppsBtn" class="btn ghost">📋 Carica app</button>
+      </div>
+    </div>
+    <p class="offload-intro">
+      Elenca tutte le app installate e, per quella selezionata, tutti i file correlati
+      (cache, preferenze, container, log) con selezione granulare prima della rimozione.
+      Le app di sistema Apple sono protette e non selezionabili.
+    </p>
+
+    <div class="uninstaller-layout">
+      <div id="appInventoryList" class="app-inventory-list">
+        <div class="empty-state"><p>Clicca "Carica app" per elencare le applicazioni installate.</p></div>
+      </div>
+      <div id="appFilesPanel" class="app-files-panel">
+        <div class="empty-state"><p>Seleziona un'app per vedere i file correlati.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ORFANI / LEFTOVERS (v5.2 — porting OrphanListView da MyPureMac) -->
+  <section class="panel orphans-panel">
+    <div class="output-header">
+      <h2>👻 Residui — File di app disinstallate</h2>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <label class="orphan-minsize">
+          min
+          <input type="number" id="orphanMinSize" value="1" min="0" step="1" class="offload-select" style="width:70px;">
+          MB
+        </label>
+        <button id="scanOrphansBtn" class="btn ghost">🔍 Cerca residui</button>
+      </div>
+    </div>
+    <p class="offload-intro">
+      Ricerca inversa: item in <code>~/Library</code> che non appartengono ad alcuna app installata.
+      Solo gli item nelle aree utente note sono eliminabili; gli altri vengono segnalati per la verifica manuale.
+    </p>
+
+    <div id="orphansResults" style="display:none;">
+      <div class="modal-controls">
+        <button id="selectAllOrphansBtn" class="btn ghost small">Seleziona eliminabili</button>
+        <button id="deselectAllOrphansBtn" class="btn ghost small">Deseleziona tutti</button>
+        <span id="orphanSelectionCount" class="selection-count">0 selezionati</span>
+        <button id="deleteOrphansBtn" class="btn danger small" disabled>Elimina selezionati</button>
+      </div>
+      <div id="orphansList" class="file-list"></div>
+    </div>
+
+    <div id="orphansEmpty" class="empty-state" style="display:none;">
+      <p>Nessun residuo rilevato sopra la soglia impostata.</p>
+    </div>
+  </section>
+
   <!-- SMART OFFLOAD -->
   <section class="panel offload-panel">
     <div class="output-header">
