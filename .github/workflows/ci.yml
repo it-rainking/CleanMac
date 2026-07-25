@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Test e verifica sintassi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # I test coprono solo logica pura (matching, normalizzazione, guard-rail)
+      # e non richiedono le dipendenze runtime del server.
+      - name: Test unitari
+        run: npm test
+
+      - name: Sintassi bash
+        run: |
+          bash -n CleanMac.command
+          bash -n schedule.command
+
+      - name: Sintassi JavaScript
+        run: |
+          for f in server.js appPathFinder.js appInventory.js orphanFinder.js \
+                   conditions.js stringNormalization.js public/app.js; do
+            node --check "$f"
+          done
