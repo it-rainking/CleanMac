@@ -337,6 +337,52 @@ else
     fi
 fi
 
+#############################################
+# Full Disk Access check (v5.1 — porting FullDiskAccessManager da MyPureMac)
+# Senza FDA, il TCC di macOS blocca ~/Library/Mail, Safari, .Trash e molti
+# container: la pulizia risulterebbe silenziosamente incompleta.
+#############################################
+check_full_disk_access() {
+    # Prova a leggere path protetti da TCC: basta che uno sia leggibile.
+    if head -c1 "$HOME/Library/Safari/Bookmarks.plist" >/dev/null 2>&1; then
+        return 0
+    fi
+    if ls "$HOME/Library/Mail" >/dev/null 2>&1 && [ -d "$HOME/Library/Mail" ]; then
+        return 0
+    fi
+    if head -c1 "/Library/Application Support/com.apple.TCC/TCC.db" >/dev/null 2>&1; then
+        return 0
+    fi
+    # Il Cestino è protetto da TCC: se è enumerabile e non vuoto, FDA è attivo.
+    if [ -n "$(ls -A "$HOME/.Trash" 2>/dev/null)" ]; then
+        return 0
+    fi
+    # Nessuna delle probe è andata a buon fine: se Mail o Safari esistono ma non
+    # sono leggibili, FDA è quasi certamente negato.
+    if [ -d "$HOME/Library/Mail" ] || [ -e "$HOME/Library/Safari" ]; then
+        return 1
+    fi
+    return 1
+}
+
+if check_full_disk_access; then
+    log "Full Disk Access: OK"
+    FDA_GRANTED=true
+else
+    FDA_GRANTED=false
+    log "⚠️  Full Disk Access NON concesso al terminale: alcune aree (Mail, Safari, Cestino, container) non saranno pulibili."
+    log "    Concedilo in Impostazioni di Sistema → Privacy e Sicurezza → Accesso completo al disco."
+    # Suggerimento visivo solo in modalità interattiva
+    if [ "$CLI_MODE" = false ]; then
+        osascript <<'EOF' >/dev/null 2>&1
+            display dialog "⚠️ Full Disk Access non concesso.\n\nSenza questo permesso la pulizia di Mail, Safari, Cestino e container sarà incompleta.\n\nVuoi aprire le Impostazioni per concederlo?" buttons {"Continua senza", "Apri Impostazioni"} default button "Apri Impostazioni"
+            if button returned of result is "Apri Impostazioni" then
+                do shell script "open 'x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles'"
+            end if
+EOF
+    fi
+fi
+
 # Inizializza report dry run
 echo "═══════════════════════════════════════════════════════════" > "$DRY_RUN_REPORT"
 echo "CLEANMAC v5.0 — DRY RUN REPORT" >> "$DRY_RUN_REPORT"
@@ -2002,6 +2048,171 @@ log "Analisi orphaned files (residui app disinstallate)..."
     ORPHAN_FILE="$REPORTS_DIR/orphaned_files_${TIMESTAMP}.txt"
     INSTALLED_IDS=$(mktemp)
 
+    # v5.1: lista skipReverse portata da MyPureMac/Conditions.swift — prefissi
+    # (normalizzati a-z0-9) di item di sistema, daemon Apple e SDK condivisi che
+    # non vanno MAI segnalati come orfani. Tenere allineata a conditions.js.
+    SKIP_REVERSE_FILE=$(mktemp)
+    cat > "$SKIP_REVERSE_FILE" << 'SKIPEOF'
+^apple
+^temporary
+^btserver
+^proapps
+^scripteditor
+^ilife
+^livefsd
+^siritoday
+^addressbook
+^animoji
+^appstore
+^askpermission
+^callhistory
+^clouddocs
+^diskimages
+^dock
+^facetime
+^fileprovider
+^instruments
+^knowledge
+^mobilesync
+^syncservices
+^homeenergyd
+^icloud
+^icdd
+^networkserviceproxy
+^familycircle
+^geoservices
+^installation
+^passkit
+^sharedimagecache
+^desktop
+^mbuseragent
+^swiftpm
+^baseband
+^coresimulator
+^photoslegacyupgrade
+^photosupgrade
+^siritts
+^ipod
+^globalpreferences
+^apmanalytics
+^apmexperiment
+^avatarcache
+^byhost
+^contextstoreagent
+^mobilemeaccounts
+^mobiledocuments
+^mobile
+^intentbuilderc
+^loginwindow
+^momc
+^replayd
+^sharedfilelistd
+^clang
+^audiocomponent
+^csexattrcryptoservice
+^livetranscriptionagent
+^sandboxhelper
+^statuskitagent
+^betaenrollmentd
+^contentlinkingd
+^diagnosticextensionsd
+^gamed
+^heard
+^homed
+^itunescloudd
+^lldb
+^mds
+^mediaanalysisd
+^metrickitd
+^mobiletimerd
+^proactived
+^ptpcamerad
+^studentd
+^talagent
+^watchlistd
+^apptranslocation
+^xcrun
+^dsstore
+^caches
+^crashreporter
+^trash
+^puremac
+^cleanmac
+^amsdatamigratortool
+^arfilecache
+^assistant
+^chromium
+^cloudkit
+^webkit
+^databases
+^diagnostic
+^cache
+^gamekit
+^homebrew
+^logi
+^microsoft
+^mozilla
+^sync
+^google
+^sentinel
+^hexnode
+^sentry
+^tvappservices
+^reminders
+^pbs
+^notarytool
+^differentialprivacy
+^storeassetd
+^webpush
+^storedownloadd
+^fsck
+^crash
+^python
+^discrecording
+^photossearch
+^pylint
+^jamf
+^scopedbookmarkagent
+^anonymous
+^identifier
+^isolated
+^nobackup
+^privacypreservingmeasurement
+^symbols
+^stickersd
+^privatecloudcomputed
+^tipsd
+^controlcenter
+^contactsd
+^staticcheck
+^index
+^segment
+^sparkle
+^summaryevents
+^launchdarkly
+^identityservicesd
+^embeddedbinaryvalidationutility
+^aaprofilepicture
+^minilauncher
+^jna
+^automator
+^locationaccessstored
+^spotlight
+^cef
+SKIPEOF
+
+    # Item di sistema/infrastruttura da non segnalare mai come orfano
+    # (matching per prefisso sul nome normalizzato a-z0-9)
+    is_skip_reverse() {
+        local norm
+        norm=$(echo "$1" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+        [ -z "$norm" ] && return 0
+        if echo "$norm" | grep -q -f "$SKIP_REVERSE_FILE" 2>/dev/null; then
+            return 0
+        fi
+        return 1
+    }
+
     # Costruisci l'insieme degli identificatori installati (bundle id + nome normalizzato)
     while IFS= read -r app; do
         [ -n "$app" ] || continue
@@ -2069,6 +2280,8 @@ log "Analisi orphaned files (residui app disinstallate)..."
                 case "$id" in
                     com.apple.*|.GlobalPreferences*|MobileMeAccounts*|loginwindow*) continue ;;
                 esac
+                # v5.1: skipReverse — mai segnalare item di sistema/SDK condivisi
+                if is_skip_reverse "$id"; then continue; fi
                 if ! is_installed_identifier "$id"; then
                     sz=$(get_dir_size_mb "$plist")
                     echo "🔍 ~/Library/Preferences/$(basename "$plist")  (${sz} MB)" >> "$ORPHAN_FILE"
@@ -2086,6 +2299,8 @@ log "Analisi orphaned files (residui app disinstallate)..."
                     case "$name" in
                         com.apple.*|Apple*|CrashReporter*|CloudDocs*) continue ;;
                     esac
+                    # v5.1: skipReverse — mai segnalare item di sistema/SDK condivisi
+                    if is_skip_reverse "$name"; then continue; fi
                     if ! is_installed_identifier "$name"; then
                         sz=$(get_dir_size_mb "$entry")
                         # Ignora voci minuscole (<1 MB) per ridurre rumore
@@ -2118,7 +2333,7 @@ log "Analisi orphaned files (residui app disinstallate)..."
         add_to_report "⏭️  Orphaned files saltato (non selezionato)"
     fi
 
-    rm -f "$INSTALLED_IDS"
+    rm -f "$INSTALLED_IDS" "$SKIP_REVERSE_FILE"
 }
 
 #############################################

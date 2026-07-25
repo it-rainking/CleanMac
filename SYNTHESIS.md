@@ -1,4 +1,4 @@
-# CleanMac v5.0 — Synthesis Edition
+# CleanMac v5.1 — Synthesis Edition
 
 Documento di sintesi della fusione tra le due repository:
 
@@ -65,7 +65,67 @@ L'obiettivo era creare **una versione unica** che integri tutte le funzionalità
 - Boot optimization: quarantena reversibile, mai rimozione diretta di daemon di sistema.
 - Password sudo (web): file temp `0o700`, cleanup su exit/SIGINT/SIGTERM (invariato).
 
+## v5.1 — Parità completa del motore euristico (round 2 della sintesi)
+
+La v5.0 aveva portato una versione semplificata di `AppPathFinder` (4 livelli su 9,
+nessun database di condizioni). La v5.1 completa il porting 1:1 dei sorgenti
+MyPureMac rimasti fuori:
+
+### Nuovi moduli
+- **`stringNormalization.js`** — porting di `StringNormalization.swift`:
+  `normalizeForMatching` (semantica Swift: rimuove spazi/trattini/underscore/punti),
+  `strippingTrailingVersion`, `lettersOnly`, `bundleCompanyName`,
+  `bundleLastTwoComponents`, `baseBundleIdentifier` (strip suffissi
+  `.helper/.agent/.daemon/…`).
+- **`conditions.js`** — porting di `Conditions.swift` + `Locations.swift`:
+  - `appConditions`: 25 regole per-app (Xcode vs Xcodes, Chrome vs iTerm,
+    Logi vs login/logic, VS Code vs Insiders, JetBrains, Arc, Zoom, …) con
+    includeTerms/excludeTerms e forceInclude/forceExclude path.
+  - `skipConditions`: prefissi e path di sistema mai toccati (password manager,
+    SystemExtensions, Trash, …) con `allowPrefixes` per le eccezioni Apple volute.
+  - `skipDeepSearch`: ~160 directory di sistema escluse dalla deep search del Library.
+  - `skipReverse`: ~150 prefissi (daemon Apple, SDK condivisi, telemetria) mai
+    segnalati come orfani.
+  - `standardLibrarySubdirectories` + location di ricerca complete (incluse
+    system-wide: `/Library`, `/usr/local`, receipts, …).
+
+### `appPathFinder.js` v5.1 — parità con `AppPathFinder.swift`
+- Matching a **9 livelli**: bundle id → nome app → nome directory `.app` →
+  nome solo-lettere → ultimi due componenti bundle → base bundle id →
+  nome senza versione → company (deep) → **Team ID della firma codice** (deep,
+  via `codesign`); più matching sugli **entitlements** (`application-groups`,
+  `keychain-access-groups`).
+- **Deep search del Library a depth 2** con esclusioni `skipDeepSearch` e
+  riconoscimento delle *vendor folder* (il match dentro
+  `Application Support/Vendor/...` include la cartella del vendor).
+- Condizioni per-app applicate (exclude vince, include forza, force paths).
+- Regola del Cestino: un risultato composto dal solo `.Trash` viene scartato.
+
+### Guard-rail nuovi (oltre lo Swift originale)
+- Lo scan esteso può toccare aree non eliminabili (Documents, `/Library`, altri
+  bundle): ogni file di `/api/uninstall-scan` è ora marcato **`deletable`** e
+  la disinstallazione **non elimina mai un bundle `.app` diverso dal target**
+  (`isOtherAppBundle`), anche se il matcher lo aggancia (es. "Google Drive.app"
+  durante l'uninstall di Chrome).
+- Il frontend conta nella conferma solo i file realmente eliminabili e segnala
+  a parte quelli trovati fuori dalle aree sicure.
+
+### op33 Orphaned Files — skipReverse
+- La lista `skipReverse` è ora applicata anche nell'op33 bash (heredoc di
+  prefissi normalizzati, matching con `grep -f`): stop ai falsi positivi su
+  daemon Apple, SDK condivisi (Sparkle, Sentry, Chromium, …) e telemetria.
+  Da tenere allineata a `conditions.js`.
+
+### Full Disk Access (porting `FullDiskAccessManager.swift`)
+- `CleanMac.command`: probe TCC all'avvio (Safari Bookmarks, Mail, TCC.db,
+  Cestino); warning nel log e dialog interattivo con apertura diretta di
+  *Privacy e Sicurezza → Accesso completo al disco*.
+- `server.js`: endpoint `GET /api/fda-status`; la dashboard mostra un banner
+  se il processo non ha FDA (senza il quale Mail/Safari/Cestino non sono pulibili).
+
 ## Test
-- `appPathFinder.js`: 11 test unitari sulla logica di matching pura (eseguibili senza macOS).
+- `test/appPathFinder.test.js`: **29 test unitari** committati sulla logica pura
+  (normalizzazione, 9 livelli di matching, condizioni per-app, skip logic,
+  filterSubpaths, parser codesign/entitlements) — eseguibili senza macOS: `npm test`.
 - `CleanMac.command`: `bash -n` pulito.
-- `server.js`: caricamento verificato (nessun errore TDZ/modulo).
+- `server.js`, `app.js`, moduli: `node --check` puliti.

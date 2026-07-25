@@ -77,9 +77,23 @@ document.addEventListener('DOMContentLoaded', () => {
     initEventListeners();
     loadReports();
     checkServerStatus();
+    checkFullDiskAccess();
     // Load insights on startup if analysis files exist
     analyzeReports();
 });
+
+// v5.1: mostra un banner se il processo server non ha Full Disk Access
+async function checkFullDiskAccess() {
+    try {
+        const resp = await fetch('/api/fda-status');
+        if (!resp.ok) return;
+        const status = await resp.json();
+        const banner = document.getElementById('fdaBanner');
+        if (banner && status.granted === false) {
+            banner.style.display = 'block';
+        }
+    } catch (e) { /* endpoint non disponibile: nessun banner */ }
+}
 
 // Event Listeners
 function initEventListeners() {
@@ -1484,14 +1498,19 @@ document.addEventListener('DOMContentLoaded', () => {
         let includeRelated = false;
         let totalRelated = 0;
         let totalRelatedBytes = 0;
+        let totalManual = 0;
         try {
             for (const appName of selected) {
                 const scanResp = await fetch(`/api/uninstall-scan?app=${encodeURIComponent(appName)}&sensitivity=enhanced`);
                 if (!scanResp.ok) continue;
                 const scan = await scanResp.json();
                 if (Array.isArray(scan.files)) {
-                    totalRelated += scan.files.length;
-                    totalRelatedBytes += scan.files.reduce((sum, f) => sum + (f.sizeBytes || 0), 0);
+                    // v5.1: solo i file `deletable` verranno rimossi; gli altri
+                    // (es. match in Documents o in altri bundle) sono solo segnalati.
+                    const deletable = scan.files.filter(f => f.deletable !== false);
+                    totalRelated += deletable.length;
+                    totalRelatedBytes += deletable.reduce((sum, f) => sum + (f.sizeBytes || 0), 0);
+                    totalManual += scan.files.length - deletable.length;
                 }
             }
         } catch (e) {
@@ -1500,9 +1519,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (totalRelated > 0) {
             const mb = (totalRelatedBytes / 1048576).toFixed(0);
+            const manualNote = totalManual > 0
+                ? `\n(${totalManual} altri elementi trovati fuori dalle aree sicure: verranno solo segnalati, non eliminati)\n`
+                : '';
             includeRelated = confirm(
                 `Rimuovere anche i ${totalRelated} file/cartelle correlati (~${mb} MB)?\n\n` +
-                'Include cache, preferenze e container delle app selezionate.\n\n' +
+                'Include cache, preferenze e container delle app selezionate.\n' + manualNote + '\n' +
                 'OK = disinstallazione completa (consigliato)\n' +
                 'Annulla = rimuovi solo il bundle .app'
             );

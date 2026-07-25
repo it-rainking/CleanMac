@@ -114,6 +114,18 @@ body {
   margin-bottom: 16px;
 }
 
+/* Banner Full Disk Access (v5.1) */
+.fda-banner {
+  margin: 12px 20px 0;
+  padding: 12px 16px;
+  border: 1px solid #ff9f0a;
+  border-radius: 10px;
+  background: #ff9f0a1a;
+  color: var(--text, #1d1d1f);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 /* ACTIONS */
 .actions {
   display: flex;

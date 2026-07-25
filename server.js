@@ -41,6 +41,38 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+// v5.1 — porting FullDiskAccessManager (MyPureMac): rileva se il processo ha
+// Full Disk Access sondando path protetti da TCC. Senza FDA molte pulizie
+// (Mail, Safari, Cestino, container) falliscono in silenzio.
+function hasFullDiskAccess() {
+  if (process.platform !== 'darwin') return true; // fuori da macOS non ha senso
+  const probes = [
+    path.join(HOME_DIR, 'Library/Safari/Bookmarks.plist'),
+    '/Library/Application Support/com.apple.TCC/TCC.db',
+  ];
+  for (const p of probes) {
+    try {
+      const fd = fs.openSync(p, 'r');
+      fs.closeSync(fd);
+      return true;
+    } catch (e) { /* EPERM/ENOENT → prova la prossima */ }
+  }
+  try {
+    if (fs.readdirSync(path.join(HOME_DIR, 'Library/Mail')).length >= 0) return true;
+  } catch (e) { /* bloccato da TCC */ }
+  try {
+    if (fs.readdirSync(path.join(HOME_DIR, '.Trash')).length > 0) return true;
+  } catch (e) { /* bloccato da TCC */ }
+  return false;
+}
+
+app.get('/api/fda-status', (req, res) => {
+  res.json({
+    granted: hasFullDiskAccess(),
+    settingsUrl: 'x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles',
+  });
+});
+
 app.get('/api/reports', (req, res) => {
   const reports = [];
   if (!fs.existsSync(REPORTS_DIR)) return res.json([]);
@@ -259,6 +291,14 @@ const UNINSTALL_SAFE_ROOTS = [
   path.join(HOME_DIR, 'Applications') + path.sep,
 ];
 
+// Un path che è (o sta dentro) un bundle .app diverso da quello in disinstallazione
+// non va MAI eliminato automaticamente: il matcher euristico può agganciare app
+// affini (es. "Google Drive.app" durante l'uninstall di Chrome).
+function isOtherAppBundle(p, targetAppPath) {
+  if (!/\.app(\/|$)/i.test(p)) return false;
+  return p !== targetAppPath && !p.startsWith(targetAppPath + path.sep);
+}
+
 // Valida che un percorso correlato sia sicuro da eliminare: dentro un'area nota,
 // senza componenti '..', e senza attraversare symlink verso l'esterno.
 function isSafeRelatedPath(p) {
@@ -289,8 +329,15 @@ app.get('/api/uninstall-scan', (req, res) => {
 
   try {
     const result = appPathFinder.findRelatedFiles(appPath, sensitivity);
-    // Non includere il bundle .app stesso tra i "related"
-    result.files = result.files.filter(f => f.path !== appPath);
+    // Non includere il bundle .app stesso tra i "related".
+    // v5.1: ogni file è marcato `deletable` — lo scan esteso (Documents, /Library,
+    // altri bundle) può trovare item che vengono solo segnalati, mai eliminati.
+    result.files = result.files
+      .filter(f => f.path !== appPath)
+      .map(f => ({
+        ...f,
+        deletable: isSafeRelatedPath(f.path) && !isOtherAppBundle(f.path, appPath),
+      }));
     let appSize = 0;
     try { appSize = parseInt(require('child_process').execFileSync('/usr/bin/du', ['-sk', appPath], { encoding: 'utf8' }).trim().split(/\s+/)[0], 10) * 1024; } catch (e) {}
     res.json({ app: appName, appPath, appSizeBytes: appSize, ...result });
@@ -325,6 +372,7 @@ app.post('/api/uninstall-apps', (req, res) => {
           const related = appPathFinder.findRelatedFiles(appPath, sensitivity);
           related.files.forEach(f => {
             if (f.path === appPath) return; // il bundle lo gestiamo dopo
+            if (isOtherAppBundle(f.path, appPath)) return; // mai altri bundle .app
             if (isSafeRelatedPath(f.path)) {
               try { fs.rmSync(f.path, { recursive: true, force: true }); relatedDeleted++; }
               catch (e) { errors.push({ app: appName, file: f.path, error: e.message }); }
