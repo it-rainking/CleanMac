@@ -1,5 +1,9 @@
 #!/bin/bash
 # CleanMac.command — versione 5.2 (Synthesis Edition)
+#
+# Alcune operazioni (op10, op32, op33, op34, check Full Disk Access) sono
+# derivate da PureMac (https://github.com/momenbasel/PureMac) — MIT License,
+# Copyright (c) 2026 PureMac Contributors. Vedi LICENSE, sezione THIRD-PARTY CODE.
 # Salvataggio automatico nella cartella dello script
 # Changelog v5.0 (2026-07-07) — SINTESI CleanMac + MyPureMac:
 #   - op32 Boot Optimization: rileva LaunchAgents/LaunchDaemons problematici e orfani (da MyPureMac)

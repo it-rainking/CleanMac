@@ -1,5 +1,10 @@
 // conditions.js — v5.1
-// Porting 1:1 di Conditions.swift + parte di Locations.swift (MyPureMac).
+//
+// Derivato da PureMac (https://github.com/momenbasel/PureMac) — MIT License,
+// Copyright (c) 2026 PureMac Contributors. Vedi LICENSE, sezione THIRD-PARTY CODE.
+// Sorgenti originali: Logic/Scanning/Conditions.swift, Logic/Scanning/Locations.swift
+//
+// Porting 1:1 di Conditions.swift + parte di Locations.swift.
 // Database di regole per-app, esclusioni di sistema e liste di skip usate
 // dal motore euristico appPathFinder.js e dall'orphan finder.
 //

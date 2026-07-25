@@ -1,5 +1,10 @@
 // orphanFinder.js — v5.2
-// Porting di AppState.findOrphans() (MyPureMac) + guard-rail di sicurezza.
+//
+// Derivato da PureMac (https://github.com/momenbasel/PureMac) — MIT License,
+// Copyright (c) 2026 PureMac Contributors. Vedi LICENSE, sezione THIRD-PARTY CODE.
+// Sorgente originale: ViewModels/AppState.swift (findOrphans)
+//
+// Ricerca inversa dei residui + guard-rail di sicurezza.
 // Ricerca inversa: enumera le location note e segnala gli item che non
 // appartengono ad alcuna app installata (residui di app disinstallate).
 //

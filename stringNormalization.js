@@ -1,5 +1,10 @@
 // stringNormalization.js — v5.1
-// Porting 1:1 di StringNormalization.swift (MyPureMac).
+//
+// Derivato da PureMac (https://github.com/momenbasel/PureMac) — MIT License,
+// Copyright (c) 2026 PureMac Contributors. Vedi LICENSE, sezione THIRD-PARTY CODE.
+// Sorgente originale: Logic/Scanning/StringNormalization.swift
+//
+// Porting 1:1 di StringNormalization.swift.
 // Helper puri di normalizzazione stringhe usati dal motore euristico.
 
 'use strict';

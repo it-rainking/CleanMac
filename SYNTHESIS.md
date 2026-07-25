@@ -1,5 +1,11 @@
 # CleanMac v5.2 — Synthesis Edition
 
+> **Attribuzione**: le funzionalità portate da MyPureMac derivano da
+> [PureMac](https://github.com/momenbasel/PureMac), progetto open source con
+> licenza MIT (Copyright © 2026 PureMac Contributors). L'elenco dei file
+> derivati e il testo integrale della licenza originale sono in
+> [`LICENSE`](LICENSE), sezione THIRD-PARTY CODE.
+
 Documento di sintesi della fusione tra le due repository:
 
 - **CleanMac** — tool bash (`CleanMac.command`) + dashboard web Node.js/Socket.IO. Set di operazioni molto ampio (31 ops), report HTML, smart offload verso volumi esterni.

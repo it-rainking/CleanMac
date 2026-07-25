@@ -1,6 +1,11 @@
 // appPathFinder.js — v5.1 (Synthesis Edition)
+//
+// Derivato da PureMac (https://github.com/momenbasel/PureMac) — MIT License,
+// Copyright (c) 2026 PureMac Contributors. Vedi LICENSE, sezione THIRD-PARTY CODE.
+// Sorgente originale: Logic/Scanning/AppPathFinder.swift
+//
 // Motore euristico di scoperta file, porting completo di
-// MyPureMac/AppPathFinder.swift (matching a 9 livelli + condizioni per-app).
+// AppPathFinder.swift (matching a 9 livelli + condizioni per-app).
 // Individua gli artefatti su filesystem appartenenti a una app macOS.
 //
 // Livelli di matching (per sensitivity crescente):

@@ -1,6 +1,11 @@
 // appInventory.js — v5.2
-// Porting di AppInfoFetcher.swift (MyPureMac): inventario delle applicazioni
-// installate con bundle id, dimensione e ultimo utilizzo.
+//
+// Derivato da PureMac (https://github.com/momenbasel/PureMac) — MIT License,
+// Copyright (c) 2026 PureMac Contributors. Vedi LICENSE, sezione THIRD-PARTY CODE.
+// Sorgente originale: Logic/Scanning/AppInfoFetcher.swift
+//
+// Inventario delle applicazioni installate con bundle id, dimensione e
+// ultimo utilizzo.
 //
 // Nessuna eliminazione avviene qui: il modulo è di sola lettura.
 
