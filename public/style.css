@@ -114,6 +114,18 @@ body {
   margin-bottom: 16px;
 }
 
+/* Banner Full Disk Access (v5.1) */
+.fda-banner {
+  margin: 12px 20px 0;
+  padding: 12px 16px;
+  border: 1px solid #ff9f0a;
+  border-radius: 10px;
+  background: #ff9f0a1a;
+  color: var(--text, #1d1d1f);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 /* ACTIONS */
 .actions {
   display: flex;
@@ -1103,3 +1115,156 @@ details[open] .output-summary span::before {
 
 .offload-panel h3 { font-size: 0.95rem; font-weight: 600; margin: 16px 0 8px; }
 .offload-dest-path { font-family: monospace; font-size: 0.78rem; color: var(--muted); }
+
+/* ═══════════════════════════════════════════════════════════
+   UNINSTALLER + RESIDUI (v5.2)
+   ═══════════════════════════════════════════════════════════ */
+
+.uninstaller-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(280px, 1.4fr);
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 820px) {
+  .uninstaller-layout { grid-template-columns: 1fr; }
+}
+
+.app-inventory-list,
+.app-files-panel {
+  max-height: 380px;
+  overflow-y: auto;
+  border: 1px solid #0000001a;
+  border-radius: 12px;
+  background: #ffffff88;
+}
+
+.app-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid #0000000d;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.app-row:last-child { border-bottom: none; }
+.app-row:hover { background: #007aff0d; }
+.app-row.selected { background: #007aff1f; }
+
+.app-row.protected {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.app-row-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.app-row-main strong {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-row-main small {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.app-size {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.app-unused-badge,
+.app-protected-badge,
+.file-manual-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.app-unused-badge { background: #ff9f0a26; color: #a35f00; }
+.app-protected-badge { background: #86868b26; color: var(--muted); }
+.file-manual-badge { background: #ff9f0a26; color: #a35f00; }
+
+.app-files-header {
+  padding: 12px;
+  border-bottom: 1px solid #0000000d;
+}
+
+.app-files-header strong { display: block; font-size: 14px; }
+.app-files-header small { color: var(--muted); font-size: 11px; }
+
+.app-files-summary {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.app-files-list { max-height: 240px; overflow-y: auto; }
+
+.orphan-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-bottom: 1px solid #0000000d;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.orphan-row:last-child { border-bottom: none; }
+.orphan-row:hover { background: #007aff0d; }
+.orphan-row.not-deletable { opacity: 0.7; cursor: default; }
+
+.orphan-path {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+}
+
+.orphan-size {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.orphan-minsize {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+#orphansList {
+  max-height: 340px;
+  overflow-y: auto;
+  border: 1px solid #0000001a;
+  border-radius: 12px;
+  background: #ffffff88;
+}

@@ -1,4 +1,10 @@
-# CleanMac v5.0 — Synthesis Edition
+# CleanMac v5.2 — Synthesis Edition
+
+> **Attribuzione**: le funzionalità portate da MyPureMac derivano da
+> [PureMac](https://github.com/momenbasel/PureMac), progetto open source con
+> licenza MIT (Copyright © 2026 PureMac Contributors). L'elenco dei file
+> derivati e il testo integrale della licenza originale sono in
+> [`LICENSE`](LICENSE), sezione THIRD-PARTY CODE.
 
 Documento di sintesi della fusione tra le due repository:
 
@@ -65,7 +71,157 @@ L'obiettivo era creare **una versione unica** che integri tutte le funzionalità
 - Boot optimization: quarantena reversibile, mai rimozione diretta di daemon di sistema.
 - Password sudo (web): file temp `0o700`, cleanup su exit/SIGINT/SIGTERM (invariato).
 
+## v5.1 — Parità completa del motore euristico (round 2 della sintesi)
+
+La v5.0 aveva portato una versione semplificata di `AppPathFinder` (4 livelli su 9,
+nessun database di condizioni). La v5.1 completa il porting 1:1 dei sorgenti
+MyPureMac rimasti fuori:
+
+### Nuovi moduli
+- **`stringNormalization.js`** — porting di `StringNormalization.swift`:
+  `normalizeForMatching` (semantica Swift: rimuove spazi/trattini/underscore/punti),
+  `strippingTrailingVersion`, `lettersOnly`, `bundleCompanyName`,
+  `bundleLastTwoComponents`, `baseBundleIdentifier` (strip suffissi
+  `.helper/.agent/.daemon/…`).
+- **`conditions.js`** — porting di `Conditions.swift` + `Locations.swift`:
+  - `appConditions`: 25 regole per-app (Xcode vs Xcodes, Chrome vs iTerm,
+    Logi vs login/logic, VS Code vs Insiders, JetBrains, Arc, Zoom, …) con
+    includeTerms/excludeTerms e forceInclude/forceExclude path.
+  - `skipConditions`: prefissi e path di sistema mai toccati (password manager,
+    SystemExtensions, Trash, …) con `allowPrefixes` per le eccezioni Apple volute.
+  - `skipDeepSearch`: ~160 directory di sistema escluse dalla deep search del Library.
+  - `skipReverse`: ~150 prefissi (daemon Apple, SDK condivisi, telemetria) mai
+    segnalati come orfani.
+  - `standardLibrarySubdirectories` + location di ricerca complete (incluse
+    system-wide: `/Library`, `/usr/local`, receipts, …).
+
+### `appPathFinder.js` v5.1 — parità con `AppPathFinder.swift`
+- Matching a **9 livelli**: bundle id → nome app → nome directory `.app` →
+  nome solo-lettere → ultimi due componenti bundle → base bundle id →
+  nome senza versione → company (deep) → **Team ID della firma codice** (deep,
+  via `codesign`); più matching sugli **entitlements** (`application-groups`,
+  `keychain-access-groups`).
+- **Deep search del Library a depth 2** con esclusioni `skipDeepSearch` e
+  riconoscimento delle *vendor folder* (il match dentro
+  `Application Support/Vendor/...` include la cartella del vendor).
+- Condizioni per-app applicate (exclude vince, include forza, force paths).
+- Regola del Cestino: un risultato composto dal solo `.Trash` viene scartato.
+
+### Guard-rail nuovi (oltre lo Swift originale)
+- Lo scan esteso può toccare aree non eliminabili (Documents, `/Library`, altri
+  bundle): ogni file di `/api/uninstall-scan` è ora marcato **`deletable`** e
+  la disinstallazione **non elimina mai un bundle `.app` diverso dal target**
+  (`isOtherAppBundle`), anche se il matcher lo aggancia (es. "Google Drive.app"
+  durante l'uninstall di Chrome).
+- Il frontend conta nella conferma solo i file realmente eliminabili e segnala
+  a parte quelli trovati fuori dalle aree sicure.
+
+### op33 Orphaned Files — skipReverse
+- La lista `skipReverse` è ora applicata anche nell'op33 bash (heredoc di
+  prefissi normalizzati, matching con `grep -f`): stop ai falsi positivi su
+  daemon Apple, SDK condivisi (Sparkle, Sentry, Chromium, …) e telemetria.
+  Da tenere allineata a `conditions.js`.
+
+### Full Disk Access (porting `FullDiskAccessManager.swift`)
+- `CleanMac.command`: probe TCC all'avvio (Safari Bookmarks, Mail, TCC.db,
+  Cestino); warning nel log e dialog interattivo con apertura diretta di
+  *Privacy e Sicurezza → Accesso completo al disco*.
+- `server.js`: endpoint `GET /api/fda-status`; la dashboard mostra un banner
+  se il processo non ha FDA (senza il quale Mail/Safari/Cestino non sono pulibili).
+
+## v5.2 — Moduli Uninstaller e Residui (chiusura della fusione)
+
+Con la v5.1 il *motore* era allineato, ma due **moduli utente** di MyPureMac non
+avevano equivalente in CleanMac: la vista uninstaller (`AppListView` +
+`AppFilesView`) e la vista residui (`OrphanListView`). Erano le ultime funzioni
+presenti solo nella app SwiftUI. La v5.2 le porta nella dashboard web.
+
+### Nuovi moduli backend
+- **`appInventory.js`** — porting di `AppInfoFetcher.swift`: elenco di tutte le
+  app installate (`/Applications`, `~/Applications`, `/System/Applications`) con
+  bundle id, dimensione (`du`), ultimo utilizzo (Spotlight `kMDItemLastUsedDate`
+  con fallback su mtime) e giorni di inutilizzo. Le 39 app Apple di
+  `PROTECTED_BUNDLE_IDS` e tutto `/System/Applications` sono marcati
+  `removable: false` e non selezionabili.
+- **`orphanFinder.js`** — porting di `AppState.findOrphans()`: ricerca inversa
+  sulle `reverseSearchPaths` di `conditions.js`, con `skipReverse`, confronto
+  con l'inventario installato e soglia dimensionale.
+
+### Nuovi endpoint
+| Endpoint | Funzione |
+|---|---|
+| `GET /api/apps[?fast=1]` | Inventario app (cache 60 s; `fast=1` salta `du`/`mdls`) |
+| `GET /api/orphans[?minSizeMB=N]` | Residui candidati, ognuno con flag `deletable` |
+| `POST /api/orphans/delete` | Eliminazione residui — **rivalida ogni path lato server** |
+| `GET /api/disk-info` | Spazio totale/libero/usato (porting `getDiskInfo`) |
+
+### Guard-rail dei residui
+`isDeletableOrphan` è più stretto delle location scandite: consente solo i
+**figli** di 9 directory dentro `~/Library`, rifiuta `..`, path relativi,
+qualunque bundle `.app`, symlink non risolvibili e ogni percorso che dopo
+`realpath` esce dall'area consentita. `/Library`, `PrivilegedHelperTools` e
+`/Users/Shared` vengono **scanditi e segnalati ma mai eliminati**.
+La lista di path inviata dal client non è mai considerata attendibile: ogni
+percorso viene rivalidato in `POST /api/orphans/delete` e i rifiuti sono
+riportati nella risposta.
+
+### UI
+- **Pannello Uninstaller**: lista app con ricerca, badge "non usata da Ng" e
+  "🔒 protetta"; selezione di un'app → elenco dei file correlati con dimensioni,
+  selettore di precisione (`strict`/`enhanced`/`deep`) e conteggio del selezionato.
+  Gli elementi non eliminabili sono marcati `manuale` e disabilitati.
+- **Pannello Residui**: soglia MB configurabile, selezione multipla dei soli
+  item eliminabili, totale selezionato ed eliminazione con conferma.
+
+### Difetto trovato dai test
+`skipReverse` confronta **prefissi** del nome normalizzato: un item
+`com.apple.X` diventa `comappleX` e **non** veniva intercettato dal prefisso
+`apple` (l'op33 bash aveva invece un `case com.apple.*` esplicito). Senza la
+guardia, ogni file di sistema Apple sarebbe stato classificato come residuo.
+Aggiunta `SYSTEM_NAME_PREFIXES` in `orphanFinder.js` + test di regressione.
+
+### Delta funzionali residui chiusi (bash)
+- **op10 esteso**: MyPureMac cercava `>100MB` **oppure** file più vecchi di un anno
+  sopra i 10MB; CleanMac si fermava a `>500MB`. Aggiunta la sezione "file >10MB non
+  usati da oltre 1 anno" (Desktop/Documents/Downloads, esclusi quelli già elencati).
+  È la categoria "Large & Old Files" che mancava del tutto.
+- **op34 APFS purge**: `op31` misurava lo spazio purgeable ma non lo liberava mai,
+  mentre `CleaningEngine.purgePurgeable()` eseguiva `diskutil apfs purgePurgeable /`.
+  Portato come operazione PERFORMANCE separata e opt-in (op31 resta pura analisi),
+  con misurazione reale del liberato via `df` prima/dopo.
+
+**Totale operazioni: 34.**
+
+## Stato della fusione
+
+Tutti i sorgenti funzionali di MyPureMac hanno ora un equivalente in CleanMac:
+
+| Sorgente MyPureMac | Destinazione CleanMac |
+|---|---|
+| `AppPathFinder.swift` | `appPathFinder.js` (9 livelli, v5.1) |
+| `Conditions.swift` | `conditions.js` (v5.1) |
+| `StringNormalization.swift` | `stringNormalization.js` (v5.1) |
+| `Locations.swift` | `conditions.js` (appSearch + reverseSearch) |
+| `AppInfoFetcher.swift` | `appInventory.js` (v5.2) |
+| `AppState.findOrphans()` | `orphanFinder.js` + op33 bash |
+| `FullDiskAccessManager.swift` | check bash + `/api/fda-status` (v5.1) |
+| `SchedulerService.swift` | `schedule.command` (v5.0) |
+| `ScanEngine.swift` | operazioni op01–op34 |
+| `CleaningEngine.swift` | `safe_remove` + guard-rail server (`isSafeRelatedPath`, `isDeletableOrphan`) |
+| `AppListView` / `AppFilesView` | pannello Uninstaller (v5.2) |
+| `OrphanListView` | pannello Residui (v5.2) |
+| `SmartScanView` | flusso dry-run → selezione → pulizia |
+
+Restano fuori solo i file specifici di SwiftUI (`Theme.swift`, `MainWindow.swift`,
+`OnboardingView.swift`, `Models.swift`, `Logger.swift`), che non hanno senso fuori
+dalla app nativa: la loro funzione è coperta da CSS, dalla dashboard e dai log dello script.
+
 ## Test
-- `appPathFinder.js`: 11 test unitari sulla logica di matching pura (eseguibili senza macOS).
+- `test/orphanFinder.test.js`: **15 test** su guard-rail di eliminazione,
+  classificazione e inventario app (NEW v5.2).
+- `test/appPathFinder.test.js`: **29 test unitari** committati sulla logica pura
+  (normalizzazione, 9 livelli di matching, condizioni per-app, skip logic,
+  filterSubpaths, parser codesign/entitlements) — eseguibili senza macOS.
+- **Totale: 44 test**, `npm test` esegue entrambe le suite.
 - `CleanMac.command`: `bash -n` pulito.
-- `server.js`: caricamento verificato (nessun errore TDZ/modulo).
+- `server.js`, `app.js`, moduli: `node --check` puliti.

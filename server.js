@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// CleanMac Web Interface Server v5.0 (Synthesis Edition)
-// Compatible with CleanMac v5.0 (33 operations + category selection)
-// Include uninstaller euristico multi-livello (porting AppPathFinder da MyPureMac)
+// CleanMac Web Interface Server v5.2 (Synthesis Edition)
+// Compatible with CleanMac v5.1 (33 operations + category selection)
+// Include uninstaller euristico a 9 livelli (porting AppPathFinder da MyPureMac),
+// inventario app (AppInfoFetcher) e ricerca orfani azionabile (findOrphans).
 
 const express = require('express');
 const { spawn, exec } = require('child_process');
@@ -11,6 +12,8 @@ const http = require('http');
 const os = require('os');
 const { Server } = require('socket.io');
 const appPathFinder = require('./appPathFinder');
+const appInventory = require('./appInventory');
+const orphanFinder = require('./orphanFinder');
 
 const app = express();
 const server = http.createServer(app);
@@ -38,6 +41,38 @@ app.get('/api/status', (req, res) => {
     running: currentExecution !== null,
     scriptPath: SCRIPT_PATH,
     scriptExists: fs.existsSync(SCRIPT_PATH)
+  });
+});
+
+// v5.1 — porting FullDiskAccessManager (MyPureMac): rileva se il processo ha
+// Full Disk Access sondando path protetti da TCC. Senza FDA molte pulizie
+// (Mail, Safari, Cestino, container) falliscono in silenzio.
+function hasFullDiskAccess() {
+  if (process.platform !== 'darwin') return true; // fuori da macOS non ha senso
+  const probes = [
+    path.join(HOME_DIR, 'Library/Safari/Bookmarks.plist'),
+    '/Library/Application Support/com.apple.TCC/TCC.db',
+  ];
+  for (const p of probes) {
+    try {
+      const fd = fs.openSync(p, 'r');
+      fs.closeSync(fd);
+      return true;
+    } catch (e) { /* EPERM/ENOENT → prova la prossima */ }
+  }
+  try {
+    if (fs.readdirSync(path.join(HOME_DIR, 'Library/Mail')).length >= 0) return true;
+  } catch (e) { /* bloccato da TCC */ }
+  try {
+    if (fs.readdirSync(path.join(HOME_DIR, '.Trash')).length > 0) return true;
+  } catch (e) { /* bloccato da TCC */ }
+  return false;
+}
+
+app.get('/api/fda-status', (req, res) => {
+  res.json({
+    granted: hasFullDiskAccess(),
+    settingsUrl: 'x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles',
   });
 });
 
@@ -259,6 +294,14 @@ const UNINSTALL_SAFE_ROOTS = [
   path.join(HOME_DIR, 'Applications') + path.sep,
 ];
 
+// Un path che è (o sta dentro) un bundle .app diverso da quello in disinstallazione
+// non va MAI eliminato automaticamente: il matcher euristico può agganciare app
+// affini (es. "Google Drive.app" durante l'uninstall di Chrome).
+function isOtherAppBundle(p, targetAppPath) {
+  if (!/\.app(\/|$)/i.test(p)) return false;
+  return p !== targetAppPath && !p.startsWith(targetAppPath + path.sep);
+}
+
 // Valida che un percorso correlato sia sicuro da eliminare: dentro un'area nota,
 // senza componenti '..', e senza attraversare symlink verso l'esterno.
 function isSafeRelatedPath(p) {
@@ -289,13 +332,117 @@ app.get('/api/uninstall-scan', (req, res) => {
 
   try {
     const result = appPathFinder.findRelatedFiles(appPath, sensitivity);
-    // Non includere il bundle .app stesso tra i "related"
-    result.files = result.files.filter(f => f.path !== appPath);
+    // Non includere il bundle .app stesso tra i "related".
+    // v5.1: ogni file è marcato `deletable` — lo scan esteso (Documents, /Library,
+    // altri bundle) può trovare item che vengono solo segnalati, mai eliminati.
+    result.files = result.files
+      .filter(f => f.path !== appPath)
+      .map(f => ({
+        ...f,
+        deletable: isSafeRelatedPath(f.path) && !isOtherAppBundle(f.path, appPath),
+      }));
     let appSize = 0;
     try { appSize = parseInt(require('child_process').execFileSync('/usr/bin/du', ['-sk', appPath], { encoding: 'utf8' }).trim().split(/\s+/)[0], 10) * 1024; } catch (e) {}
     res.json({ app: appName, appPath, appSizeBytes: appSize, ...result });
   } catch (error) {
     console.error(`Errore scan uninstall ${appName}:`, error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ── Inventario app (v5.2, porting AppInfoFetcher) ──────────────────────────
+// GET /api/apps[?fast=1] — tutte le app installate con dimensione e ultimo uso.
+// `fast=1` salta `du`/`mdls` (risposta immediata, senza dimensioni).
+let appsCache = { at: 0, data: null };
+app.get('/api/apps', (req, res) => {
+  const fast = req.query.fast === '1';
+  try {
+    if (!fast && appsCache.data && Date.now() - appsCache.at < 60000) {
+      return res.json({ apps: appsCache.data, cached: true });
+    }
+    const apps = appInventory.listInstalledApps({ withSize: !fast, withLastUsed: !fast });
+    if (!fast) appsCache = { at: Date.now(), data: apps };
+    res.json({ apps, cached: false });
+  } catch (error) {
+    console.error('Errore inventario app:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ── Ricerca orfani (v5.2, porting AppState.findOrphans) ────────────────────
+// GET /api/orphans[?minSizeMB=1] — residui di app disinstallate, ogni item
+// marcato `deletable` (solo aree utente note; mai bundle .app né /Library).
+app.get('/api/orphans', (req, res) => {
+  const minSizeMB = Math.max(0, parseFloat(req.query.minSizeMB) || 1);
+  try {
+    const result = orphanFinder.findOrphans({ minSizeBytes: minSizeMB * 1024 * 1024 });
+    res.json(result);
+  } catch (error) {
+    console.error('Errore ricerca orfani:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/orphans/delete { paths: [...] }
+// Elimina solo i path che superano di nuovo la validazione lato server:
+// la lista ricevuta dal client non è mai considerata attendibile.
+app.post('/api/orphans/delete', (req, res) => {
+  const { paths } = req.body;
+  if (!Array.isArray(paths) || paths.length === 0) {
+    return res.status(400).json({ error: 'Nessun percorso specificato' });
+  }
+
+  let deleted = 0;
+  let freedBytes = 0;
+  const rejected = [];
+  const errors = [];
+
+  paths.forEach(p => {
+    if (!orphanFinder.isDeletableOrphan(p)) {
+      rejected.push(p);
+      return;
+    }
+    try {
+      let size = 0;
+      try {
+        size = parseInt(require('child_process')
+          .execFileSync('/usr/bin/du', ['-sk', p], { encoding: 'utf8' })
+          .trim().split(/\s+/)[0], 10) * 1024;
+      } catch (e) { /* dimensione best-effort */ }
+      fs.rmSync(p, { recursive: true, force: true });
+      deleted++;
+      freedBytes += size || 0;
+    } catch (e) {
+      errors.push({ path: p, error: e.message });
+    }
+  });
+
+  res.json({
+    success: deleted > 0 || paths.length === rejected.length,
+    deleted,
+    freedBytes,
+    rejected: rejected.length ? rejected : undefined,
+    errors: errors.length ? errors : undefined,
+    message: `${deleted} residui eliminati (${(freedBytes / 1048576).toFixed(0)} MB)` +
+      (rejected.length ? `, ${rejected.length} rifiutati per sicurezza` : ''),
+  });
+});
+
+// ── Info disco (v5.2, porting ScanEngine.getDiskInfo) ──────────────────────
+app.get('/api/disk-info', (req, res) => {
+  try {
+    const stat = fs.statfsSync ? fs.statfsSync('/') : null;
+    if (!stat) return res.json({ available: false });
+    const total = stat.blocks * stat.bsize;
+    const free = stat.bavail * stat.bsize;
+    res.json({
+      available: true,
+      totalBytes: total,
+      freeBytes: free,
+      usedBytes: total - free,
+      usedPercent: total > 0 ? Math.round(((total - free) / total) * 100) : 0,
+    });
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -325,6 +472,7 @@ app.post('/api/uninstall-apps', (req, res) => {
           const related = appPathFinder.findRelatedFiles(appPath, sensitivity);
           related.files.forEach(f => {
             if (f.path === appPath) return; // il bundle lo gestiamo dopo
+            if (isOtherAppBundle(f.path, appPath)) return; // mai altri bundle .app
             if (isSafeRelatedPath(f.path)) {
               try { fs.rmSync(f.path, { recursive: true, force: true }); relatedDeleted++; }
               catch (e) { errors.push({ app: appName, file: f.path, error: e.message }); }
