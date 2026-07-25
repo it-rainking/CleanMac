@@ -67,7 +67,7 @@ CleanMac/
 
 ---
 
-## Operazioni Disponibili (33 totali)
+## Operazioni Disponibili (34 totali)
 
 ### Categorie v5.0
 - **CLEANUP** (19 ops): Cache utente/sistema, log, Safari, Xcode, DS_Store, temp, trash, localized, cache app (Slack/Discord/VSCode/Chrome/Firefox/Spotify/Teams/Zoom/Telegram/Notion/WhatsApp), log vecchi, download >30gg, npm/yarn/pip/pnpm, Docker, Homebrew (con HOMEBREW_CACHE custom), Time Machine, iOS backup, Mail Attachments
@@ -78,6 +78,10 @@ CleanMac/
 ### Operazioni NEW v5.0 (dalla sintesi con MyPureMac)
 - **op32 Boot Optimization** (PERFORMANCE): rileva LaunchAgents/LaunchDaemons noti come problematici (keystone, dropbox updater, CleanMyMac, ecc.) + item orfani (eseguibile mancante). In cleanup mette in **quarantena reversibile** SOLO gli agent utente noti (mai daemon di sistema). Output: `boot_optimization_TS.txt`, backup in `boot_quarantine_TS/`.
 - **op33 Orphaned Files** (ANALYSIS): file/cartelle residui in `~/Library` (Preferences/Application Support/Containers/Caches) di app non più installate, confrontando gli identificatori con le app presenti. Solo analisi (nessuna eliminazione automatica). Output: `orphaned_files_TS.txt`.
+
+### Operazioni NEW v5.2
+- **op10 esteso** (ANALYSIS): oltre ai file >500MB su tutta la home, rileva i file >10MB non modificati da oltre 1 anno in Desktop/Documents/Downloads (euristica da `ScanEngine.scanLargeFiles`). Entrambe le sezioni in `large_files_TS.txt`; nessuna eliminazione automatica.
+- **op34 APFS purge purgeable** (PERFORMANCE): esegue `diskutil apfs purgePurgeable /` e misura lo spazio effettivamente liberato con `df` prima/dopo (porting di `CleaningEngine.purgePurgeable`). Opt-in: op31 resta di sola analisi.
 
 ---
 

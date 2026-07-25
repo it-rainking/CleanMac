@@ -1,5 +1,5 @@
 #!/bin/bash
-# CleanMac.command — versione 5.0 (Synthesis Edition)
+# CleanMac.command — versione 5.2 (Synthesis Edition)
 # Salvataggio automatico nella cartella dello script
 # Changelog v5.0 (2026-07-07) — SINTESI CleanMac + MyPureMac:
 #   - op32 Boot Optimization: rileva LaunchAgents/LaunchDaemons problematici e orfani (da MyPureMac)
@@ -8,6 +8,10 @@
 #   - op02 Cache utente: discovery dinamica di ~/Library/Caches (da MyPureMac) oltre ai path noti
 #   - Uninstaller euristico multi-livello nel server web (porting AppPathFinder)
 #   - Totale operazioni: 33
+# Changelog v5.2 (2026-07-25):
+#   - op10 esteso: rileva anche file >10MB non usati da oltre 1 anno (da MyPureMac)
+#   - op34 APFS purge purgeable: libera davvero lo spazio misurato da op31 (da CleaningEngine)
+#   - Totale operazioni: 34
 # Changelog v4.2 (2025-12-31):
 #   - Aggiunta selezione interattiva operazioni post-DryRun
 #   - Categorizzazione operazioni (Pulizia, Performance, Analisi)
@@ -99,6 +103,7 @@ init_operations_map() {
     echo "op20:0:PERFORMANCE:Permissions" >> "$OPERATIONS_DATA_FILE"
     echo "op21:0:PERFORMANCE:DNS flush" >> "$OPERATIONS_DATA_FILE"
     echo "op22:0:PERFORMANCE:Spotlight" >> "$OPERATIONS_DATA_FILE"
+    echo "op34:0:PERFORMANCE:APFS purge purgeable" >> "$OPERATIONS_DATA_FILE"
     echo "op32:0:PERFORMANCE:Boot optimization" >> "$OPERATIONS_DATA_FILE"
 
     # ANALYSIS (solo report)
@@ -264,12 +269,12 @@ is_operation_enabled() {
 }
 
 log "═══════════════════════════════════════════════════════════"
-log "CleanMac v5.0 (Synthesis Edition) — Avvio"
+log "CleanMac v5.2 (Synthesis Edition) — Avvio"
 log "═══════════════════════════════════════════════════════════"
 
 # Inizializzo mappatura operazioni (NEW v4.2)
 init_operations_map
-log "Mappatura operazioni inizializzata: 33 operazioni (v5.0)"
+log "Mappatura operazioni inizializzata: 34 operazioni (v5.2)"
 
 # Supporto parametri CLI (NEW v4.2 - Web Interface)
 # Uso: ./CleanMac.command --dry-run --categories="CLEANUP,PERFORMANCE"
@@ -753,13 +758,17 @@ log "Scansione file grandi..."
 
     BIG_FILES="$REPORTS_DIR/large_files_${TIMESTAMP}.txt"
 
-    if [ "$DRY_RUN" = true ]; then
-        register_operation "op10" "0" "ANALYSIS" "Large files >500MB"
-
+    # v5.2: oltre ai file >500MB, rileva anche i file "grandi e vecchi"
+    # (>10MB non toccati da oltre un anno in Desktop/Documents/Downloads),
+    # euristica portata da MyPureMac/ScanEngine.scanLargeFiles.
+    # BIG_COUNT / OLD_COUNT sono impostate dalla funzione per il chiamante.
+    scan_large_files() {
         echo "═══════════════════════════════════════════" > "$BIG_FILES"
-        echo "FILE GRANDI (>500 MB)"  >> "$BIG_FILES"
+        echo "FILE GRANDI E FILE VECCHI"  >> "$BIG_FILES"
         echo "$(date)" >> "$BIG_FILES"
         echo "═══════════════════════════════════════════" >> "$BIG_FILES"
+        echo "" >> "$BIG_FILES"
+        echo "── File > 500 MB (tutta la home) ──" >> "$BIG_FILES"
         echo "" >> "$BIG_FILES"
 
         BIG_COUNT=0
@@ -771,31 +780,45 @@ log "Scansione file grandi..."
             fi
         done < <(find ~ -type f -size +500M 2>/dev/null)
 
+        echo "" >> "$BIG_FILES"
+        echo "── File > 10 MB non usati da oltre 1 anno ──" >> "$BIG_FILES"
+        echo "   (Desktop / Documents / Downloads; esclusi quelli già elencati sopra)" >> "$BIG_FILES"
+        echo "" >> "$BIG_FILES"
+
+        OLD_COUNT=0
+        for dir in "$HOME/Desktop" "$HOME/Documents" "$HOME/Downloads"; do
+            [ -d "$dir" ] || continue
+            while IFS= read -r file; do
+                if [ -n "$file" ]; then
+                    SIZE=$(du -sh "$file" 2>/dev/null | cut -f1)
+                    AGE_DAYS=$(( ( $(date +%s) - $(stat -f %m "$file" 2>/dev/null || echo "$(date +%s)") ) / 86400 ))
+                    echo "🕰️  $file — $SIZE (${AGE_DAYS}g)" >> "$BIG_FILES"
+                    OLD_COUNT=$(( OLD_COUNT + 1 ))
+                fi
+            done < <(find "$dir" -type f -size +10M -size -500M -mtime +365 2>/dev/null)
+        done
+
+        echo "" >> "$BIG_FILES"
+        echo "Totale: $BIG_COUNT file grandi, $OLD_COUNT file vecchi e voluminosi" >> "$BIG_FILES"
+    }
+
+    if [ "$DRY_RUN" = true ]; then
+        register_operation "op10" "0" "ANALYSIS" "Large files >500MB + file vecchi"
+
+        scan_large_files
+
         append_dryrun ""
-        append_dryrun "📊 FILE GRANDI >500MB (ANALISI - NON ELIMINABILI)"
+        append_dryrun "📊 FILE GRANDI E VECCHI (ANALISI - NON ELIMINABILI)"
         append_dryrun "────────────────────────────────────────"
-        append_dryrun "File trovati: $BIG_COUNT"
+        append_dryrun "File >500MB trovati: $BIG_COUNT"
+        append_dryrun "File >10MB non usati da oltre 1 anno: $OLD_COUNT"
         append_dryrun "Dettagli completi in: $BIG_FILES"
         append_dryrun "⚠️  Questi file NON saranno eliminati automaticamente"
         append_dryrun "    (richiedono valutazione manuale)"
     else
         if is_operation_enabled "op10"; then
-            echo "═══════════════════════════════════════════" > "$BIG_FILES"
-            echo "FILE GRANDI (>500 MB)"  >> "$BIG_FILES"
-            echo "$(date)" >> "$BIG_FILES"
-            echo "═══════════════════════════════════════════" >> "$BIG_FILES"
-            echo "" >> "$BIG_FILES"
-
-            BIG_COUNT=0
-            while IFS= read -r file; do
-                if [ -n "$file" ]; then
-                    SIZE=$(du -sh "$file" 2>/dev/null | cut -f1)
-                    echo "📦 $file — $SIZE" >> "$BIG_FILES"
-                    BIG_COUNT=$(( BIG_COUNT + 1 ))
-                fi
-            done < <(find ~ -type f -size +500M 2>/dev/null)
-
-            add_to_report "✅ File grandi analizzati ($BIG_COUNT file) → $BIG_FILES"
+            scan_large_files
+            add_to_report "✅ File grandi analizzati ($BIG_COUNT >500MB, $OLD_COUNT vecchi >10MB) → $BIG_FILES"
         else
             log "Scansione file grandi: SALTATA (non selezionata)"
             add_to_report "⏭️  Scansione file grandi saltata (non selezionata)"
@@ -1917,6 +1940,53 @@ log "Analisi spazio APFS purgeable..."
     fi
 
     log "APFS purgeable analizzato: $PURGEABLE_MB MB"
+}
+
+#############################################
+# 34. APFS PURGE PURGEABLE (NEW v5.2 - da MyPureMac CleaningEngine)
+# op31 si limita a misurare lo spazio purgeable; MyPureMac lo liberava davvero
+# con `diskutil apfs purgePurgeable /`. Qui è un'operazione PERFORMANCE distinta
+# e opt-in, così l'analisi resta non distruttiva.
+#############################################
+log "Valutazione purge spazio APFS purgeable..."
+{
+    if [ "$DRY_RUN" = true ]; then
+        register_operation "op34" "0" "PERFORMANCE" "APFS purge purgeable"
+        append_dryrun ""
+        append_dryrun "♻️  PURGE SPAZIO APFS (AZIONE)"
+        append_dryrun "────────────────────────────────────────"
+        if [ "$PURGEABLE_MB" -gt 0 ]; then
+            append_dryrun "Chiede a macOS di liberare subito i ~$PURGEABLE_MB MB purgeable."
+        else
+            append_dryrun "Nessuno spazio purgeable rilevato: l'operazione non avrà effetto."
+        fi
+        append_dryrun "ℹ️  Non elimina file dell'utente: libera snapshot e cache di sistema."
+    else
+        if is_operation_enabled "op34"; then
+            FREE_BEFORE=$(df -m / 2>/dev/null | awk 'NR==2 {print $4}')
+            FREE_BEFORE=${FREE_BEFORE:-0}
+
+            if diskutil apfs purgePurgeable / >/dev/null 2>&1; then
+                FREE_AFTER=$(df -m / 2>/dev/null | awk 'NR==2 {print $4}')
+                FREE_AFTER=${FREE_AFTER:-$FREE_BEFORE}
+                PURGED_MB=$(( FREE_AFTER - FREE_BEFORE ))
+                [ "$PURGED_MB" -lt 0 ] && PURGED_MB=0
+                if [ "$PURGED_MB" -gt 0 ]; then
+                    calculate_freed $(( PURGED_MB * 1048576 )) "PERFORMANCE"
+                    add_to_report "✅ Purge APFS completato: ${PURGED_MB} MB liberati"
+                else
+                    add_to_report "ℹ️  Purge APFS eseguito: nessuno spazio aggiuntivo liberato"
+                fi
+                log "Purge APFS eseguito (${PURGED_MB} MB)"
+            else
+                add_to_report "⚠️  Purge APFS non riuscito (richiede privilegi o non supportato)"
+                log "Purge APFS fallito o non supportato"
+            fi
+        else
+            log "Purge APFS: SALTATO (non selezionato)"
+            add_to_report "⏭️  Purge APFS saltato (non selezionato)"
+        fi
+    fi
 }
 
 #############################################

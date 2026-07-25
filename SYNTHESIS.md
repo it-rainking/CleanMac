@@ -174,6 +174,42 @@ riportati nella risposta.
 guardia, ogni file di sistema Apple sarebbe stato classificato come residuo.
 Aggiunta `SYSTEM_NAME_PREFIXES` in `orphanFinder.js` + test di regressione.
 
+### Delta funzionali residui chiusi (bash)
+- **op10 esteso**: MyPureMac cercava `>100MB` **oppure** file più vecchi di un anno
+  sopra i 10MB; CleanMac si fermava a `>500MB`. Aggiunta la sezione "file >10MB non
+  usati da oltre 1 anno" (Desktop/Documents/Downloads, esclusi quelli già elencati).
+  È la categoria "Large & Old Files" che mancava del tutto.
+- **op34 APFS purge**: `op31` misurava lo spazio purgeable ma non lo liberava mai,
+  mentre `CleaningEngine.purgePurgeable()` eseguiva `diskutil apfs purgePurgeable /`.
+  Portato come operazione PERFORMANCE separata e opt-in (op31 resta pura analisi),
+  con misurazione reale del liberato via `df` prima/dopo.
+
+**Totale operazioni: 34.**
+
+## Stato della fusione
+
+Tutti i sorgenti funzionali di MyPureMac hanno ora un equivalente in CleanMac:
+
+| Sorgente MyPureMac | Destinazione CleanMac |
+|---|---|
+| `AppPathFinder.swift` | `appPathFinder.js` (9 livelli, v5.1) |
+| `Conditions.swift` | `conditions.js` (v5.1) |
+| `StringNormalization.swift` | `stringNormalization.js` (v5.1) |
+| `Locations.swift` | `conditions.js` (appSearch + reverseSearch) |
+| `AppInfoFetcher.swift` | `appInventory.js` (v5.2) |
+| `AppState.findOrphans()` | `orphanFinder.js` + op33 bash |
+| `FullDiskAccessManager.swift` | check bash + `/api/fda-status` (v5.1) |
+| `SchedulerService.swift` | `schedule.command` (v5.0) |
+| `ScanEngine.swift` | operazioni op01–op34 |
+| `CleaningEngine.swift` | `safe_remove` + guard-rail server (`isSafeRelatedPath`, `isDeletableOrphan`) |
+| `AppListView` / `AppFilesView` | pannello Uninstaller (v5.2) |
+| `OrphanListView` | pannello Residui (v5.2) |
+| `SmartScanView` | flusso dry-run → selezione → pulizia |
+
+Restano fuori solo i file specifici di SwiftUI (`Theme.swift`, `MainWindow.swift`,
+`OnboardingView.swift`, `Models.swift`, `Logger.swift`), che non hanno senso fuori
+dalla app nativa: la loro funzione è coperta da CSS, dalla dashboard e dai log dello script.
+
 ## Test
 - `test/orphanFinder.test.js`: **15 test** su guard-rail di eliminazione,
   classificazione e inventario app (NEW v5.2).
