@@ -150,7 +150,8 @@ app.get('/api/analysis-files', (req, res) => {
     duplicates: /^duplicates_.*\.txt$/,
     large_files: /^large_files_.*\.txt$/,
     unused_apps: /^unused_apps_.*\.txt$/,
-    dryrun_report: /^dryrun_report_.*\.txt$/
+    dryrun_report: /^dryrun_report_.*\.txt$/,
+    ai_models: /^ai_models_.*\.txt$/
   };
 
   Object.keys(analysisTypes).forEach(type => {

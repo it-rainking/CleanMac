@@ -47,6 +47,11 @@ const OP_DESCRIPTIONS = {
     op29: { name: 'Swap e Sleepimage', desc: 'File swap e sleepimage. Sleepimage serve per l\'ibernazione: rimuoverlo disabilita l\'ibernazione profonda.', icon: '💤' },
     op30: { name: 'Mail attachments', desc: 'Allegati email scaricati da Mail.app in ~/Library/Mail Downloads.', icon: '📧' },
     op31: { name: 'Spazio APFS Purgeable', desc: 'Spazio APFS occupato da dati recuperabili (snapshot, cache APFS). macOS lo libera automaticamente se necessario.', icon: '💿' },
+    op32: { name: 'Ottimizzazione avvio', desc: 'LaunchAgents e LaunchDaemons noti come problematici o orfani. Gli agent utente vengono messi in quarantena reversibile, mai eliminati.', icon: '🚀' },
+    op33: { name: 'Residui app disinstallate', desc: 'File in ~/Library che appartengono ad app non più installate. Solo analisi: la rimozione si fa dalla sezione Residui.', icon: '🧹' },
+    op34: { name: 'Purge spazio APFS', desc: 'Forza il rilascio dello spazio purgeable con diskutil e misura i MB effettivamente liberati.', icon: '💿' },
+    op35: { name: 'Cache AI', desc: 'Cache rigenerabili degli strumenti AI: transfer cache Hugging Face, cache di compilazione Triton/CUDA, log Ollama, cache app client. I modelli scaricati NON vengono toccati.', icon: '🤖' },
+    op36: { name: 'Modelli AI', desc: 'Inventario degli store di modelli (Ollama, Hugging Face, LM Studio, PyTorch, Whisper, GPT4All). Solo analisi: nessuna eliminazione automatica.', icon: '🧠' },
 };
 
 // DOM Elements

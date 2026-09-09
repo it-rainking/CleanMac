@@ -3,7 +3,7 @@
 ## Descrizione
 Script di pulizia e manutenzione macOS con doppia interfaccia: GUI tradizionale via osascript e dashboard web real-time via Node.js + Socket.IO.
 
-**Versione attuale**: v5.1 (Synthesis Edition) + Web Interface v5.2
+**Versione attuale**: v5.3 (Synthesis Edition) + Web Interface v5.3
 
 > **v5.0 Synthesis Edition**: fusione di CleanMac (bash + web) e MyPureMac (SwiftUI).
 > Da MyPureMac sono state integrate: Boot Optimization (op32), Orphaned Files finder (op33),
@@ -22,6 +22,11 @@ Script di pulizia e manutenzione macOS con doppia interfaccia: GUI tradizionale 
 > ultimo uso e app Apple protette) e **Residui** (`orphanFinder.js`, porting
 > `findOrphans`) con eliminazione azionabile e guard-rail rivalidati lato server.
 > 44 test unitari committati (`npm test`).
+> **v5.3**: prima risposta al confronto con MangoDisk — nuova categoria **AI**.
+> `op35` pulisce le sole cache AI rigenerabili a costo zero; `op36` inventaria
+> gli store di modelli in sola analisi. L'invariante "op35 non tocca mai i pesi"
+> è protetta da 10 test (`test/aiCaches.test.js`). Vedi `COMPARISON-MANGODISK.md`.
+>
 > Vedi `SYNTHESIS.md` per la matrice funzionale completa e le scelte di merge.
 
 ---
@@ -37,7 +42,7 @@ Script di pulizia e manutenzione macOS con doppia interfaccia: GUI tradizionale 
 ## Struttura progetto
 ```
 CleanMac/
-├── CleanMac.command        # Script bash principale (v5.1, 33 operazioni + check FDA)
+├── CleanMac.command        # Script bash principale (v5.3, 36 operazioni + check FDA)
 ├── server.js               # Backend web (Express + Socket.IO)
 ├── appPathFinder.js        # Motore euristico uninstaller a 9 livelli (parità AppPathFinder.swift) v5.1
 ├── appInventory.js         # Inventario app installate (porting AppInfoFetcher.swift) NEW v5.2
@@ -51,7 +56,8 @@ CleanMac/
 ├── package.json            # Dipendenze Node.js (npm test → test unitari)
 ├── test/
 │   ├── appPathFinder.test.js  # 29 test logica matching pura (girano anche su Linux) NEW v5.1
-│   └── orphanFinder.test.js   # 15 test guard-rail residui + inventario app NEW v5.2
+│   ├── orphanFinder.test.js   # 15 test guard-rail residui + inventario app NEW v5.2
+│   └── aiCaches.test.js       # 10 test guard-rail cache AI vs store modelli NEW v5.3
 └── public/
     ├── index.html          # Dashboard web UI (+ banner FDA, Uninstaller, Residui)
     ├── app.js              # Logica frontend (WebSocket, stats, modals)
@@ -67,12 +73,12 @@ CleanMac/
 
 ---
 
-## Operazioni Disponibili (34 totali)
+## Operazioni Disponibili (36 totali)
 
 ### Categorie v5.0
-- **CLEANUP** (19 ops): Cache utente/sistema, log, Safari, Xcode, DS_Store, temp, trash, localized, cache app (Slack/Discord/VSCode/Chrome/Firefox/Spotify/Teams/Zoom/Telegram/Notion/WhatsApp), log vecchi, download >30gg, npm/yarn/pip/pnpm, Docker, Homebrew (con HOMEBREW_CACHE custom), Time Machine, iOS backup, Mail Attachments
+- **CLEANUP** (20 ops): Cache utente/sistema, log, Safari, Xcode, DS_Store, temp, trash, localized, cache app (Slack/Discord/VSCode/Chrome/Firefox/Spotify/Teams/Zoom/Telegram/Notion/WhatsApp), log vecchi, download >30gg, npm/yarn/pip/pnpm, Docker, Homebrew (con HOMEBREW_CACHE custom), Time Machine, iOS backup, Mail Attachments, **Cache AI (op35, NEW v5.3)**
 - **PERFORMANCE** (6 ops): RAM purge, LaunchServices rebuild, permessi utente, DNS flush, Spotlight reset, **Boot Optimization (op32, NEW v5.0 da MyPureMac)**
-- **ANALYSIS** (7 ops): Spazio disco, file >500MB, app non usate, duplicati, swap/sleepimage, APFS Purgeable, **Orphaned Files (op33, NEW v5.0 da MyPureMac)**
+- **ANALYSIS** (8 ops): Spazio disco, file >500MB, app non usate, duplicati, swap/sleepimage, APFS Purgeable, **Orphaned Files (op33, NEW v5.0 da MyPureMac)**, **Modelli AI (op36, NEW v5.3)**
 - **UTILITY** (1 op): Backup config (sempre attiva)
 
 ### Operazioni NEW v5.0 (dalla sintesi con MyPureMac)
@@ -82,6 +88,18 @@ CleanMac/
 ### Operazioni NEW v5.2
 - **op10 esteso** (ANALYSIS): oltre ai file >500MB su tutta la home, rileva i file >10MB non modificati da oltre 1 anno in Desktop/Documents/Downloads (euristica da `ScanEngine.scanLargeFiles`). Entrambe le sezioni in `large_files_TS.txt`; nessuna eliminazione automatica.
 - **op34 APFS purge purgeable** (PERFORMANCE): esegue `diskutil apfs purgePurgeable /` e misura lo spazio effettivamente liberato con `df` prima/dopo (porting di `CleaningEngine.purgePurgeable`). Opt-in: op31 resta di sola analisi.
+
+### Operazioni NEW v5.3 (categoria AI)
+- **op35 Cache AI** (CLEANUP): elimina SOLO cache rigenerabili a costo zero — transfer
+  cache Hugging Face (`xet`, `download`, `assets`), cache di compilazione `~/.triton/cache`
+  e `~/.nv/ComputeCache`, log Ollama, cache delle app client AI. **Non tocca mai i pesi
+  dei modelli**: la lista è tenuta disgiunta da quella di op36 e l'invariante è verificata
+  da `test/aiCaches.test.js`.
+- **op36 Modelli AI** (ANALYSIS): inventario degli store di modelli (Ollama, Hugging Face
+  hub/datasets, LM Studio, PyTorch hub, Keras, Whisper, GPT4All, ModelScope) con dimensioni,
+  elenco dei singoli file >1 GB e comandi di rimozione manuale suggeriti. **Nessuna
+  eliminazione automatica**: i pesi sono re-scaricabili ma costano ore di banda, la scelta
+  resta dell'utente.
 
 ---
 
@@ -129,6 +147,10 @@ CLEANUP → is_operation_enabled() → legge OPERATIONS_DATA_FILE (init_operatio
 - Nuove op CLEANUP: aggiungere `calculate_freed` nel ramo dry-run
 - Stima TM snapshots: `SNAPSHOTS * 2048` MB (non 5000 — troppo ottimistico)
 
+- **Categoria AI**: la lista di op35 (heredoc `AICACHEEOF`) e quella di op36 (heredoc
+  `AIMODELEOF`) devono restare DISGIUNTE. Aggiungere un path di modelli a op35 rende
+  l'operazione distruttiva su GB di download: `test/aiCaches.test.js` fallisce apposta.
+
 ### Node.js (server.js)
 - La lista `skipReverse` esiste in DUE posti: `conditions.js` e l'heredoc in
   `CleanMac.command` (op33). Ogni modifica va replicata in entrambi.
@@ -170,6 +192,7 @@ Node.js >= 14.0.0
 | `unused_apps_TS.txt` | App non usate (esclude whitelist Apple) |
 | `duplicates_TS.txt` | File duplicati raggruppati per hash |
 | `config_backup_TS/` | Backup .zshrc, .gitconfig, .ssh/config |
+| `ai_models_TS.txt` | Inventario store modelli AI (solo analisi) |
 
 ---
 

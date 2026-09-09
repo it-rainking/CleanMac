@@ -12,6 +12,14 @@
 #   - op02 Cache utente: discovery dinamica di ~/Library/Caches (da MyPureMac) oltre ai path noti
 #   - Uninstaller euristico multi-livello nel server web (porting AppPathFinder)
 #   - Totale operazioni: 33
+# Changelog v5.3 (2026-09-09):
+#   - op35 Cache AI: pulizia delle sole cache AI rigenerabili (transfer/compile
+#     cache HuggingFace/Triton/CUDA, log Ollama, cache app client). I pesi dei
+#     modelli non vengono MAI toccati da questa operazione.
+#   - op36 Modelli AI: inventario di sola analisi degli store di modelli
+#     (Ollama, HF hub/datasets, LM Studio, PyTorch, Keras, Whisper, GPT4All,
+#     ModelScope) con dimensioni e comandi di rimozione manuale suggeriti.
+#
 # Changelog v5.2 (2026-07-25):
 #   - op10 esteso: rileva anche file >10MB non usati da oltre 1 anno (da MyPureMac)
 #   - op34 APFS purge purgeable: libera davvero lo spazio misurato da op31 (da CleaningEngine)
@@ -100,6 +108,7 @@ init_operations_map() {
     echo "op27:0:CLEANUP:Time Machine" >> "$OPERATIONS_DATA_FILE"
     echo "op28:0:CLEANUP:iOS backups" >> "$OPERATIONS_DATA_FILE"
     echo "op30:0:CLEANUP:Mail attachments" >> "$OPERATIONS_DATA_FILE"
+    echo "op35:0:CLEANUP:Cache AI" >> "$OPERATIONS_DATA_FILE"
 
     # PERFORMANCE (velocità)
     echo "op18:0:PERFORMANCE:RAM optimize" >> "$OPERATIONS_DATA_FILE"
@@ -118,6 +127,7 @@ init_operations_map() {
     echo "op29:0:ANALYSIS:Swap analysis" >> "$OPERATIONS_DATA_FILE"
     echo "op31:0:ANALYSIS:APFS Purgeable Space" >> "$OPERATIONS_DATA_FILE"
     echo "op33:0:ANALYSIS:Orphaned files" >> "$OPERATIONS_DATA_FILE"
+    echo "op36:0:ANALYSIS:Modelli AI" >> "$OPERATIONS_DATA_FILE"
 
     # UTILITY (sempre ON)
     echo "op16:0:UTILITY:Config backup" >> "$OPERATIONS_DATA_FILE"
@@ -273,12 +283,12 @@ is_operation_enabled() {
 }
 
 log "═══════════════════════════════════════════════════════════"
-log "CleanMac v5.2 (Synthesis Edition) — Avvio"
+log "CleanMac v5.3 (Synthesis Edition) — Avvio"
 log "═══════════════════════════════════════════════════════════"
 
 # Inizializzo mappatura operazioni (NEW v4.2)
 init_operations_map
-log "Mappatura operazioni inizializzata: 34 operazioni (v5.2)"
+log "Mappatura operazioni inizializzata: 36 operazioni (v5.3)"
 
 # Supporto parametri CLI (NEW v4.2 - Web Interface)
 # Uso: ./CleanMac.command --dry-run --categories="CLEANUP,PERFORMANCE"
@@ -2408,6 +2418,190 @@ SKIPEOF
     fi
 
     rm -f "$INSTALLED_IDS" "$SKIP_REVERSE_FILE"
+}
+
+#############################################
+# 35. PULIZIA CACHE AI (NEW v5.3)
+# Solo cache RIGENERABILI a costo zero: cache di trasferimento/compilazione e
+# cache delle app client AI. I PESI DEI MODELLI NON VENGONO MAI TOCCATI QUI:
+# sono download da GB gestiti dall'utente e finiscono nell'analisi op36.
+#############################################
+log "Analisi cache AI..."
+{
+    # Lista conservativa: ogni path qui dentro deve essere ricreabile
+    # automaticamente dallo strumento che lo possiede (nessun peso di modello,
+    # nessuna configurazione, nessun dato utente).
+    AI_CACHE_PATHS_FILE=$(mktemp)
+    cat > "$AI_CACHE_PATHS_FILE" << AICACHEEOF
+$HOME/.cache/huggingface/xet
+$HOME/.cache/huggingface/download
+$HOME/.cache/huggingface/assets
+$HOME/.triton/cache
+$HOME/.nv/ComputeCache
+$HOME/.ollama/logs
+$HOME/Library/Caches/com.openai.chat
+$HOME/Library/Caches/com.anthropic.claudefordesktop
+AICACHEEOF
+
+    AI_CACHE_MB=0
+    AI_CACHE_FOUND=0
+    AI_CACHE_DETAIL=""
+    while IFS= read -r ai_path; do
+        [ -n "$ai_path" ] || continue
+        [ -e "$ai_path" ] || continue
+        _mb=$(get_dir_size_mb "$ai_path")
+        _mb=${_mb:-0}
+        AI_CACHE_MB=$(( AI_CACHE_MB + _mb ))
+        AI_CACHE_FOUND=$(( AI_CACHE_FOUND + 1 ))
+        AI_CACHE_DETAIL="${AI_CACHE_DETAIL}${ai_path}|${_mb}
+"
+    done < "$AI_CACHE_PATHS_FILE"
+
+    AI_CACHE_BYTES=$(( AI_CACHE_MB * 1048576 ))
+
+    if [ "$DRY_RUN" = true ]; then
+        register_operation "op35" "$AI_CACHE_MB" "CLEANUP" "Cache AI (transfer/compile cache, no modelli)"
+
+        append_dryrun ""
+        append_dryrun "🤖 CACHE AI (DRY RUN)"
+        append_dryrun "────────────────────────────────────────"
+        if [ "$AI_CACHE_FOUND" -eq 0 ]; then
+            append_dryrun "Nessuna cache AI rilevata"
+        else
+            echo "$AI_CACHE_DETAIL" | while IFS='|' read -r _p _m; do
+                [ -n "$_p" ] || continue
+                append_dryrun "$(basename "$(dirname "$_p")")/$(basename "$_p"): ${_m} MB"
+            done
+            append_dryrun "────────────────────────────────────────"
+            append_dryrun "Totale spazio liberabile: $AI_CACHE_MB MB"
+            append_dryrun "ℹ️  I modelli scaricati NON sono inclusi (vedi analisi op36)"
+        fi
+        calculate_freed "$AI_CACHE_BYTES" "AI Cache"
+    else
+        if is_operation_enabled "op35"; then
+            AI_CACHE_REMOVED=0
+            while IFS= read -r ai_path; do
+                [ -n "$ai_path" ] || continue
+                [ -e "$ai_path" ] || continue
+                if safe_remove "$ai_path"; then
+                    AI_CACHE_REMOVED=$(( AI_CACHE_REMOVED + 1 ))
+                fi
+            done < "$AI_CACHE_PATHS_FILE"
+            calculate_freed "$AI_CACHE_BYTES" "AI Cache"
+            add_to_report "✅ Cache AI pulite: $AI_CACHE_REMOVED path ($AI_CACHE_MB MB) — modelli non toccati"
+        else
+            log "Cache AI: SALTATE (non selezionate)"
+            add_to_report "⏭️  Cache AI saltate (non selezionate)"
+        fi
+    fi
+
+    rm -f "$AI_CACHE_PATHS_FILE"
+    log "Cache AI analizzate: $AI_CACHE_MB MB su $AI_CACHE_FOUND path"
+}
+
+#############################################
+# 36. INVENTARIO MODELLI AI (NEW v5.3)
+# Solo ANALISI. I pesi dei modelli sono re-scaricabili ma costano ore di banda:
+# la scelta di eliminarli resta sempre dell'utente. Nessuna rimozione automatica.
+#############################################
+log "Analisi modelli AI scaricati..."
+{
+    AI_MODELS_FILE="$REPORTS_DIR/ai_models_${TIMESTAMP}.txt"
+
+    AI_MODEL_PATHS_FILE=$(mktemp)
+    cat > "$AI_MODEL_PATHS_FILE" << AIMODELEOF
+Ollama|$HOME/.ollama/models
+Hugging Face (hub)|$HOME/.cache/huggingface/hub
+Hugging Face (datasets)|$HOME/.cache/huggingface/datasets
+LM Studio|$HOME/.lmstudio/models
+LM Studio (legacy)|$HOME/.cache/lm-studio/models
+PyTorch hub|$HOME/.cache/torch/hub
+PyTorch (legacy)|$HOME/.torch
+Keras|$HOME/.keras/models
+Whisper|$HOME/.cache/whisper
+GPT4All|$HOME/Library/Application Support/nomic.ai/GPT4All
+ModelScope|$HOME/.cache/modelscope
+AIMODELEOF
+
+    AI_MODELS_MB=0
+    AI_MODELS_COUNT=0
+
+    if [ "$DRY_RUN" = true ]; then
+        {
+            echo "═══════════════════════════════════════════════════════════"
+            echo "🤖 MODELLI AI SCARICATI — $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "═══════════════════════════════════════════════════════════"
+            echo ""
+            echo "SOLO ANALISI: CleanMac non elimina mai automaticamente i pesi"
+            echo "dei modelli. Sono re-scaricabili, ma il costo è tempo e banda."
+            echo ""
+        } > "$AI_MODELS_FILE"
+
+        while IFS='|' read -r ai_label ai_path; do
+            [ -n "$ai_path" ] || continue
+            [ -d "$ai_path" ] || continue
+            _mb=$(get_dir_size_mb "$ai_path")
+            _mb=${_mb:-0}
+            [ "$_mb" -gt 0 ] || continue
+            AI_MODELS_MB=$(( AI_MODELS_MB + _mb ))
+            AI_MODELS_COUNT=$(( AI_MODELS_COUNT + 1 ))
+            {
+                echo "────────────────────────────────────────"
+                echo "$ai_label: ${_mb} MB"
+                echo "  $ai_path"
+            } >> "$AI_MODELS_FILE"
+            # Singoli file > 1 GB dentro lo store (i pesi veri e propri)
+            find "$ai_path" -type f -size +1024000k 2>/dev/null | head -20 | while IFS= read -r big; do
+                _bmb=$(get_dir_size_mb "$big")
+                echo "    • $(basename "$big") — ${_bmb:-0} MB" >> "$AI_MODELS_FILE"
+            done
+        done < "$AI_MODEL_PATHS_FILE"
+
+        {
+            echo ""
+            echo "═══════════════════════════════════════════════════════════"
+            echo "TOTALE: $AI_MODELS_MB MB in $AI_MODELS_COUNT store"
+            echo "═══════════════════════════════════════════════════════════"
+            echo ""
+            echo "Come recuperare spazio (manuale, reversibile scaricando di nuovo):"
+            echo "  • Ollama:       ollama list  →  ollama rm <modello>"
+            echo "  • Hugging Face: huggingface-cli delete-cache"
+            echo "  • LM Studio:    gestione modelli dall'app"
+        } >> "$AI_MODELS_FILE"
+
+        register_operation "op36" "$AI_MODELS_MB" "ANALYSIS" "Modelli AI scaricati (solo analisi)"
+
+        append_dryrun ""
+        append_dryrun "🤖 MODELLI AI (DRY RUN — SOLA ANALISI)"
+        append_dryrun "────────────────────────────────────────"
+        if [ "$AI_MODELS_COUNT" -eq 0 ]; then
+            append_dryrun "Nessuno store di modelli AI rilevato"
+        else
+            append_dryrun "Store rilevati: $AI_MODELS_COUNT"
+            append_dryrun "Spazio occupato: $AI_MODELS_MB MB"
+            append_dryrun "Dettaglio: $AI_MODELS_FILE"
+            append_dryrun "⚠️  Nessuna eliminazione automatica: scelta dell'utente"
+        fi
+    else
+        if is_operation_enabled "op36"; then
+            while IFS='|' read -r ai_label ai_path; do
+                [ -n "$ai_path" ] || continue
+                [ -d "$ai_path" ] || continue
+                _mb=$(get_dir_size_mb "$ai_path")
+                _mb=${_mb:-0}
+                [ "$_mb" -gt 0 ] || continue
+                AI_MODELS_MB=$(( AI_MODELS_MB + _mb ))
+                AI_MODELS_COUNT=$(( AI_MODELS_COUNT + 1 ))
+            done < "$AI_MODEL_PATHS_FILE"
+            add_to_report "📊 Modelli AI: $AI_MODELS_COUNT store, $AI_MODELS_MB MB (nessuna eliminazione — analisi)"
+        else
+            log "Modelli AI: SALTATO (non selezionato)"
+            add_to_report "⏭️  Analisi modelli AI saltata (non selezionata)"
+        fi
+    fi
+
+    rm -f "$AI_MODEL_PATHS_FILE"
+    log "Modelli AI analizzati: $AI_MODELS_MB MB"
 }
 
 #############################################
